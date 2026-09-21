@@ -1,0 +1,40 @@
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+
+class Usuario(AbstractUser):
+
+    TIPO_DOCUMENTO_CHOICES = (
+        ('CC', 'Cédula de ciudadanía'),
+        ('CE', 'Cédula de extranjería'),
+        ('TI', 'Tarjeta de identidad'),
+        ('RC', 'Registro civil'),
+        ('PA', 'Pasaporte'),
+        ('NU', 'Otro')
+    )
+
+    first_name = models.CharField(max_length=50, verbose_name="Nombre", blank=True)
+    last_name = models.CharField(max_length=50, verbose_name="Apellido", blank=True)
+    
+    Document_Type = models.CharField(
+        max_length=3,
+        choices=TIPO_DOCUMENTO_CHOICES,
+        verbose_name="Tipo de documento",
+        default='CC',
+        blank=True,
+    )
+    Number_Document = models.CharField(
+        max_length=20,
+        unique=True,
+        verbose_name="Número de documento",
+        blank=True,
+        null=True,
+    )
+    Date_of_birth = models.DateField(
+        verbose_name="Fecha de nacimiento",
+        null=True,
+        blank=True,
+    )
+    REQUIRED_FIELDS = ["first_name", "last_name", "Document_Type", "Number_Document", "Date_of_birth"]
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}".strip() or self.username
