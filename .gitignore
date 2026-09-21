@@ -21,7 +21,7 @@ env/
 .venv/
 
 # Static and Media files (if using collectstatic)
-staticfiles/
+
 
 # IDE and System files
 .vscode/
