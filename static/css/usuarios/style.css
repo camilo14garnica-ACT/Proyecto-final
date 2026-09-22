@@ -1,0 +1,101 @@
+:root {
+  --users-background: #f3f4f6;
+  --users-surface: #ffffff;
+  --users-text: #1f2937;
+  --users-muted: #6b7280;
+  --users-border: #d1d5db;
+  --users-primary: #2563eb;
+  --users-primary-hover: #1d4ed8;
+  --users-focus: #93c5fd;
+  --users-radius: 8px;
+  --users-space: 1rem;
+}
+
+.users-module {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--users-text);
+  background-color: var(--users-background);
+  font-family: Arial, sans-serif;
+}
+
+.auth-container {
+  width: min(100% - 2rem, 32rem);
+  margin: 0 auto;
+  padding: 4rem 0;
+}
+
+.auth-card {
+  padding: 2rem;
+  background-color: var(--users-surface);
+  border: 1px solid var(--users-border);
+  border-radius: var(--users-radius);
+  box-sizing: border-box;
+}
+
+.auth-card h1 {
+  margin: 0 0 1.5rem;
+}
+
+.auth-form p {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0 0 var(--users-space);
+}
+
+.auth-form input,
+.auth-form select,
+.auth-form textarea {
+  width: 100%;
+  padding: 0.65rem;
+  border: 1px solid var(--users-border);
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: inherit;
+  background-color: var(--users-surface);
+}
+
+.auth-form input:focus,
+.auth-form select:focus,
+.auth-form textarea:focus {
+  outline: 2px solid var(--users-focus);
+  outline-offset: 1px;
+}
+
+.button {
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.button-primary {
+  color: #ffffff;
+  background-color: var(--users-primary);
+}
+
+.button-primary:hover {
+  background-color: var(--users-primary-hover);
+}
+
+.auth-help {
+  margin: 1.5rem 0 0;
+  color: var(--users-muted);
+}
+
+.auth-help a {
+  color: var(--users-primary);
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    width: min(100% - 1rem, 32rem);
+    padding: 1rem 0;
+  }
+
+  .auth-card {
+    padding: 1.25rem;
+  }
+}

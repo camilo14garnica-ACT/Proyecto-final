@@ -1,27 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "usuarios/base.html" %} {% block title %}Crear usuario{% endblock %}
+{% block content %}
+<section class="auth-card" aria-labelledby="create-user-title">
+  <h1 id="create-user-title">Crear usuario</h1>
 
+  <form method="post" class="auth-form">
+    {% csrf_token %} {{ form.as_p }}
 
-    <title>Crear Usuario</title>
-</head>
-<body>
-
-    <h1>Crear Usuarios</h1>
-
-    <form method='POST'>       
-
-        {% csrf_token %}      
-
-        {{form.as_p}}          
-
-        <button type="submit">
-            Crear Usuario
-        </button>
-    
-    </form>
-    
-</body>
-</html>
+    <button type="submit" class="button button-primary">Crear usuario</button>
+  </form>
+</section>
+{% endblock %}
