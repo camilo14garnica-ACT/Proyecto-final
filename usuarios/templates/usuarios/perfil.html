@@ -1,0 +1,21 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Mi perfil{% endblock %}
+
+{% block usuarios_content %}
+  <section class="auth-card" aria-labelledby="perfil-title">
+    <h1 id="perfil-title">Mi perfil</h1>
+
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <button type="submit" class="button button-primary">Guardar cambios</button>
+    </form>
+
+    <p class="auth-help">
+      ¿Quieres cambiar tu contraseña?
+      <a href="{% url 'cambiar_password' %}">Cambiar contraseña</a>
+    </p>
+  </section>
+{% endblock usuarios_content %}
