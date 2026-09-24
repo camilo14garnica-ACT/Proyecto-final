@@ -1,0 +1,15 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'css/usuarios/style.css' %}" />
+    <title>{% block title %}Usuarios{% endblock %}</title>
+  </head>
+  <body class="users-module">
+    <main class="auth-container">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
