@@ -1,0 +1,8 @@
+{% extends "usuarios/base_panel.html" %}
+
+{% block title %}Panel de Veterinario{% endblock %}
+
+{% block panel_content %}
+    <h1>Panel de Veterinario</h1>
+    <p>Bienvenido, Dr(a). {{ user.first_name }}</p>
+{% endblock panel_content %}

@@ -1,0 +1,13 @@
+{% extends "usuarios/base.html" %}
+
+{% block usuarios_content %}
+
+    <h1> Bienvenido a la veterinaria </h1>
+
+    {% if user.is_authenticated %}
+        <p> hola, {{ user.first_name}} </p>
+    {% else %}
+        <p>Por favor <a href="{% url 'login' %}">inicia sesión</a> o <a href="{% url 'crear_usuario' %}">regístrate</a></p>
+    {% endif %}
+
+{% endblock usuarios_content %}

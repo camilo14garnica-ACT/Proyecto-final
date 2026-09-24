@@ -12,4 +12,5 @@ urlpatterns = [
         ),
         name='iniciar_sesion',
     ),
+    path('perfil/', views.mi_perfil, name='mi_perfil'),
 ]

@@ -46,5 +46,18 @@ class CrearUsuarioForm(forms.ModelForm):
         return cleaned_data
 
 
+class EditarPerfilForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields =[
+            'first_name',
+            'last_name',
+            'email',
+            'Document_type',
+            'Number_document',
+            'Date_of_birth',
+        ]
+    
+
 
     
