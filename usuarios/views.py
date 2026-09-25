@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 
 from .decorators import solo_admin, solo_veterinario, solo_veterianrio
@@ -35,24 +36,22 @@ def crear_usuario(request):
 
 # Inicio de sesión (redirige según el rol del usuario)
 def iniciar_sesion(request):
-    error = None
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        usuario = authenticate(request, username=username, password=password)
-
-        if usuario is not None:
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            usuario = form.get_user()
             login(request, usuario)
+
             if usuario.rol == 'ADMIN':
                 return redirect('panel_admin')
             elif usuario.rol == 'VETERINARIO':
                 return redirect('panel_veterinario')
             else:
                 return redirect('inicio')
-        else:
-            error = 'Usuario o contraseña incorrecta'
+    else:
+        form = AuthenticationForm()
 
-    return render(request, 'usuarios/iniciar_sesion.html', {'error': error})
+    return render(request, 'usuarios/iniciar_sesion.html', {'form': form})
 
 
 # Cerrar sesión

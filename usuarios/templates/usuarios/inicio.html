@@ -7,7 +7,7 @@
     {% if user.is_authenticated %}
         <p> hola, {{ user.first_name}} </p>
     {% else %}
-        <p>Por favor <a href="{% url 'login' %}">inicia sesión</a> o <a href="{% url 'crear_usuario' %}">regístrate</a></p>
+        <p>Hola, {{user.first_name}}</p>
     {% endif %}
 
 {% endblock usuarios_content %}
