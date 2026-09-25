@@ -1,13 +1,14 @@
-{% extends "usuarios/base.html" %}
-
-{% block title %}Iniciar sesión{% endblock %}
-
 {% block usuarios_content%}
   <section class="auth-card" aria-labelledby="login-title">
     <h1 id="login-title">Iniciar sesión</h1>
 
     <form method="post" class="auth-form">
       {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <p class="text-danger">{{ form.non_field_errors }}</p>
+      {% endif %}
+
       {{ form.as_p }}
 
       {% if next %}
@@ -19,9 +20,14 @@
       </button>
     </form>
 
+    <p class="auth-help"> 
+      <a href="{% url "password_reset" %}">¿Olvidaste tu contraseña?</a>
+    </p>
+
     <p class="auth-help">
       ¿Todavía no tienes una cuenta?
       <a href="{% url 'crear_usuario' %}">Crear usuario</a>
     </p>
+
   </section>
 {% endblock usuarios_content%}

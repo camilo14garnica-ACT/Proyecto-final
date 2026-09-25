@@ -56,11 +56,11 @@ class Usuario(AbstractUser):
     def es_veterinario(self):
         return self.rol == self.Rol.VETERINARIO
     
-    def es_cliente(sefl):
-        return sefl.rol == sefl.Rol.CLIENTE
+    def es_cliente(self):
+        return self.rol == self.Rol.CLIENTE
     
     def es_admin(self):
         return self.rol == self.Rol.ADMIN
     
     def __str__(self):
-        return f"{self.first_name} {self-self.last_name}".strip() or self.username
+        return f"{self.first_name} {self.last_name}".strip() or self.username

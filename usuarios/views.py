@@ -4,6 +4,11 @@ from .forms import CrearUsuarioForm
 from .decorators import solo_admin, solo_veterianrio
 from django.contrib.auth.decorators import login_required
 from .forms import CrearUsuarioForm, EditarPerfilForm
+from django.contrib.auth.forms import AuthenticationForm
+
+
+def inicio(request):
+    return render(request, 'usuarios/inicio.html')
 
 
 # Creamos nuestra vista
@@ -46,29 +51,32 @@ def crear_usuario(request):
 
 
 #Inicio de sesion (todos entran por aqui, luego se redirige el rol)
-def iniciar_sesion(reuqest):
-    if reuqest.method == 'POST':
-        username = reuqest.POST.get('username')
-        password = reuqest.POST.get('password')
-        usuario = authenticate(reuqest, username=username, password=password)
-        
-        if usuario is not None:
-            login(reuqest, usuario)
-            
+from django.contrib.auth.forms import AuthenticationForm
+
+
+def iniciar_sesion(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+
+        if form.is_valid():
+            usuario = form.get_user()
+            login(request, usuario)
+
             if usuario.rol == 'ADMIN':
                 return redirect('panel_admin')
-            if usuario.rol == 'VETERINARIO':
+            elif usuario.rol == 'VETERINARIO':
                 return redirect('panel_veterinario')
             else:
-                return render(reuqest, 'usuarios/iniciar_sesion.html'), {
-                    'error': 'Usuario o contraseña incorrecta'
-                }
-    return render(reuqest, 'usuarios/iniciar_sesion.html')
+                return redirect('inicio')
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'usuarios/iniciar_sesion.html', {'form': form})
 
 
 #CERRAR SESION 
 
-def cerrar_secion(request):
+def cerrar_sesion(request):
     logout(request)
     return redirect('inicio')
 
@@ -76,7 +84,7 @@ def cerrar_secion(request):
 #PANEL DE ADMINISTRADOR (PROTEGIDO)
 @solo_admin
 def panel_admin(request):
-    return render(request, 'usuario/panel_admin.html')
+    return render(request, 'usuarios/panel_admin.html')
 
 #PANEL DEL VETERINARIO 
 

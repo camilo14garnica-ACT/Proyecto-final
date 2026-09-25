@@ -49,12 +49,12 @@ class CrearUsuarioForm(forms.ModelForm):
 class EditarPerfilForm(forms.ModelForm):
     class Meta:
         model = Usuario
-        fields =[
+        fields = [
             'first_name',
             'last_name',
             'email',
-            'Document_type',
-            'Number_document',
+            'Document_Type',
+            'Number_Document',
             'Date_of_birth',
         ]
     
