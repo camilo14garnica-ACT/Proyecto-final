@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'usuarios',
+    'mascotas',
 ]
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
@@ -79,9 +80,9 @@ DATABASES = {
     # 1. Base de datos LOCAL (Por defecto)
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'inventario_local_db',
+        'NAME': 'veterinaria_local_db',
         'USER': 'postgres',
-        'PASSWORD': 'tu_password_local',
+        'PASSWORD': config('DB_LOCAL_PASSWORD'),
         'HOST': 'localhost', # Corre en esta misma computadora
         'PORT': '5432',
     },
@@ -90,11 +91,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'neondb',
         'USER': 'neondb_owner',
-        'PASSWORD': 'tu_password_secreto', # ¡Nunca subas esta clave a GitHub!
-        'HOST': 'ep-shiny-sound-123456.us-east-2.aws.neon.tech',
+        'PASSWORD': config('DB_REMOTA_PASSWORD'),  #No subir esta clave a git hub NUNCA!
+        'HOST': 'ep-calm-sea-b7si43eq-pooler.c-13.us-east-1.aws.neon.tech',
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require', # Obligatorio para conexiones seguras en la nube
+            'connect_timeout': 5
         }
     }
 }
