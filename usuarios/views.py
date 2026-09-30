@@ -5,6 +5,27 @@ from .decorators import solo_admin, solo_veterianrio
 from django.contrib.auth.decorators import login_required
 from .forms import CrearUsuarioForm, EditarPerfilForm
 from django.contrib.auth.forms import AuthenticationForm
+from usuarios.models import Usuario
+
+#Trae los productos de la base de datos LOCAL
+usuarios_locales = Usuario.objects.all()
+
+#Trae los usuarios de la base de datos REMOTA en la nube
+usuarios_nube = Usuario.objects.using('remota').all()
+
+#Generar un usuario directamente en la nube
+nuevo_usuario = Usuario(
+    username="ana123",
+    first_name="Ana",
+    last_name="Pérez",
+    email="ana@correo.com",
+    rol="CLIENTE",
+    Document_Type="CC",          # pon un valor que exista en tus opciones
+    Number_Document="1234567890",
+    Date_of_birth="1995-05-20",
+)
+nuevo_usuario.set_password("ClaveSegura123") # Guarda la contraseña cifrada
+nuevo_usuario.save(using='remota')
 
 
 def inicio(request):

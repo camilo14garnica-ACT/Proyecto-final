@@ -50,8 +50,6 @@ class Usuario(AbstractUser):
         blank=True,
     )
     REQUIRED_FIELDS = ["first_name", "last_name", "Document_Type", "Number_Document", "Date_of_birth"]
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}".strip() or self.username
     
     def es_veterinario(self):
         return self.rol == self.Rol.VETERINARIO
@@ -64,3 +62,7 @@ class Usuario(AbstractUser):
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}".strip() or self.username
+
+
+   
+sincronizado = models.BooleanField(default=False)
