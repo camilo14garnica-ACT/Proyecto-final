@@ -1,0 +1,15 @@
+{% extends base_html %}
+
+{% block content %}
+<h1> Registrar especie </h1>
+
+{% for mensaje in mensaje %}
+    <p>{{mensaje}}</p>
+{% endfor %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type="submit"> Guardar</button>
+</form>
+{% endblock %}

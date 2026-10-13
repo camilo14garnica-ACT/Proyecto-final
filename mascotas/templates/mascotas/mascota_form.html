@@ -1,0 +1,25 @@
+{% extends "partials/base-user.html" %}
+
+{% block content %}
+<h1>Registrar mascota</h1>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type="submit">Guardar mascota</button>
+    <a hrrf="{% url "lista_mascotas" %}">Cancelar</a>
+</form>
+
+<scripts>
+    const especie = documet.getElementById('id_especie'):
+    const raza = documet.getElementById('id_raza'):
+    const plantillaUrl = "{% url "razas_por_especie" 0 %}";
+
+    especie.addEventlistener('change', async () => {
+        raza.innerHTML = <option value="">Sin raza definidas</option>;
+        const respuesta = await respuesta.json();
+        datos.razas.forEach(r => raza.add(new option(r.nombre, r.id)));
+    });
+</scripts>
+
+{% endblock  %}
