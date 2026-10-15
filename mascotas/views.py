@@ -9,6 +9,12 @@ from .forms import EspecieForm, MascotaForm
 from .permisos import es_personal, solo_admin
 from django.views.decorators.http import require_http_methods
 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+
+
 def mascotas_visible(usuario):
     mascotas = Mascota.objects.select_related('Cliente', 'especie', 'raza')
     if es_personal(usuario):
@@ -99,14 +105,102 @@ def razas_por_especie(request, especie_id):
     return JsonResponse({'razas': [{'id': r.id, 'nombre': r.nombre} for r in razas]})
 
 
-
+#CRUD hecho en FBV borrar despues de crear CRUD con CBV 
 @solo_admin
 def crear_especie(request):
     form = EspecieForm(request.POST or  None)
     if request.method == 'POST' and form.is_valid():
         messages.success(request, 'Especie registrada correctamente.')
         return redirect('crear_especie')
-    return render(request, 'mascota/especie_form.html', {'form': form})
+    return render(request, 'mascota/registrar_especie.html', {'form': form})
 
 
+#PERMISOS PARA EL CRUD DE ESPECIES
+class PersonalAutorizadoMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.rol in ['ADMIN', 'VETERINARIO']
+    
+    def handle_no_permission(self):
+        if not self.request.user.is_aunthenticated:
+            return super().handle_no_permission()
+        
+        messages.error(
+            self.request,
+            'No tienes permisos para gestionar especies'
+        )
+        return redirect('inicio')
+    
+
+# VISTA PARA LISTAR ESPECIES
+class ListarEspecieView(PersonalAutorizadoMixin, ListView):
+    model = Especie
+    template_name = 'especies/lista_especies.html'
+    context_object_name = 'especies'
+    ordering = ['nombre']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Gestión de especies'
+        return context
+
+
+# VISTA PARA CREAR ESPECIES
+class CrearEspecieView(PersonalAutorizadoMixin, CreateView):
+    model = Especie
+    form_class = EspecieForm
+    template_name = 'especies/especie_form.html'
+    success_url = reverse_lazy('lista_especies')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Registrar especie'
+        return context
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Especie registrada correctamente.'
+        )
+        return super().form_valid(form)
+
+
+# VISTA PARA EDITAR ESPECIES
+class EditarEspecieView(PersonalAutorizadoMixin, UpdateView):
+    model = Especie
+    form_class = EspecieForm
+    template_name = 'especies/especie_form.html'
+    success_url = reverse_lazy('lista_especies')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Editar especie'
+        return context
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Especie actualizada correctamente.'
+        )
+        return super().form_valid(form)
+
+
+# VISTA PARA ELIMINAR ESPECIES
+class EliminarEspeciesView(PersonalAutorizadoMixin, DeleteView):
+    model = Especie
+    template_name = 'especies/confirmar_eliminacion_especie.html'
+    context_object_name = 'especie'
+    success_url = reverse_lazy('lista_especies')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Eliminar especie'
+        return context
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Especie eliminada correctamente.'
+        )
+        return super().form_valid(form)
+    
 # Create your views here.
