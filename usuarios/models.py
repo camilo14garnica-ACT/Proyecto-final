@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import identify_hasher, is_password_usable
 from django.conf import settings
 
 
@@ -62,6 +63,22 @@ class Usuario(AbstractUser):
     
     def es_admin(self):
         return self.rol == self.Rol.ADMIN
+
+    def save(self, *args, **kwargs):
+        # Sincronizar roles y permisos administrativos
+        if self.is_superuser and self.rol != self.Rol.ADMIN:
+            self.rol = self.Rol.ADMIN
+        if self.rol == self.Rol.ADMIN and not self.is_staff:
+            self.is_staff = True
+
+        # Asegurar que la contraseña siempre se guarde cifrada usando el hasher por defecto de Django
+        if self.password and is_password_usable(self.password):
+            try:
+                identify_hasher(self.password)
+            except ValueError:
+                self.set_password(self.password)
+
+        super().save(*args, **kwargs)
 
 
 class Mascota(models.Model):
