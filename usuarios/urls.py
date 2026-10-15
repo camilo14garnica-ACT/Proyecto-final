@@ -62,4 +62,12 @@ urlpatterns = [
         ),
         name='password_reset_complete',
     ),
+
+    # CRUD administrativo de usuarios
+    path('administracion/usuarios/', views.listar_usuarios, name='lista_usuarios'),
+    path('administracion/usuarios/editar/<int:pk>/', views.editar_usuario, name='editar_usuario'),
+    path('administracion/usuarios/eliminar/<int:pk>/', views.eliminar_usuario, name='eliminar_usuario'),
+
+    # Solicitar eliminar cuenta propia
+    path('perfil/confirmar-eliminacion/', views.confirmar_eliminacion_cuenta, name='confirmar_eliminacion_cuenta'),
 ]

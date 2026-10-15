@@ -1,0 +1,61 @@
+{% extends 'partials/base-user.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="card shadow mx-auto" style="max-width: 600px;">
+
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Eliminar mi cuenta</h4>
+        </div>
+
+        <div class="card-body p-4">
+
+            <p class="fs-5">
+                Hola, <strong>{{ request.user.username }}</strong>.
+            </p>
+
+            <p>
+                ¿Estás seguro de que deseas eliminar definitivamente
+                tu cuenta de Mascott?
+            </p>
+
+            <div class="alert alert-warning">
+                <strong>Advertencia:</strong>
+
+                Al eliminar tu cuenta, también se eliminarán las mascotas
+                asociadas a ella.
+
+                Esta acción no se puede deshacer.
+            </div>
+
+            <form method="POST"
+                  action="{% url 'solicitar_eliminacion_cuenta' %}">
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="confirmar_eliminacion"
+                    value="SI"
+                >
+
+                <button type="submit" class="btn btn-danger">
+                    Sí, eliminar mi cuenta
+                </button>
+
+                <a href="{% url 'mi_perfil' %}"
+                   class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock content %}

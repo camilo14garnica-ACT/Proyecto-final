@@ -1,0 +1,17 @@
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        ¿Estás seguro de que deseas eliminar la especie
+        <strong>{{ especie.nombre }}</strong>?
+    </p>
+
+    <button type="submit" class="btn btn-danger">
+        Sí, eliminar
+    </button>
+
+    <a href="{% url 'lista_especies' %}"
+       class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>

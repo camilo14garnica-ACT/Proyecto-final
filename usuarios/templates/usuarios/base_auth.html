@@ -1,0 +1,18 @@
+{% extends "usuarios/base.html" %}
+
+{% block nav %}{% endblock nav %}
+{% block header %}{% endblock header %}
+{% block footer %}{% endblock footer %}
+
+{% block content %}
+    <div class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
+        <div class="card shadow-sm w-100" style="max-width: 480px;">
+            <div class="card-body p-4">
+            <a href="{% url "inicio" %}" class="d-block text-center mb-3 fw-bold text-decoration-none">
+                Veterinaria Mascott
+            </a>
+            {% block auth_content %}{% endblock auth_content %}
+            </div>
+        </div>
+    </dv>
+{% endblock content %}

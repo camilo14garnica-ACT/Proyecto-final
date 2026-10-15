@@ -1,10 +1,13 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_http_methods, require_POST
 
 from .decorators import solo_admin, solo_veterinario, solo_veterianrio
-from .forms import CrearUsuarioForm, EditarPerfilForm
+from .forms import CrearUsuarioForm, EditarPerfilForm, EditarUsuarioForm
+from .models import Usuario
 
 
 # Vista de página de inicio pública
@@ -70,6 +73,20 @@ def panel_admin(request):
     return render(request, 'usuarios/panel_admin.html')
 
 
+# Listar usuarios para el Administrador
+@solo_admin
+def listar_usuarios(request):
+    usuarios = Usuario.objects.all().order_by(
+        'last_name',
+        'first_name'
+    )
+    return render(
+        request,
+        'usuarios/lista_usuarios.html',
+        {'usuarios': usuarios}
+    )
+
+
 # Panel del Veterinario (Protegido con redirección a inicio)
 @solo_veterinario
 def panel_veterinario(request):
@@ -88,3 +105,88 @@ def mi_perfil(request):
         form = EditarPerfilForm(instance=request.user)
 
     return render(request, 'usuarios/perfil.html', {'form': form})
+
+
+# Eliminación de usuarios desde el panel administrativo
+@solo_admin
+@require_http_methods(["GET", "POST"])
+def eliminar_usuario(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+
+    # Evitar que el administrador elimine su propia cuenta
+    if usuario.pk == request.user.pk:
+        messages.error(
+            request,
+            'No puedes eliminar tu propia cuenta desde este módulo.'
+        )
+        return redirect('lista_usuarios')
+
+    # Eliminar únicamente cuando se confirme mediante POST
+    if request.method == 'POST':
+        username = usuario.username
+        usuario.delete()
+
+        messages.success(
+            request,
+            f'El usuario {username} fue eliminado correctamente.'
+        )
+        return redirect('lista_usuarios')
+
+    # Mostrar la pantalla de confirmación administrativa
+    return render(
+        request,
+        'usuarios/confirmar_eliminacion.html',
+        {'usuario': usuario}
+    )
+
+
+# Editar usuarios desde el panel administrativo
+@solo_admin
+def editar_usuario(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+
+    if request.method == 'POST':
+        form = EditarUsuarioForm(
+            request.POST,
+            instance=usuario
+        )
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                'Usuario actualizado correctamente.'
+            )
+            return redirect('lista_usuarios')
+    else:
+        form = EditarUsuarioForm(instance=usuario)
+
+    return render(
+        request,
+        'usuarios/editar_usuario.html',
+        {
+            'form': form,
+            'usuario': usuario
+        }
+    )
+
+
+# Eliminación de cuenta propia de cliente
+@login_required
+@require_http_methods(["GET", "POST"])
+def confirmar_eliminacion_cuenta(request, pk=None):
+    usuario = request.user
+    if request.method == 'POST':
+        username = usuario.username
+        logout(request)
+        usuario.delete()
+        messages.success(
+            request,
+            f'Tu cuenta ({username}) ha sido eliminada con éxito.'
+        )
+        return redirect('inicio')
+
+    return render(
+        request,
+        'usuarios/confirmar_eliminacion_cuenta.html',
+        {'usuario': usuario}
+    )

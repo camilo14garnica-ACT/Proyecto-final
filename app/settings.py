@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'usuarios',
+    'mascotas',
 ]
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
@@ -77,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'mascotas.context_processors.plantilla_base'
             ],
         },
     },
@@ -96,7 +98,7 @@ if USE_POSTGRES:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.getenv('DB_NAME', 'veterinaria_db'),
             'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', os.getenv('DB_LOCAL_PASSWORD', 'postgres')),
             'HOST': os.getenv('DB_HOST', 'localhost'),
             'PORT': os.getenv('DB_PORT', '5432'),
         }
@@ -109,6 +111,23 @@ else:
         }
     }
 
+# Base de datos REMOTA (Neon.tech en la nube si está configurada en .env)
+db_remota_pwd = os.getenv('DB_REMOTA_PASSWORD')
+if db_remota_pwd:
+    DATABASES['remota'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_REMOTA_NAME', 'neondb'),
+        'USER': os.getenv('DB_REMOTA_USER', 'neondb_owner'),
+        'PASSWORD': db_remota_pwd,
+        'HOST': os.getenv('DB_REMOTA_HOST', 'ep-calm-sea-b7si43eq-pooler.c-13.us-east-1.aws.neon.tech'),
+        'PORT': os.getenv('DB_REMOTA_PORT', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require',
+            'connect_timeout': 5
+        }
+    }
+
+DATABASE_ROUTERS = ['app.ruoters.EnrutadorDobleBase']
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -156,8 +175,10 @@ MEDIA_ROOT =BASE_DIR / "media"
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'webmaster@localhost'

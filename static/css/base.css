@@ -1,0 +1,24 @@
+/* Colores de la marca: Boostrap los toma de aqui*/
+
+:root {
+    --bs-primary: #156c0;
+    --bs-primary-rgb: 21, 101, 192;
+    --bs-link-color: #1565c0;
+    --bs-link-color-rgb: 21, 101, 192;
+    --bs-link-hover-color: #0d47a1;
+    --bs-body-font-family: 'Inter', system-ui, sans-serif;
+    --mascott-azul-oscuro: #0d47a1;
+    --mascott-azul-claro: #e3f2fd;
+}
+
+-btn-primary {
+    --bs-btn-bg: #1565c0;
+    -bs-btn-border-color: #1565c0;
+    --bs-btn-hover-bg: #0d47a1;
+    --bs-btn-hover-border-color: #0d47a1;
+    --bs-btn-active-bg: #0d47a1;
+    --bs-btn-active-border-color: #0d47a1;   
+}
+
+.bg-mascott-oscuro { background-color: var(--mascott-azul-claro);}
+.bg-mascott-calro { background-color: var(--mascott-azul-claro);}

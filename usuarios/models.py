@@ -1,4 +1,7 @@
+import uuid
+
 from django.db import models
+from django.db import router, transaction
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import identify_hasher, is_password_usable
 from django.conf import settings
@@ -52,9 +55,7 @@ class Usuario(AbstractUser):
         blank=True,
     )
     REQUIRED_FIELDS = ["first_name", "last_name", "Document_Type", "Number_Document", "Date_of_birth"]
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}".strip() or self.username
-    
+
     def es_veterinario(self):
         return self.rol == self.Rol.VETERINARIO
     
@@ -78,7 +79,9 @@ class Usuario(AbstractUser):
             except ValueError:
                 self.set_password(self.password)
 
-        super().save(*args, **kwargs)
+        using = kwargs.get('using') or router.db_for_write(type(self), instance=self)
+        with transaction.atomic(using=using):
+            return super().save(*args, **kwargs)
 
 
 class Mascota(models.Model):
@@ -86,7 +89,7 @@ class Mascota(models.Model):
     propietario = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
-        related_name='mascotas',
+        related_name='mascotas_usuarios',
         limit_choices_to={'rol': 'CLIENTE'},
         verbose_name="Dueño"
     )
@@ -129,7 +132,7 @@ class HistorialMedico(models.Model):
     veterinario = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.SET_NULL, 
-        null=True,
+        null=True, 
         limit_choices_to={'rol': 'VETERINARIO'},
         verbose_name="Atendido por"
     )
@@ -140,3 +143,50 @@ class HistorialMedico(models.Model):
 
     def __str__(self):
         return f"Historial {self.mascota.nombre} - {self.fecha}"
+
+
+class UsuarioSyncPendiente(models.Model):
+    class Operacion(models.TextChoices):
+        GUARDAR = 'guardar', 'Guardar'
+        ELIMINAR = 'eliminar', 'Eliminar'
+
+    sync_uuid = models.UUIDField(unique=True)
+    operacion = models.CharField(
+        max_length=10,
+        choices=Operacion.choices,
+        default=Operacion.GUARDAR,
+    )
+    intentos = models.PositiveIntegerField(default=0)
+    reintentar_despues = models.DateTimeField(null=True, blank=True)
+    ultimo_error = models.TextField(blank=True)
+    revision = models.PositiveBigIntegerField(default=1)
+    creado = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('creado',)
+
+    def __str__(self):
+        return f"Sync {self.sync_uuid} ({self.operacion})"
+
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Usuario)
+def encolar_usuario_guardado(sender, instance, **kwargs):
+    pendiente, created = UsuarioSyncPendiente.objects.get_or_create(
+        sync_uuid=instance.sync_uuid,
+        defaults={'operacion': UsuarioSyncPendiente.Operacion.GUARDAR}
+    )
+    if not created:
+        pendiente.revision += 1
+        pendiente.operacion = UsuarioSyncPendiente.Operacion.GUARDAR
+        pendiente.save()
+
+@receiver(post_delete, sender=Usuario)
+def encolar_usuario_eliminado(sender, instance, **kwargs):
+    UsuarioSyncPendiente.objects.update_or_create(
+        sync_uuid=instance.sync_uuid,
+        defaults={'operacion': UsuarioSyncPendiente.Operacion.ELIMINAR}
+    )

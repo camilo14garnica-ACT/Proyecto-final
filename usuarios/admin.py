@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Usuario, Mascota, Cita, HistorialMedico
+from .models import Usuario, Mascota, Cita, HistorialMedico, UsuarioSyncPendiente
+
 
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'rol', 'is_staff')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'rol', 'is_staff', 'is_active')
     list_filter = ('rol', 'is_staff', 'is_superuser', 'is_active')
     fieldsets = UserAdmin.fieldsets + (
         ('Información adicional', {
@@ -17,11 +18,13 @@ class UsuarioAdmin(UserAdmin):
         }),
     )
 
+
 @admin.register(Mascota)
 class MascotaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'especie', 'raza', 'propietario', 'peso', 'fecha_nacimiento')
     search_fields = ('nombre', 'propietario__username', 'propietario__first_name', 'propietario__last_name')
     list_filter = ('especie',)
+
 
 @admin.register(Cita)
 class CitaAdmin(admin.ModelAdmin):
@@ -29,9 +32,15 @@ class CitaAdmin(admin.ModelAdmin):
     list_filter = ('estado', 'fecha_hora')
     search_fields = ('mascota__nombre', 'veterinario__username', 'motivo')
 
+
 @admin.register(HistorialMedico)
 class HistorialMedicoAdmin(admin.ModelAdmin):
     list_display = ('mascota', 'veterinario', 'fecha')
     search_fields = ('mascota__nombre', 'diagnostico')
     list_filter = ('fecha',)
 
+
+@admin.register(UsuarioSyncPendiente)
+class UsuarioSyncPendienteAdmin(admin.ModelAdmin):
+    list_display = ('sync_uuid', 'operacion', 'intentos', 'creado', 'actualizado')
+    list_filter = ('operacion',)
