@@ -1,36 +1,59 @@
-<!-- MENU DE NAVEGACION -->
-
-<!-- MENU DE NAVEGACION -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<!-- MENU DE NAVEGACION VETERINARIA MASCOTT -->
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'inicio' %}">Veterinaria Mascott</a>
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'inicio' %}">
+            <img src="{% static 'usuarios/img/logo mascott.png' %}" alt="Logo Mascott" width="34" height="34" class="d-inline-block align-text-top rounded-circle me-2 border">
+            <span class="fw-bold text-primary">Veterinaria Mascott</span>
+        </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'inicio' %}">Inicio</a>
+                    <a class="nav-link fw-semibold" href="{% url 'inicio' %}">Inicio</a>
                 </li>
 
                 {% if user.is_authenticated %}
+                    {% if user.rol == 'ADMIN' %}
+                        <li class="nav-item">
+                            <a class="nav-link text-danger fw-semibold" href="{% url 'panel_admin' %}">
+                                <i class="bi bi-gear-fill me-1"></i> Panel Admin
+                            </a>
+                        </li>
+                    {% elif user.rol == 'VETERINARIO' %}
+                        <li class="nav-item">
+                            <a class="nav-link text-info fw-semibold" href="{% url 'panel_veterinario' %}">
+                                <i class="bi bi-hospital me-1"></i> Panel Médico
+                            </a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'mi_perfil' %}">Mi perfil</a>
+                        <a class="nav-link fw-semibold" href="{% url 'mi_perfil' %}">
+                            <i class="bi bi-person-circle me-1"></i> {{ user.first_name|default:user.username }}
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-sm btn-outline-danger px-3 rounded-pill fw-semibold" href="{% url 'cerrar_sesion' %}">
+                            Cerrar sesión
+                        </a>
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+                        <a class="nav-link fw-semibold" href="{% url 'iniciar_sesion' %}">
+                            Iniciar sesión
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'crear_usuario' %}">Registrarme</a>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-sm btn-primary px-3 rounded-pill fw-semibold" href="{% url 'crear_usuario' %}">
+                            Registrarme
+                        </a>
                     </li>
                 {% endif %}
             </ul>
         </div>
     </div>
-</nav>
+</nav>

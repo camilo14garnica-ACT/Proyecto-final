@@ -1,36 +1,49 @@
-<!-- BARRA LATERAL -->
+<!-- BARRA LATERAL VETERINARIA MASCOTT -->
 
-<aside class="sidebar p-4 bg-light rounded shadow-sm">
-    <!-- Widget 1: Clima -->
-    <div class="card mb-4 shadow-sm">
+<aside class="sidebar p-3 p-md-4 bg-light rounded shadow-sm">
+    <!-- Widget 1: Horarios y Urgencias -->
+    <div class="card mb-4 border-0 shadow-sm">
         <div class="card-body">
-            <h5 class="card-title text-success fw-bold">☀️ Clima en el Llano</h5>
-            <p class="card-text mb-1">Temperatura actual: <strong>29°C</strong></p>
-            <p class="text-muted small">Época de verano ideal para sabanear, cabalgatas y avistamiento de fauna.</p>
+            <h5 class="card-title text-primary fw-bold">
+                <i class="bi bi-clock-history me-1"></i> Horarios de Atención
+            </h5>
+            <p class="card-text mb-1"><strong>Lunes a Sábado:</strong> 8:00 AM - 7:00 PM</p>
+            <p class="text-danger small fw-semibold mb-0">
+                <i class="bi bi-exclamation-octagon-fill me-1"></i> Urgencias 24 Horas disponibles para perros y gatos.
+            </p>
         </div>
     </div>
 
-    <!-- Widget 2: Destacado del mes -->
-    <div class="card mb-4 shadow-sm">
+    <!-- Widget 2: Especialidades en Mascott -->
+    <div class="card mb-4 border-0 shadow-sm">
         <div class="card-body">
-            <h5 class="card-title text-warning fw-bold">🐆 Destacado del Mes</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Safari Fotográfico en Vichada</h6>
-            <p class="card-text small">Adéntrate en la sabana inundable y descubre chigüires, toninas y la majestuosidad del Tuparro.</p>
-            <a href="#" class="btn btn-sm btn-outline-success">Ver Experiencia</a>
+            <h5 class="card-title text-success fw-bold">
+                <i class="bi bi-shield-plus me-1"></i> Especialidades
+            </h5>
+            <ul class="list-unstyled small mb-3">
+                <li class="mb-1"><i class="bi bi-check2-circle text-success me-1"></i> <strong>Laboratorio propio</strong> (resultados rápidos)</li>
+                <li class="mb-1"><i class="bi bi-check2-circle text-success me-1"></i> <strong>Rayos X y Ecografía</strong></li>
+                <li class="mb-1"><i class="bi bi-check2-circle text-success me-1"></i> <strong>Cirugía y quirófano estéril</strong></li>
+                <li class="mb-1"><i class="bi bi-check2-circle text-success me-1"></i> <strong>Hospitalización monitoreada</strong></li>
+            </ul>
+            <a href="{% url 'crear_usuario' %}" class="btn btn-sm btn-outline-success w-100 fw-semibold">
+                Registrar a mi mascota
+            </a>
         </div>
     </div>
 
-    <!-- Widget 3: Newsletter -->
-    <div class="card shadow-sm bg-success text-white">
+    <!-- Widget 3: Ubicación y Contacto -->
+    <div class="card border-0 shadow-sm bg-primary text-white">
         <div class="card-body">
-            <h5 class="card-title fw-bold">🗺️ Guías Exclusivas</h5>
-            <p class="card-text small">Suscríbete y recibe rutas secretas y tips para viajar por los Llanos Orientales.</p>
-            <form>
-                <div class="mb-2">
-                    <input type="email" class="form-control form-control-sm" placeholder="Tu correo electrónico">
-                </div>
-                <button type="submit" class="btn btn-warning btn-sm w-100 fw-bold text-dark">Suscribirme</button>
-            </form>
+            <h5 class="card-title fw-bold">
+                <i class="bi bi-geo-alt-fill me-1"></i> Sogamoso, Boyacá
+            </h5>
+            <p class="card-text small mb-3">
+                30 años brindando atención ética y cálida a las familias de Sogamoso y alrededores.
+            </p>
+            <div class="bg-white bg-opacity-10 p-2 rounded small text-white">
+                <i class="bi bi-telephone-fill me-1"></i> Línea de atención y citas
+            </div>
         </div>
     </div>
-</aside>
+</aside>

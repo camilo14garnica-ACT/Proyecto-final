@@ -1,156 +1,157 @@
 {% extends "usuarios/base.html" %}
+{% load static %}
 
-{% block title %}Inicio - Veterinaria Mascott{% endblock %}
+{% block title %}Clinica Veterinaria Mascott | Sogamoso, Boyacá{% endblock %}
+
+{% block meta_description %}30 años cuidando perros y gatos en Sogamoso. Laboratorio propio, rayos X, ecografía, cirugía y hospitalización.{% endblock %}
 
 {% block usuarios_content %}
 
-    <!-- Tarjeta Principal de Bienvenida -->
+    <!-- Tarjeta Principal de Bienvenida - Clínica Veterinaria Mascott -->
     <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);">
         <div class="card-body p-4 p-md-5">
             <div class="row align-items-center">
                 <div class="col-lg-8">
-                    {% if user.is_authenticated %}
-                        <span class="badge bg-success text-white px-3 py-2 rounded-pill mb-3">
-                            <i class="bi bi-patch-check-fill me-1"></i> Sesión iniciada
+                    <div class="d-flex align-items-center mb-3 flex-wrap gap-2">
+                        <span class="badge bg-primary text-white px-3 py-2 rounded-pill">
+                            <i class="bi bi-geo-alt-fill me-1"></i> Sogamoso, Boyacá
                         </span>
-                        <h1 class="display-6 fw-bold text-dark mb-2">
-                            ¡Hola, {{ user.first_name|default:user.username }}! 🐾
-                        </h1>
-                        <p class="lead text-secondary mb-4">
-                            Bienvenido a tu panel en <strong>Veterinaria Mascott</strong>. Aquí puedes consultar información, gestionar tu perfil y acceder a nuestros servicios médicos.
-                        </p>
-                        <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-success text-white px-3 py-2 rounded-pill">
+                            <i class="bi bi-patch-check-fill me-1"></i> 30 años de experiencia
+                        </span>
+                    </div>
+
+                    <h1 class="display-6 fw-bold text-dark mb-3">
+                        Bienvenido a la Clínica Veterinaria Mascott 🐾
+                    </h1>
+
+                    <p class="lead text-secondary mb-4">
+                        30 años cuidando perros y gatos en Sogamoso. Contamos con <strong>laboratorio propio, rayos X, ecografía, cirugía y hospitalización</strong> permanente para la salud y tranquilidad de tu familia.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if user.is_authenticated %}
                             <a href="{% url 'mi_perfil' %}" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
                                 <i class="bi bi-person-circle me-1"></i> Ver Mi Perfil
                             </a>
-                            <a href="{% url 'logout' %}" class="btn btn-outline-secondary px-3 py-2 rounded-pill fw-semibold">
+                            <a href="{% url 'cerrar_sesion' %}" class="btn btn-outline-secondary px-3 py-2 rounded-pill fw-semibold">
                                 <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
                             </a>
-                        </div>
-                    {% else %}
-                        <span class="badge bg-primary text-white px-3 py-2 rounded-pill mb-3">
-                            <i class="bi bi-heart-pulse-fill me-1"></i> Cuidado y Pasión Animal
-                        </span>
-                        <h1 class="display-6 fw-bold text-dark mb-2">
-                            Bienvenido a Veterinaria Mascott 🐾
-                        </h1>
-                        <p class="lead text-secondary mb-4">
-                            Cuidamos la salud, el bienestar y la felicidad de tus mejores amigos con tecnología avanzada y profesionales certificados.
-                        </p>
-                        <div class="d-flex flex-wrap gap-2">
+                        {% else %}
                             <a href="{% url 'crear_usuario' %}" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
                                 <i class="bi bi-person-plus-fill me-1"></i> Registrarme Gratis
                             </a>
-                            <a href="{% url 'login' %}" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-semibold">
+                            <a href="{% url 'iniciar_sesion' %}" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-semibold">
                                 <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
                             </a>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
+
                 <div class="col-lg-4 text-center d-none d-lg-block">
-                    <div class="p-3 bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 130px; height: 130px;">
-                        <i class="bi bi-shield-heart text-primary display-3"></i>
+                    <div class="p-3 bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                        <img src="{% static 'usuarios/img/logo mascott.png' %}" alt="Logo Mascott" class="img-fluid" style="max-height: 110px; max-width: 110px; object-fit: contain;">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Aviso / Estado del Servicio -->
+    <!-- Banner de Compromiso y Urgencias -->
     <div class="alert alert-light border shadow-sm rounded-3 d-flex align-items-center mb-4 py-3 px-3">
-        <i class="bi bi-info-circle-fill text-primary fs-3 me-3 flex-shrink-0"></i>
+        <i class="bi bi-shield-heart-fill text-danger fs-2 me-3 flex-shrink-0"></i>
         <div class="small">
-            <strong>Horario habitual:</strong> Lunes a Sábado de 8:00 AM a 7:00 PM. 
+            <strong>Atención médica integral en Sogamoso:</strong> Consulta general, diagnósticos avanzados y atención de urgencias para caninos y felinos.
             <span class="d-block d-sm-inline text-muted mt-1 mt-sm-0">
-                — Servicio de urgencias médicas disponible 24 horas al día.
+                — Comprometidos con el bienestar y la longevidad de tu mascota.
             </span>
         </div>
     </div>
 
-    <!-- Sección de Servicios Médicos Responsiva -->
+    <!-- Servicios Oficiales de la Clínica Mascott -->
     <div class="mb-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
-                <h3 class="fw-bold mb-1">Servicios Veterinarios</h3>
-                <p class="text-muted small mb-0">Atención integral preventiva, curativa y estética para tu mascota.</p>
+                <h3 class="fw-bold mb-1">Nuestros Servicios Médicos</h3>
+                <p class="text-muted small mb-0">Infraestructura diagnóstica y quirúrgica completa en Sogamoso.</p>
             </div>
             <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill d-none d-sm-inline-block">
-                Especialidades
+                Tecnología y Cuidado
             </span>
         </div>
 
         <div class="row g-3 g-md-4">
-            <!-- Servicio 1: Consulta Médica -->
+            <!-- 1. Laboratorio Propio -->
+            <div class="col-12 col-sm-6">
+                <div class="card h-100 border-0 shadow-sm hover-card p-3">
+                    <div class="card-body d-flex flex-column p-2">
+                        <div class="service-icon-box bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-droplet-half"></i>
+                        </div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary align-self-start mb-2 px-2 py-1 rounded">Diagnóstico Rápido</span>
+                        <h5 class="card-title fw-bold text-dark">Laboratorio Propio</h5>
+                        <p class="card-text text-secondary small flex-grow-1">
+                            Análisis clínicos inmediatos, hematología completa, uroanálisis y bioquímica sanguínea para diagnósticos oportunos y sin esperas.
+                        </p>
+                        <div class="mt-2 text-primary small fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i> Resultados en tiempo récord
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Rayos X y Ecografía -->
+            <div class="col-12 col-sm-6">
+                <div class="card h-100 border-0 shadow-sm hover-card p-3">
+                    <div class="card-body d-flex flex-column p-2">
+                        <div class="service-icon-box bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-cpu"></i>
+                        </div>
+                        <span class="badge bg-info bg-opacity-10 text-info align-self-start mb-2 px-2 py-1 rounded">Imagenología</span>
+                        <h5 class="card-title fw-bold text-dark">Rayos X y Ecografía</h5>
+                        <p class="card-text text-secondary small flex-grow-1">
+                            Equipos digitales de alta definición para exploración torácica, abdominal y traumatológica sin estrés para tu perro o gato.
+                        </p>
+                        <div class="mt-2 text-info small fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i> Imágenes de alta resolución
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Cirugía Especializada -->
             <div class="col-12 col-sm-6">
                 <div class="card h-100 border-0 shadow-sm hover-card p-3">
                     <div class="card-body d-flex flex-column p-2">
                         <div class="service-icon-box bg-danger bg-opacity-10 text-danger">
                             <i class="bi bi-heart-pulse-fill"></i>
                         </div>
-                        <span class="badge bg-danger bg-opacity-10 text-danger align-self-start mb-2 px-2 py-1 rounded">Medicina General</span>
-                        <h5 class="card-title fw-bold text-dark">Consulta Médica</h5>
+                        <span class="badge bg-danger bg-opacity-10 text-danger align-self-start mb-2 px-2 py-1 rounded">Quirófano Estéril</span>
+                        <h5 class="card-title fw-bold text-dark">Cirugía y Procedimientos</h5>
                         <p class="card-text text-secondary small flex-grow-1">
-                            Diagnóstico oportuno, valoración clínica completa, control de crecimiento y atención personalizada según especie y edad.
+                            Intervenciones de tejidos blandos, cirugías preventivas y ortopédicas con monitoreo anestésico continuo y protocolos seguros.
                         </p>
-                        <div class="mt-2 text-primary small fw-semibold">
-                            <i class="bi bi-arrow-right-circle me-1"></i> Chequeos preventivos
+                        <div class="mt-2 text-danger small fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i> Protocolos quirúrgicos estrictos
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Servicio 2: Vacunación -->
+            <!-- 4. Hospitalización y Cuidados -->
             <div class="col-12 col-sm-6">
                 <div class="card h-100 border-0 shadow-sm hover-card p-3">
                     <div class="card-body d-flex flex-column p-2">
                         <div class="service-icon-box bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <span class="badge bg-success bg-opacity-10 text-success align-self-start mb-2 px-2 py-1 rounded">Prevención</span>
-                        <h5 class="card-title fw-bold text-dark">Vacunas y Desparasitación</h5>
-                        <p class="card-text text-secondary small flex-grow-1">
-                            Esquemas completos de inmunización para cachorros y adultos, carnet digital y protección frente a parásitos internos y externos.
-                        </p>
-                        <div class="mt-2 text-success small fw-semibold">
-                            <i class="bi bi-arrow-right-circle me-1"></i> Esquemas al día
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Servicio 3: Peluquería -->
-            <div class="col-12 col-sm-6">
-                <div class="card h-100 border-0 shadow-sm hover-card p-3">
-                    <div class="card-body d-flex flex-column p-2">
-                        <div class="service-icon-box bg-info bg-opacity-10 text-info">
-                            <i class="bi bi-scissors"></i>
-                        </div>
-                        <span class="badge bg-info bg-opacity-10 text-info align-self-start mb-2 px-2 py-1 rounded">Estética y Spa</span>
-                        <h5 class="card-title fw-bold text-dark">Peluquería y Baños</h5>
-                        <p class="card-text text-secondary small flex-grow-1">
-                            Baños medicados e hidratantes, cortes de pelo según estándar de raza, limpieza de oídos y corte higiénico de uñas.
-                        </p>
-                        <div class="mt-2 text-info small fw-semibold">
-                            <i class="bi bi-arrow-right-circle me-1"></i> Cuidado e higiene
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Servicio 4: Quirófano y Urgencias -->
-            <div class="col-12 col-sm-6">
-                <div class="card h-100 border-0 shadow-sm hover-card p-3">
-                    <div class="card-body d-flex flex-column p-2">
-                        <div class="service-icon-box bg-warning bg-opacity-10 text-warning">
                             <i class="bi bi-hospital-fill"></i>
                         </div>
-                        <span class="badge bg-warning bg-opacity-10 text-warning align-self-start mb-2 px-2 py-1 rounded">24/7 Disponible</span>
-                        <h5 class="card-title fw-bold text-dark">Cirugía y Urgencias</h5>
+                        <span class="badge bg-success bg-opacity-10 text-success align-self-start mb-2 px-2 py-1 rounded">Atención Continua</span>
+                        <h5 class="card-title fw-bold text-dark">Hospitalización</h5>
                         <p class="card-text text-secondary small flex-grow-1">
-                            Quirófano estéril equipado con monitoreo anestésico multiparamétrico y guardia veterinaria permanente para atender imprevistos.
+                            Áreas acondicionadas y separadas para perros y gatos, fluidoterapia computarizada y supervisión veterinaria constante.
                         </p>
-                        <div class="mt-2 text-warning small fw-semibold">
-                            <i class="bi bi-arrow-right-circle me-1"></i> Atención prioritaria
+                        <div class="mt-2 text-success small fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i> Monitoreo permanente
                         </div>
                     </div>
                 </div>
@@ -158,45 +159,45 @@
         </div>
     </div>
 
-    <!-- Indicadores de Confianza / Estadísticas Rápidas -->
+    <!-- Indicadores de Trayectoria en Sogamoso -->
     <div class="card border-0 bg-white shadow-sm rounded-4 p-3 p-md-4 mb-4">
         <div class="row g-3 text-center">
             <div class="col-6 col-md-3">
                 <div class="p-2 border-end">
-                    <i class="bi bi-heart-fill text-danger fs-3 mb-1 d-block"></i>
-                    <h4 class="fw-bold text-dark mb-0">+1,500</h4>
-                    <span class="text-muted small">Mascotas atendidas</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-2 border-end">
                     <i class="bi bi-award-fill text-primary fs-3 mb-1 d-block"></i>
-                    <h4 class="fw-bold text-dark mb-0">10+</h4>
-                    <span class="text-muted small">Años de experiencia</span>
+                    <h4 class="fw-bold text-dark mb-0">30</h4>
+                    <span class="text-muted small">Años en Sogamoso</span>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="p-2 border-end">
-                    <i class="bi bi-clock-fill text-success fs-3 mb-1 d-block"></i>
+                    <i class="bi bi-shield-check text-success fs-3 mb-1 d-block"></i>
+                    <h4 class="fw-bold text-dark mb-0">100%</h4>
+                    <span class="text-muted small">Equipos propios</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-2 border-end">
+                    <i class="bi bi-hospital text-danger fs-3 mb-1 d-block"></i>
                     <h4 class="fw-bold text-dark mb-0">24/7</h4>
-                    <span class="text-muted small">Urgencias médicas</span>
+                    <span class="text-muted small">Hospitalización</span>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="p-2">
-                    <i class="bi bi-star-fill text-warning fs-3 mb-1 d-block"></i>
-                    <h4 class="fw-bold text-dark mb-0">4.9 ★</h4>
-                    <span class="text-muted small">Calificación media</span>
+                    <i class="bi bi-heart-fill text-warning fs-3 mb-1 d-block"></i>
+                    <h4 class="fw-bold text-dark mb-0">Perros y Gatos</h4>
+                    <span class="text-muted small">Atención especializada</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Llamado a la Acción (CTA) Final -->
-    <div class="card border-0 rounded-4 text-white p-4 p-md-5 text-center shadow-sm" style="background: linear-gradient(135deg, #0d6efd 0%, #0d9488 100%);">
-        <h3 class="fw-bold mb-2">¿Tu mascota necesita chequeo o atención médica?</h3>
-        <p class="text-white-50 mb-4 mx-auto" style="max-width: 540px;">
-            En Veterinaria Mascott te garantizamos un trato cálido, responsable y profesional para el integrante más querido de tu hogar.
+    <div class="card border-0 rounded-4 text-white p-4 p-md-5 text-center shadow-sm" style="background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);">
+        <h3 class="fw-bold mb-2">¿Tu mascota necesita atención o chequeo médico?</h3>
+        <p class="text-white-50 mb-4 mx-auto" style="max-width: 580px;">
+            En la Clínica Veterinaria Mascott de Sogamoso ponemos 30 años de experiencia y tecnología diagnóstica de vanguardia al cuidado de tus seres queridos.
         </p>
         <div class="d-flex justify-content-center gap-2 flex-wrap">
             {% if user.is_authenticated %}
@@ -207,7 +208,7 @@
                 <a href="{% url 'crear_usuario' %}" class="btn btn-warning text-dark fw-bold px-4 py-2 rounded-pill shadow-sm">
                     <i class="bi bi-person-plus-fill me-1"></i> Registrarme Ahora
                 </a>
-                <a href="{% url 'login' %}" class="btn btn-outline-light fw-bold px-4 py-2 rounded-pill">
+                <a href="{% url 'iniciar_sesion' %}" class="btn btn-outline-light fw-bold px-4 py-2 rounded-pill">
                     <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
                 </a>
             {% endif %}
