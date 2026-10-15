@@ -6,61 +6,186 @@ from .permisos import es_personal
 
 
 class EspecieForm(forms.ModelForm):
-    class   Meta:
+
+    class Meta:
         model = Especie
-        fields = ['nombre', 'descripcion']
-    
+
+        fields = [
+            'nombre',
+            'descripcion',
+            'estado',
+        ]
+
+        labels = {
+            'nombre': 'Nombre de la especie',
+            'descripcion': 'Descripción',
+            'estado': 'Estado de la especie',
+        }
+
+        widgets = {
+            'nombre': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Ej. Canino',
+                }
+            ),
+
+            'descripcion': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'rows': 3,
+                    'placeholder': 'Describe la especie',
+                }
+            ),
+
+            'estado': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+        }
+
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre de la especie es obligatorio.',
+            },
+            'estado': {
+                'required': 'Debes seleccionar un estado.',
+            },
+        }
+
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre'].strip()
-        repetida = Especie.objects.filter(nombre__iexact=nombre).exclude(pk=self.instance.pk)
+
+        repetida = Especie.objects.filter(
+            nombre__iexact=nombre
+        ).exclude(
+            pk=self.instance.pk
+        )
+
         if repetida.exists():
-            raise forms.ValidationError('Ya existe una especie con ese nombre')
+            raise forms.ValidationError(
+                'Ya existe una especie con ese nombre.'
+            )
+
         return nombre
-        
+      
     
     
     
 class MascotaForm(forms.ModelForm):
+
     class Meta:
         model = Mascota
-        fields = ['Cliente', 'nombre', 'especie', 'raza', 'sexo',
-                  'fecha_nacimiento', 'edad_aproximada_meses', 'peso_kg',
-                  'color', 'esterilizado', 'microchip', 'observaciones']
-        widgets = {
-            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
-            'observaciones': forms.Textarea(attrs={'rows': 3}),
+
+        fields = [
+            'Cliente',
+            'nombre',
+            'especie',
+            'raza',
+            'sexo',
+            'fecha_nacimiento',
+            'edad_aproximada_meses',
+            'peso_kg',
+            'color',
+            'esterilizado',
+            'microchip',
+            'observaciones',
+        ]
+
+        labels = {
+            'Cliente': 'Propietario',
+            'nombre': 'Nombre de la mascota',
+            'especie': 'Especie',
+            'raza': 'Raza',
+            'sexo': 'Sexo',
+            'fecha_nacimiento': 'Fecha de nacimiento',
+            'edad_aproximada_meses': 'Edad aproximada (meses)',
+            'peso_kg': 'Peso (kg)',
+            'color': 'Color',
+            'esterilizado': 'Esterilización',
+            'microchip': 'Número de microchip',
+            'observaciones': 'Observaciones',
         }
-        
-    def __init__(self, *args, usuario=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        # Solo especie activas
-        self.fields['especie'].queryset = Especie.objects.filter(estado='ACTIVO')
-        
-        #Razas : solo las activas de la especie elegida 
-        especie_id = self.data.get('especie') or self.initial.get('especie')
-        razas = Raza.objects.filter(estado='ACTIVO')
-        if especie_id and str(especie_id).isdigit():
-            razas = razas.filter(especie_id=especie_id)
-        else:
-            razas = razas.none()
-        self.fields['raza'].queryset = razas
-        self.fields['raza'].empty_label = 'Sin raza definida'
-        
-        
-        # Dueño: el cliente no lo ve; el persomal escoge entre los clientes activos
-        
-        if usuario and es_personal(usuario):
-            self.fields['Cliente'].queryset = get_user_model().objects.filter(
-                rol='CLIENTE', is_active=True
-            )
-        else:
-            del self.fields['Cliente']
-        
-    def clean(self):
-        datos = super().clean()
-        if not datos.get('fecha_nacimiento') and datos.get ('edad_aproximada_meses') is None:
-            self.add_error('edad_aproximada_meses',
-                           'Escriba la fecha de nacimiento o la edad aproximada en meses.')
-        return datos
-        
+
+        widgets = {
+            'Cliente': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+
+            'nombre': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+
+            'especie': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+
+            'raza': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+
+            'sexo': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+
+            'fecha_nacimiento': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={
+                    'class': 'form-control',
+                    'type': 'date',
+                }
+            ),
+
+            'edad_aproximada_meses': forms.NumberInput(
+                attrs={'class': 'form-control'}
+            ),
+
+            'peso_kg': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                }
+            ),
+
+            'color': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+
+            'esterilizado': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Ej. Sí, No o Pendiente',
+                }
+            ),
+
+            'microchip': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+
+            'observaciones': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'rows': 3,
+                }
+            ),
+        }
+
+        error_messages = {
+            'Cliente': {
+                'required': 'Debes seleccionar un propietario.',
+            },
+            'nombre': {
+                'required': 'El nombre de la mascota es obligatorio.',
+            },
+            'especie': {
+                'required': 'Debes seleccionar una especie.',
+            },
+            'sexo': {
+                'required': 'Debes seleccionar el sexo de la mascota.',
+            },
+            'fecha_nacimiento': {
+                'invalid': 'Introduce una fecha válida.',
+            },
+            'peso_kg': {
+                'invalid': 'Introduce un peso válido.',
+            },
+        }

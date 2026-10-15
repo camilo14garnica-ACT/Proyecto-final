@@ -1,21 +1,28 @@
-{% extends "usuarios/base.html" %}
+{% extends "usuarios/base.html" %} {% block title %}Mi perfil{% endblock %} {%
+{%block content %}
+<section class="auth-card" aria-labelledby="perfil-title">
+  <h1 id="perfil-title">Mi perfil</h1>
 
-{% block title %}Mi perfil{% endblock %}
+  <form method="post" class="auth-form">
+    {% csrf_token %} {{ form.as_p }}
 
-{% block usuarios_content %}
-  <section class="auth-card" aria-labelledby="perfil-title">
-    <h1 id="perfil-title">Mi perfil</h1>
+    <button type="submit" class="button button-primary">Guardar cambios</button>
+  </form>
 
-    <form method="post" class="auth-form">
-      {% csrf_token %}
-      {{ form.as_p }}
+  <p class="auth-help">
+    ¿Quieres cambiar tu contraseña?
+    <a href="{% url 'cambiar_password' %}">Cambiar contraseña</a>
+  </p>
+</section>
 
-      <button type="submit" class="button button-primary">Guardar cambios</button>
-    </form>
+<!-- BOTON PARA ELIMINAR LA CUENTA PROPIA-->
+ <div class="mt-4">
+  <a href="{% url "confirmar_eliminacion_cuenta" %}"
+    class="btn btn-danger">
+    <i class="bi bi-trash"> </i>
+    Eliminar mi cuenta
+ </a>
+ </div>
+ 
+{% endblock content %}
 
-    <p class="auth-help">
-      ¿Quieres cambiar tu contraseña?
-      <a href="{% url 'cambiar_password' %}">Cambiar contraseña</a>
-    </p>
-  </section>
-{% endblock usuarios_content %}
