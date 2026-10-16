@@ -59,6 +59,13 @@ from django.contrib.auth.forms import AuthenticationForm
 
 
 def iniciar_sesion(request):
+    if request.user.is_authenticated:
+        if request.user.rol == 'ADMIN':
+            return redirect('panel_admin')
+        elif request.user.rol == 'VETERINARIO':
+            return redirect('panel_veterinario')
+        return redirect('inicio')
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
 

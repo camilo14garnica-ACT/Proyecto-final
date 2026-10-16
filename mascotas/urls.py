@@ -14,7 +14,7 @@ urlpatterns = [
     
     #Crud de especies
     path('especies/', views.ListarEspecieView.as_view(), name='lista_especies'),
-    path('especies/crear/', views.CrearEspecieView.as_view(), name='crear_especie'),
+    path('especies/crear/', views.CrearEspecieView.as_view(), name='especie_form'),
     path('especies/editar/<int:pk>/', views.EditarEspecieView.as_view(), name='editar_especie'),
     path('especies/eliminar/<int:pk>/', views.EliminarEspeciesView.as_view(), name='eliminar_especie')
 ]

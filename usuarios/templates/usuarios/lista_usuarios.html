@@ -1,123 +1,135 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'partials/base-admin.html' %}
 
-    <title>Gestión de usuarios | Mascott</title>
+{% load static %}
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-</head>
+{% block extra_css %}
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css">
+{% endblock extra_css %}
 
-<body class="bg-light">
+{% block title %}Gestión de usuarios | Mascott{% endblock %}
 
-    <div class="container py-5">
+{% block content %}
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
             <h1 class="h3">Gestión de usuarios</h1>
-
-            <a href="{% url 'panel_admin' %}"
-               class="btn btn-secondary">
-                Volver al panel
-            </a>
+            <p class="text-muted mb-0">
+                Administra los usuarios registrados en Mascott.
+            </p>
         </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+        <a href="{% url 'panel_admin' %}" class="btn btn-secondary">
+            Volver al panel
+        </a>
+    </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
+    <!-- Mensajes de Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                 role="alert">
+                {{ message }}
 
-                <div class="table-responsive">
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Cerrar">
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-                    <table class="table table-striped table-hover align-middle">
+    <!-- Tabla de usuarios -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Usuarios registrados</h5>
+        </div>
 
-                        <thead class="table-dark">
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table id="tablaUsuarios"
+                       class="table table-striped table-hover align-middle w-100">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombres</th>
+                            <th>Apellidos</th>
+                            <th>Correo</th>
+                            <th>Documento</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for usuario in usuarios %}
                             <tr>
-                                <th>Usuario</th>
-                                <th>Nombres</th>
-                                <th>Apellidos</th>
-                                <th>Correo</th>
-                                <th>Documento</th>
-                                <th>Rol</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
+                                <td>{{ usuario.username }}</td>
+                                <td>{{ usuario.first_name }}</td>
+                                <td>{{ usuario.last_name }}</td>
+                                <td>{{ usuario.email }}</td>
+                                <td>{{ usuario.Number_Document }}</td>
+                                <td>{{ usuario.get_rol_display }}</td>
 
-                        <tbody>
+                                <td>
+                                    {% if usuario.is_active %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
 
-                            {% for usuario in usuarios %}
+                                <td>
+                                    <div class="d-flex gap-2">
 
-                                <tr>
-                                    <td>{{ usuario.username }}</td>
-                                    <td>{{ usuario.first_name }}</td>
-                                    <td>{{ usuario.last_name }}</td>
-                                    <td>{{ usuario.email }}</td>
-                                    <td>{{ usuario.Number_Document }}</td>
-                                    <td>{{ usuario.rol }}</td>
+                                        <a href="{% url 'editar_usuario' usuario.pk %}"
+                                           class="btn btn-primary btn-sm">
+                                            Editar
+                                        </a>
+                                        
+                                        <form method="post"
+                                            action="{% url 'eliminar_usuario' usuario.pk %}"
+                                            class="form-eliminar-usuario"
+                                            data-usuario="{{ usuario.username }}">
 
-                                    <td>
-                                        {% if usuario.is_active %}
-                                            <span class="badge bg-success">
-                                                Activo
-                                            </span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">
-                                                Inactivo
-                                            </span>
-                                        {% endif %}
-                                    </td>
+                                            {% csrf_token %}
 
-                                    <td>
-                                        <div class="d-flex gap-2">
-
-                                            <a
-                                                href="{% url 'editar_usuario' usuario.pk %}"
-                                                class="btn btn-primary btn-sm"
-                                            >
-                                                Editar
-                                            </a>
-
-                                            <a
-                                                href="{% url 'eliminar_usuario' usuario.pk %}"
-                                                class="btn btn-danger btn-sm"
-                                            >
+                                            <button type="submit" class="btn btn-danger btn-sm">
                                                 Eliminar
-                                            </a>
+                                            </button>
 
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </form>
 
-                            {% empty %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
 
-                                <tr>
-                                    <td colspan="8" class="text-center">
-                                        No hay usuarios registrados.
-                                    </td>
-                                </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
+                </table>
 
             </div>
         </div>
-
     </div>
 
-</body>
-</html>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+    {{ block.super }}
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="{% static 'js/modulos/usuarios/datatables_usuarios.js' %}"></script>
+{% endblock scripts %}
