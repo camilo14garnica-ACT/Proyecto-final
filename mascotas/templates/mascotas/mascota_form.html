@@ -18,52 +18,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const especie = document.getElementById('id_especie');
-        const raza = document.getElementById('id_raza');
-        const plantillaUrl = "{% url 'razas_por_especie' 0 %}";
-
-        if (especie && raza) {
-            especie.addEventListener('change', async function () {
-                raza.innerHTML = '<option value="">Selecciona una raza</option>';
-
-                if (!especie.value) return;
-
-                try {
-                    const respuesta = await fetch(
-                        plantillaUrl.replace('/0/', `/${especie.value}/`)
-                    );
-
-                    if (!respuesta.ok) throw new Error('No se pudieron cargar las razas.');
-
-                    const datos = await respuesta.json();
-
-                    datos.razas.forEach(function (r) {
-                        raza.add(new Option(r.nombre, r.id));
-                    });
-
-                    if (window.jQuery && jQuery.fn.select2 && jQuery(raza).hasClass('select2-hidden-accessible')) {
-                        jQuery(raza).trigger('change.select2');
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            });
-        }
-
-        if (window.jQuery && jQuery.fn.select2) {
-            jQuery('#id_Cliente, #id_especie, #id_raza').each(function () {
-                if (jQuery(this).length && !jQuery(this).hasClass('select2-hidden-accessible')) {
-                    jQuery(this).select2({
-                        width: '100%',
-                        placeholder: 'Selecciona una opción',
-                        allowClear: true
-                    });
-                }
-            });
-        }
-    });
-</script>
-{% endblock scripts %}
-
+<script src="{% static 'js/modulos/mascotas/crear_mascota.js' %}"></script>
+{% endblock %}

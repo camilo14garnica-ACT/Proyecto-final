@@ -22,3 +22,4 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls')),
     path('mascotas/', include('mascotas.urls')),
 ]
+ 

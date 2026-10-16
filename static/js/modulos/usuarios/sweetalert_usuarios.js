@@ -30,9 +30,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // Permitir el envío cuando el usuario ya confirmó
+        if (formulario.dataset.confirmado === 'true') {
+            return;
+        }
+
         evento.preventDefault();
 
-        const nombreUsuario = formulario.dataset.usuario;
+        const nombreUsuario = formulario.dataset.usuario || 'este usuario';
 
         Swal.fire({
             title: '¿Eliminar usuario?',
@@ -45,7 +50,13 @@ document.addEventListener('DOMContentLoaded', function () {
             cancelButtonText: 'Cancelar'
         }).then(function (resultado) {
             if (resultado.isConfirmed) {
-                formulario.submit();
+                formulario.dataset.confirmado = 'true';
+
+                if (formulario.requestSubmit) {
+                    formulario.requestSubmit();
+                } else {
+                    formulario.submit();
+                }
             }
         });
     });

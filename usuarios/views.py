@@ -136,37 +136,25 @@ def mi_perfil(request):
 #ELIMINACION DE CUENTA PERSONAL
 # ELIMINACIÓN DE USUARIOS DESDE EL PANEL ADMINISTRATIVO
 
+# ELIMINAR USUARIOS DESDE EL PANEL ADMINISTRATIVO
 @solo_admin
-@require_http_methods(["GET", "POST"])
+@require_POST
 def eliminar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
 
-    # Evitar que el administrador elimine su propia cuenta
     if usuario.pk == request.user.pk:
-        messages.error(
-            request,
-            'No puedes eliminar tu propia cuenta desde este módulo.'
-        )
+        messages.error(request, 'No puedes eliminar tu propia cuenta.')
         return redirect('lista_usuarios')
 
-    # Eliminar únicamente cuando se confirme mediante POST
-    if request.method == 'POST':
-        username = usuario.username
-        usuario.delete()
+    username = usuario.username
+    usuario.delete()
 
-        messages.success(
-            request,
-            f'El usuario {username} fue eliminado correctamente.'
-        )
-
-        return redirect('lista_usuarios')
-
-    # Mostrar la pantalla de confirmación administrativa
-    return render(
+    messages.success(
         request,
-        'usuarios/confirmar_eliminacion.html',
-        {'usuario': usuario}
+        f'El usuario {username} fue eliminado correctamente.'
     )
+
+    return redirect('lista_usuarios')
 
 #EDITAR USUARIOS DESDE EL PANEL ADMINISTRATIVO 
 @solo_admin
