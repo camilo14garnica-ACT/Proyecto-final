@@ -54,6 +54,12 @@ class Usuario(AbstractUser):
         null=True,
         blank=True,
     )
+    sync_uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        verbose_name="UUID de sincronización",
+    )
     REQUIRED_FIELDS = ["first_name", "last_name", "Document_Type", "Number_Document", "Date_of_birth"]
 
     def es_veterinario(self):
