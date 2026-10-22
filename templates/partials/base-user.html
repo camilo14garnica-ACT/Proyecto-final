@@ -25,7 +25,20 @@
     {% block header %}{% include 'partials/header.html' %}{% endblock header %}
 
     <main id="contenido" class="flex-grow-1">
-        {% block content %}{% endblock content %}
+        {% block main_container %}
+        <div class="container my-4">
+            <div class="row g-4">
+                <div class="col-12 {% block content_col_class %}col-lg-8{% endblock content_col_class %}">
+                    {% block content %}{% endblock content %}
+                </div>
+                {% block sidebar %}
+                <div class="col-12 col-lg-4">
+                    {% include 'partials/aside.html' %}
+                </div>
+                {% endblock sidebar %}
+            </div>
+        </div>
+        {% endblock main_container %}
     </main>
 
     {% block footer %}{% include 'partials/footer.html' %}{% endblock footer %}

@@ -13,8 +13,6 @@ class Usuario(AbstractUser):
         ADMIN = 'ADMIN', 'Administrador'
         VETERINARIO = 'VETERINARIO', 'Veterinario'
         CLIENTE = 'CLIENTE', 'Cliente'
-        
-        
 
     TIPO_DOCUMENTO_CHOICES = (
         ('CC', 'Cédula de ciudadanía'),
@@ -61,6 +59,10 @@ class Usuario(AbstractUser):
         verbose_name="UUID de sincronización",
     )
     REQUIRED_FIELDS = ["first_name", "last_name", "Document_Type", "Number_Document", "Date_of_birth"]
+
+    def __str__(self):
+        full_name = f"{self.first_name} {self.last_name}".strip()
+        return full_name or self.username
 
     def es_veterinario(self):
         return self.rol == self.Rol.VETERINARIO

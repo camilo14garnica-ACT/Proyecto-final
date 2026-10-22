@@ -17,12 +17,9 @@ class PasswordEncryptionTests(TestCase):
             password='Password123Segura!',
             rol=Usuario.Rol.CLIENTE
         )
-        # La contraseña en base de datos no debe ser el texto plano
         self.assertNotEqual(usuario.password, 'Password123Segura!')
-        # Debe ser identificada por el hasher por defecto (PBKDF2)
         hasher = identify_hasher(usuario.password)
         self.assertEqual(hasher.algorithm, 'pbkdf2_sha256')
-        # check_password debe validar la contraseña correctamente
         self.assertTrue(usuario.check_password('Password123Segura!'))
 
     def test_administrador_createsuperuser_cifra_contrasena(self):
@@ -49,7 +46,6 @@ class PasswordEncryptionTests(TestCase):
             password='ClaveValida987!'
         )
         pwd_hash_inicial = usuario.password
-        # Guardar nuevamente sin cambiar la contraseña
         usuario.first_name = 'Nuevo Nombre'
         usuario.save()
         self.assertEqual(usuario.password, pwd_hash_inicial)
@@ -87,9 +83,7 @@ class SincronizacionUsuarioTests(TestCase):
 
     def test_guardar_usuario_crea_un_pendiente_local(self):
         usuario = self.crear_usuario()
-
         pendiente = UsuarioSyncPendiente.objects.get(sync_uuid=usuario.sync_uuid)
-
         self.assertEqual(pendiente.operacion, UsuarioSyncPendiente.Operacion.GUARDAR)
 
     def test_ediciones_se_consolidan_en_un_pendiente(self):
@@ -107,7 +101,6 @@ class SincronizacionUsuarioTests(TestCase):
     @patch('usuarios.sync.copiar_usuario_a_remota')
     def test_exito_remoto_elimina_el_pendiente(self, copiar_usuario):
         usuario = self.crear_usuario()
-
         resultado = procesar_pendientes()
 
         copiar_usuario.assert_called_once_with(usuario.sync_uuid)
@@ -132,7 +125,6 @@ class SincronizacionUsuarioTests(TestCase):
     @patch('usuarios.sync.copiar_usuario_a_remota', side_effect=OperationalError('sin conexión'))
     def test_error_remoto_conserva_pendiente_y_programa_reintento(self, copiar_usuario):
         usuario = self.crear_usuario()
-
         resultado = procesar_pendientes()
 
         pendiente = UsuarioSyncPendiente.objects.get(sync_uuid=usuario.sync_uuid)

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 import os
 from pathlib import Path
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,14 +21,16 @@ try:
     from dotenv import load_dotenv
     load_dotenv(BASE_DIR / '.env')
 except ImportError:
-    env_path = BASE_DIR / '.env'
-    if env_path.exists():
-        with open(env_path, encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    k, v = line.split('=', 1)
-                    os.environ.setdefault(k.strip(), v.strip().strip("'\""))
+    pass
+
+env_path = BASE_DIR / '.env'
+if env_path.exists():
+    with open(env_path, encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                os.environ.setdefault(k.strip(), v.strip().strip("'\""))
 
 
 # Quick-start development settings - unsuitable for production
@@ -78,7 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'mascotas.context_processors.plantilla_base'
+                'mascotas.context_processors.plantilla_base',
             ],
         },
     },
@@ -123,7 +126,7 @@ if db_remota_pwd:
         'PORT': os.getenv('DB_REMOTA_PORT', '5432'),
         'OPTIONS': {
             'sslmode': 'require',
-            'connect_timeout': 5
+            'connect_timeout': 5,
         }
     }
 
@@ -164,12 +167,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR/ "staticfiles"
-STATICFILES_DIRS =[BASE_DIR/ "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Media
 MEDIA_URL = "/media/"
-MEDIA_ROOT =BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / "media"
 
 
 # Email
