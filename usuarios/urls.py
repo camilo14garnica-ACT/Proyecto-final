@@ -10,10 +10,11 @@ urlpatterns = [
     path('cerrar-sesion/', views.cerrar_sesion, name='cerrar_sesion'),
     path('logout/', views.cerrar_sesion, name='logout'),
     path('perfil/', views.mi_perfil, name='mi_perfil'),
+
     path('panel-admin/', views.panel_admin, name='panel_admin'),
     path('panel-veterinario/', views.panel_veterinario, name='panel_veterinario'),
 
-    # cambiar contraseña estando logueado
+    # Cambiar contraseña estando logueado
     path(
         'perfil/cambiar-password/',
         auth_views.PasswordChangeView.as_view(
@@ -30,7 +31,7 @@ urlpatterns = [
         name='password_change_done',
     ),
 
-    # recuperar contraseña olvidada
+    # Recuperar contraseña olvidada
     path(
         'recuperar-password/',
         auth_views.PasswordResetView.as_view(

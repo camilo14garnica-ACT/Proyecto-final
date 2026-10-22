@@ -29,16 +29,31 @@ def lista_mascotas(request):
 
 @login_required
 def registrar_mascota(request):
-    form = MascotaForm(request.POST or None, usuario=request.user)
-    if request.method == 'POST' and form.is_valid():
-        mascota = form.save(commit=False)
-        if not es_personal(request.user):
-            mascota.Cliente = request.user                          #El cliente siempre es el dueño
-        mascota.save()
-        messages.success(request, 'Mascota registrada correctamente.')
-        return redirect('lista_mascotas')
-    return render(request, 'mascotas/mascota_form.html', {'form': form})
 
+    form = MascotaForm(request.POST or None, usuario=request.user)
+
+    if request.method == 'POST' and form.is_valid():
+
+        mascota = form.save(commit=False)
+
+        # Si es cliente, se asigna como propietario automáticamente.
+        if request.user.rol == 'CLIENTE':
+            mascota.Cliente = request.user
+
+        mascota.save()
+
+        messages.success(
+            request,
+            'Mascota registrada correctamente.'
+        )
+
+        return redirect('lista_mascotas')
+
+    return render(
+        request,
+        'mascotas/mascota_form.html',
+        {'form': form}
+    )
 @login_required
 def editar_mascota(request, pk):
     mascota = get_object_or_404(
@@ -57,7 +72,7 @@ def editar_mascota(request, pk):
         
         #El cliente conserva la propiedad de su mascota
         if not es_personal(request.user):
-            mascota.Client = request.user
+            mascota.Cliente = request.user
         
         mascota.save()
         
@@ -69,7 +84,7 @@ def editar_mascota(request, pk):
         return redirect('lista_mascotas')
     return render(
         request,
-        'mascota/mascota_form.html',
+        'mascotas/mascota_form.html',
         {
             'form': form,
             'titulo': 'Editar mascota'
@@ -83,7 +98,7 @@ def eliminar_mascota(request, pk):
         mascotas_visible(request.user),
         pk=pk
     )
-    if request.methos == 'POST':
+    if request.method == 'POST':
         nombre = mascota.nombre
         mascota.delete()
         
@@ -95,7 +110,7 @@ def eliminar_mascota(request, pk):
         return redirect('lista_mascotas')
     return render(
         request,
-        'mascota/confirmar_eliminacion_mascota.html',
+        'mascotas/confirmar_eliminacion_mascota.html',
         {'mascota': mascota}
     )
 
@@ -105,14 +120,6 @@ def razas_por_especie(request, especie_id):
     return JsonResponse({'razas': [{'id': r.id, 'nombre': r.nombre} for r in razas]})
 
 
-#CRUD hecho en FBV borrar despues de crear CRUD con CBV 
-@solo_admin
-def crear_especie(request):
-    form = EspecieForm(request.POST or  None)
-    if request.method == 'POST' and form.is_valid():
-        messages.success(request, 'Especie registrada correctamente.')
-        return redirect('crear_especie')
-    return render(request, 'mascota/registrar_especie.html', {'form': form})
 
 
 #PERMISOS PARA EL CRUD DE ESPECIES

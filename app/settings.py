@@ -127,7 +127,7 @@ if db_remota_pwd:
         }
     }
 
-DATABASE_ROUTERS = ['app.ruoters.EnrutadorDobleBase']
+DATABASE_ROUTERS = ['app.routers.EnrutadorDobleBase']
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -182,3 +182,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'webmaster@localhost'
+
+LOGIN_URL = '/usuarios/iniciar-sesion/'
+LOGIN_REDIRECT_URL = 'inicio'
+LOGOUT_REDIRECT_URL = 'login'

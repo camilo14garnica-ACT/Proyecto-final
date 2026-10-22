@@ -21,24 +21,25 @@ def crear_usuario(request):
         form = CrearUsuarioForm(request.POST)
         if form.is_valid():
             usuario = form.save(commit=False)
-            usuario.set_password(form.cleaned_data['password'])
             usuario.rol = 'CLIENTE'  # Se asigna el rol CLIENTE por defecto
             usuario.save()
-
             login(request, usuario)  # Inicia sesión automáticamente
             return redirect('inicio')
     else:
         form = CrearUsuarioForm()
 
-    return render(
-        request,
-        'usuarios/crear_usuario.html',
-        {'form': form}
-    )
+    return render(request, 'usuarios/crear_usuario.html', {'form': form})
 
 
 # Inicio de sesión (redirige según el rol del usuario)
 def iniciar_sesion(request):
+    if request.user.is_authenticated:
+        if request.user.rol == 'ADMIN':
+            return redirect('panel_admin')
+        elif request.user.rol == 'VETERINARIO':
+            return redirect('panel_veterinario')
+        return redirect('inicio')
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -76,15 +77,8 @@ def panel_admin(request):
 # Listar usuarios para el Administrador
 @solo_admin
 def listar_usuarios(request):
-    usuarios = Usuario.objects.all().order_by(
-        'last_name',
-        'first_name'
-    )
-    return render(
-        request,
-        'usuarios/lista_usuarios.html',
-        {'usuarios': usuarios}
-    )
+    usuarios = Usuario.objects.all().order_by('last_name', 'first_name')
+    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
 
 
 # Panel del Veterinario (Protegido con redirección a inicio)
@@ -109,35 +103,18 @@ def mi_perfil(request):
 
 # Eliminación de usuarios desde el panel administrativo
 @solo_admin
-@require_http_methods(["GET", "POST"])
+@require_POST
 def eliminar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
 
-    # Evitar que el administrador elimine su propia cuenta
     if usuario.pk == request.user.pk:
-        messages.error(
-            request,
-            'No puedes eliminar tu propia cuenta desde este módulo.'
-        )
+        messages.error(request, 'No puedes eliminar tu propia cuenta.')
         return redirect('lista_usuarios')
 
-    # Eliminar únicamente cuando se confirme mediante POST
-    if request.method == 'POST':
-        username = usuario.username
-        usuario.delete()
-
-        messages.success(
-            request,
-            f'El usuario {username} fue eliminado correctamente.'
-        )
-        return redirect('lista_usuarios')
-
-    # Mostrar la pantalla de confirmación administrativa
-    return render(
-        request,
-        'usuarios/confirmar_eliminacion.html',
-        {'usuario': usuario}
-    )
+    username = usuario.username
+    usuario.delete()
+    messages.success(request, f'El usuario {username} fue eliminado correctamente.')
+    return redirect('lista_usuarios')
 
 
 # Editar usuarios desde el panel administrativo
@@ -146,16 +123,10 @@ def editar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
 
     if request.method == 'POST':
-        form = EditarUsuarioForm(
-            request.POST,
-            instance=usuario
-        )
+        form = EditarUsuarioForm(request.POST, instance=usuario)
         if form.is_valid():
             form.save()
-            messages.success(
-                request,
-                'Usuario actualizado correctamente.'
-            )
+            messages.success(request, 'Usuario actualizado correctamente.')
             return redirect('lista_usuarios')
     else:
         form = EditarUsuarioForm(instance=usuario)
@@ -163,10 +134,7 @@ def editar_usuario(request, pk):
     return render(
         request,
         'usuarios/editar_usuario.html',
-        {
-            'form': form,
-            'usuario': usuario
-        }
+        {'form': form, 'usuario': usuario}
     )
 
 
@@ -179,10 +147,7 @@ def confirmar_eliminacion_cuenta(request, pk=None):
         username = usuario.username
         logout(request)
         usuario.delete()
-        messages.success(
-            request,
-            f'Tu cuenta ({username}) ha sido eliminada con éxito.'
-        )
+        messages.success(request, f'Tu cuenta ({username}) ha sido eliminada con éxito.')
         return redirect('inicio')
 
     return render(
