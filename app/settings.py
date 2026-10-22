@@ -12,7 +12,11 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 import os
 from pathlib import Path
+<<<<<<< HEAD
 from dotenv import load_dotenv
+=======
+from decouple import config
+>>>>>>> 4877cb84795950d378de70a9c5694b3ce7374643
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'usuarios',
+    'mascotas',
 ]
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
@@ -68,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'mascotas.context_processors.plantilla_base'
             ],
         },
     },
@@ -79,6 +85,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+<<<<<<< HEAD
 USE_POSTGRES = os.getenv('USE_POSTGRES', 'True').lower() in ('true', '1', 't')
 
 if USE_POSTGRES:
@@ -97,9 +104,33 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
+=======
+DATABASES = {
+    # 1. Base de datos LOCAL (Por defecto)
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'veterinaria_local_db',
+        'USER': 'postgres',
+        'PASSWORD': config('DB_LOCAL_PASSWORD'),
+        'HOST': 'localhost', # Corre en esta misma computadora
+        'PORT': '5432',
+    },
+    # 2. Base de datos REMOTA (Neon.tech en la nube)
+    'remota': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'neondb',
+        'USER': 'neondb_owner',
+        'PASSWORD': config('DB_REMOTA_PASSWORD'),  #No subir esta clave a git hub NUNCA!
+        'HOST': 'ep-calm-sea-b7si43eq-pooler.c-13.us-east-1.aws.neon.tech',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require', # Obligatorio para conexiones seguras en la nube
+            'connect_timeout': 5
+>>>>>>> 4877cb84795950d378de70a9c5694b3ce7374643
         }
     }
 
+DATABASE_ROUTERS = ['app.ruoters.EnrutadorDobleBase']
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -149,6 +180,23 @@ MEDIA_ROOT =BASE_DIR / "media"
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
     },
+<<<<<<< HEAD
 }
+=======
+}
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+LOGIN_URL = '/usuarios/iniciar-sesion/'
+LOGIN_REDIRECT_URL = 'inicio'
+LOGOUT_REDIRECT_URL = 'login'
+>>>>>>> 4877cb84795950d378de70a9c5694b3ce7374643

@@ -1,35 +1,92 @@
-<!-- MENU DE NAVEGACION -->
-
-<!-- MENU DE NAVEGACION -->
+<!-- MENÚ DE NAVEGACIÓN -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'inicio' %}">Veterinaria Mascott</a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <!-- Logo / nombre de la veterinaria -->
+        <a class="navbar-brand" href="{% url 'inicio' %}">
+            Veterinaria Mascott
+        </a>
+
+        <!-- Botón responsive -->
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Mostrar navegación">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                <!-- Inicio -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'inicio' %}">Inicio</a>
+                    <a class="nav-link" href="{% url 'inicio' %}">
+                        Inicio
+                    </a>
                 </li>
 
-                {% if user.is_authenticated %}
+                {% if request.user.is_authenticated %}
+
+                    <!-- Saludo personalizado -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'mi_perfil' %}">Mi perfil</a>
+                        <span class="nav-link text-primary">
+                            Hola,
+                            {{ request.user.first_name|default:request.user.username }}
+                        </span>
                     </li>
+
+                    <!-- Opciones según el rol -->
+                    {% if request.user.rol == 'ADMIN' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'panel_admin' %}">
+                                Panel administrativo
+                            </a>
+                        </li>
+                    {% elif request.user.rol == 'VETERINARIO' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'panel_veterinario' %}">
+                                Panel veterinario
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <!-- Perfil -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
+                        <a class="nav-link" href="{% url 'mi_perfil' %}">
+                            Mi perfil
+                        </a>
                     </li>
+
+                    <!-- Cerrar sesión -->
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link border-0 bg-transparent">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </li>
+
                 {% else %}
+
+                    <!-- Opciones para visitantes -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+                        <a class="nav-link" href="{% url 'login' %}">
+                            Iniciar sesión
+                        </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'crear_usuario' %}">Registrarme</a>
+                        <a class="nav-link" href="{% url 'crear_usuario' %}">
+                            Registrarme
+                        </a>
                     </li>
+
                 {% endif %}
+
             </ul>
         </div>
     </div>

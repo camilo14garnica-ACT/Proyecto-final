@@ -1,21 +1,77 @@
-{% extends "usuarios/base.html" %}
+{% extends 'usuarios/base.html' %}
+{% load static %}
 
-{% block title %}Mi perfil{% endblock %}
+{% block title %}Mi perfil | Mascott{% endblock %}
 
-{% block usuarios_content %}
-  <section class="auth-card" aria-labelledby="perfil-title">
+{% block extra_css %}
+    {{ block.super }}
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-container .select2-selection--single {
+            min-height: 38px;
+            padding: 4px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+        }
+    </style>
+{% endblock extra_css %}
+
+{% block content %}
+
+<section class="auth-card" aria-labelledby="perfil-title">
+
     <h1 id="perfil-title">Mi perfil</h1>
 
     <form method="post" class="auth-form">
-      {% csrf_token %}
-      {{ form.as_p }}
+        {% csrf_token %}
 
-      <button type="submit" class="button button-primary">Guardar cambios</button>
+        {{ form.as_p }}
+
+        <button type="submit" class="button button-primary">
+            Guardar cambios
+        </button>
     </form>
 
     <p class="auth-help">
-      ¿Quieres cambiar tu contraseña?
-      <a href="{% url 'cambiar_password' %}">Cambiar contraseña</a>
+        ¿Quieres cambiar tu contraseña?
+        <a href="{% url 'cambiar_password' %}">
+            Cambiar contraseña
+        </a>
     </p>
-  </section>
-{% endblock usuarios_content %}
+
+</section>
+
+<!-- BOTÓN PARA ELIMINAR LA CUENTA PROPIA -->
+<div class="mt-4">
+
+    <a href="{% url 'confirmar_eliminacion_cuenta' %}"
+       class="btn btn-danger">
+
+        <i class="bi bi-trash"></i>
+        Eliminar mi cuenta
+
+    </a>
+
+</div>
+
+{% endblock content %}
+
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="{% static 'js/modulos/usuarios/select2_usuarios.js' %}"></script>
+{% endblock extra_js %}

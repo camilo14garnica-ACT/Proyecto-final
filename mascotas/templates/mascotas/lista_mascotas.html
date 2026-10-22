@@ -1,0 +1,21 @@
+{% extends "partials/base-user.html" %}
+
+{% block content %}
+<h1> {% if es_personal %}Mascotas registrdas {% else %}Mis mascotas{% endif %} </h1>
+
+{% for mensaje in mensaje %}
+    <p>{{ mensaje }}</p>
+{% endfor %}
+
+<a href="{% url "registrar_mascota" %}">+ Registrar mascota </a>
+
+<ul> 
+    {% for m in mensaje %}
+    <li> 
+        {{m.nombre}} - {{m.especie}} ({{m.raza|default:":Sin raza"}}) {% if es_personal %} - Dueño: {{m.Cliente}}{% endif %}</li>
+    {%empty%}
+        <li> Aun no hay mascotas registradas. </li>
+    {% endfor %}
+</ul>
+ 
+{% endblock %}

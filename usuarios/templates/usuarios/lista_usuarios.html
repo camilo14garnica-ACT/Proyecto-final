@@ -1,0 +1,84 @@
+{% extends 'partials/base-admin.html' %}
+{% load static %}
+
+{% block title %}Gestión de usuarios | Mascott{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3">Gestión de usuarios</h1>
+            <p class="text-muted mb-0">Administra los usuarios registrados en Mascott.</p>
+        </div>
+        <a href="{% url 'panel_admin' %}" class="btn btn-secondary">Volver al panel</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mensaje-django d-none" data-tipo="{{ message.tags }}" data-mensaje="{{ message|escape }}"></div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Usuarios registrados</h5>
+        </div>
+        <div class="card-body table-responsive">
+            <table id="tablaUsuarios" class="table table-striped table-hover align-middle w-100">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                        <th>Documento</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ usuario.username }}</td>
+                            <td>{{ usuario.first_name }}</td>
+                            <td>{{ usuario.last_name }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td>{{ usuario.Number_Document }}</td>
+                            <td>{{ usuario.get_rol_display }}</td>
+                            <td>
+                                {% if usuario.is_active %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'editar_usuario' usuario.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                                    <form method="post" action="{% url 'eliminar_usuario' usuario.pk %}" class="form-eliminar-usuario" data-usuario="{{ usuario.username }}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">No hay usuarios registrados.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/modulos/usuarios/datatables_usuarios.js' %}"></script>
+{% endblock %}

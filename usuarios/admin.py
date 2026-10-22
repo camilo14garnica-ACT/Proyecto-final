@@ -35,3 +35,27 @@ class HistorialMedicoAdmin(admin.ModelAdmin):
     search_fields = ('mascota__nombre', 'diagnostico')
     list_filter = ('fecha',)
 
+<<<<<<< HEAD
+=======
+
+
+
+@admin.register(Usuario)
+class UsuarioAdmin(UserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'rol', 'is_active')
+    list_filter = ('rol', 'is_active')
+    
+    fieldsets = UserAdmin.fieldsets + (
+        ('Rol y datos personales', {
+            'fields' :( 'rol', 'Document_Type', 'Number_Document', 'Date_of_birth'),
+        }),
+    )
+    
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Rol y datos', {
+            'fields': ('rol', 'email', 'first_name', 'last_name',)
+        }),
+    )
+    
+    
+>>>>>>> 4877cb84795950d378de70a9c5694b3ce7374643

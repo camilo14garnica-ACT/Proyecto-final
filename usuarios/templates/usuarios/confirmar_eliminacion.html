@@ -1,0 +1,69 @@
+{% extends 'partials/base-admin.html' %}
+
+{% block title %}Confirmar eliminación de usuario | Mascott{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="card shadow mx-auto" style="max-width: 650px;">
+
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Confirmar eliminación de usuario</h4>
+        </div>
+
+        <div class="card-body p-4">
+
+            <p class="fs-5">
+                ¿Estás seguro de que deseas eliminar esta cuenta?
+            </p>
+
+            <div class="alert alert-warning">
+
+                <p class="mb-2">
+                    <strong>Nombre de usuario:</strong>
+                    {{ usuario.username }}
+                </p>
+
+                <p class="mb-2">
+                    <strong>Nombre completo:</strong>
+                    {{ usuario.first_name }} {{ usuario.last_name }}
+                </p>
+
+                <p class="mb-0">
+                    <strong>Correo electrónico:</strong>
+                    {{ usuario.email }}
+                </p>
+
+            </div>
+
+            <div class="alert alert-danger">
+                <strong>Advertencia:</strong>
+
+                Esta acción no se puede deshacer.
+
+                Si eliminas un cliente, también se eliminarán las mascotas
+                asociadas a su cuenta.
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-danger">
+                    Confirmar eliminación
+                </button>
+
+                <a href="{% url 'lista_usuarios' %}"
+                   class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock content %}

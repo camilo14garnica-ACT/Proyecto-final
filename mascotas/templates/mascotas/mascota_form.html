@@ -1,0 +1,22 @@
+{% extends "partials/base-user.html" %}
+{% load static %}
+
+{% block title %}Registrar mascota | Mascott{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Registrar mascota</h1>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary">Guardar mascota</button>
+        <a href="{% url 'lista_mascotas' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/modulos/mascotas/crear_mascota.js' %}"></script>
+{% endblock %}
