@@ -1,18 +1,30 @@
 {% extends "usuarios/base.html" %}
+{% load static %}
 
+{# Ocultamos nav, header y footer del base — las páginas de auth tienen su propio diseño #}
 {% block nav %}{% endblock nav %}
 {% block header %}{% endblock header %}
 {% block footer %}{% endblock footer %}
 
+{% block extra_css %}
+  <!-- CSS base de todas las páginas de autenticación -->
+  <link rel="stylesheet" href="{% static 'css/usuarios/base_auth.css' %}">
+  {% block auth_css %}{% endblock auth_css %}
+{% endblock %}
+
 {% block content %}
-    <div class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
-        <div class="card shadow-sm w-100" style="max-width: 480px;">
-            <div class="card-body p-4">
-            <a href="{% url "inicio" %}" class="d-block text-center mb-3 fw-bold text-decoration-none">
-                Veterinaria Mascott
-            </a>
-            {% block auth_content %}{% endblock auth_content %}
-            </div>
-        </div>
-    </dv>
+
+  <!-- Contenedor centrado verticalmente con fondo azul -->
+  <div class="auth-page">
+
+    <!-- Enlace para volver al inicio (arriba a la izquierda) -->
+    <a href="{% url 'inicio' %}" class="auth-back-home">← Volver al Inicio</a>
+
+    <!-- Tarjeta blanca central con el formulario -->
+    <div class="auth-card-wrapper">
+      {% block auth_content %}{% endblock auth_content %}
+    </div>
+
+  </div>
+
 {% endblock content %}

@@ -3,76 +3,36 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
+    # Páginas principales
     path('', views.inicio, name='inicio'),
     path('crear/', views.crear_usuario, name='crear_usuario'),
-<<<<<<< HEAD
     path('iniciar-sesion/', views.iniciar_sesion, name='iniciar_sesion'),
     path('login/', views.iniciar_sesion, name='login'),
     path('cerrar-sesion/', views.cerrar_sesion, name='cerrar_sesion'),
     path('logout/', views.cerrar_sesion, name='logout'),
     path('perfil/', views.mi_perfil, name='mi_perfil'),
-=======
-    path('iniciar-sesion/', views.iniciar_sesion, name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('perfil/', views.mi_perfil, name='mi_perfil'),
 
-    # panel administrativo.
->>>>>>> 4877cb84795950d378de70a9c5694b3ce7374643
+    # Paneles por rol
     path('panel-admin/', views.panel_admin, name='panel_admin'),
     path('panel-veterinario/', views.panel_veterinario, name='panel_veterinario'),
 
-    # cambiar contraseña estando logueado
-    path('perfil/cambiar-password/', auth_views.PasswordChangeView.as_view(template_name='usuarios/cambiar_password.html', success_url='/usuarios/perfil/password-cambiado/'),name='cambiar_password'),
+    # Cambiar contraseña estando logueado
+    path('perfil/cambiar-password/', auth_views.PasswordChangeView.as_view(template_name='usuarios/cambiar_password.html', success_url='/usuarios/perfil/password-cambiado/'), name='cambiar_password'),
     path('perfil/password-cambiado/', auth_views.PasswordChangeDoneView.as_view(template_name='usuarios/password_cambiado.html'), name='password_change_done'),
 
-    # recuperar contraseña olvidada
-<<<<<<< HEAD
-    path(
-        'recuperar-password/',
-        auth_views.PasswordResetView.as_view(
-            template_name='usuarios/recuperar_password.html',
-            email_template_name='usuarios/recuperar_password_email.html',
-            success_url='/usuarios/recuperar-password/enviado/'
-        ),
-        name='password_reset',
-    ),
-    path(
-        'recuperar-password/enviado/',
-        auth_views.PasswordResetDoneView.as_view(
-            template_name='usuarios/recuperar_password_enviado.html'
-        ),
-        name='password_reset_done',
-    ),
-    path(
-        'recuperar-password/confirmar/<uidb64>/<token>/',
-        auth_views.PasswordResetConfirmView.as_view(
-            template_name='usuarios/recuperar_password_confirmar.html',
-            success_url='/usuarios/recuperar-password/completo/'
-        ),
-        name='password_reset_confirm',
-    ),
-    path(
-        'recuperar-password/completo/',
-        auth_views.PasswordResetCompleteView.as_view(
-            template_name='usuarios/recuperar_password_completo.html'
-        ),
-        name='password_reset_complete',
-    ),
-]
-=======
-    path('recuperar-password/', auth_views.PasswordResetView.as_view(template_name='usuarios/recuperar_password.html', email_template_name='usuarios/recuperar_password_email.html', success_url='/usuarios/recuperar-password/enviado/'),name='password_reset'),
-    path('recuperar-password/enviado/', auth_views.PasswordResetDoneView.as_view(template_name='usuarios/recuperar_password_enviado.html'), name='password_reset_done'),
+    # Recuperar contraseña con código de 6 dígitos
+    path('recuperar-password/', views.recuperar_password_solicitar, name='recuperar_password_solicitar'),
+    path('recuperar-password/codigo/', views.recuperar_password_codigo, name='recuperar_password_codigo'),
+    path('recuperar-password/nueva/', views.recuperar_password_nueva, name='recuperar_password_nueva'),
+    path('recuperar-password/completo/', views.recuperar_password_completo, name='recuperar_password_completo'),
+
+    # Alias para compatibilidad con el link de "olvidé contraseña" del login
+    path('recuperar-password/enviado/', views.recuperar_password_codigo, name='password_reset_done'),
     path('recuperar-password/confirmar/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='usuarios/recuperar_password_confirmar.html', success_url='/usuarios/recuperar-password/completo/'), name='password_reset_confirm'),
-    path('recuperar-password/completo/', auth_views.PasswordResetCompleteView.as_view(template_name='usuarios/recuperar_password_completo.html'),name='password_reset_complete'),
-    
+
     # CRUD administrativo de usuarios
-    
     path('administracion/usuarios/', views.listar_usuarios, name='lista_usuarios'),
     path('administracion/usuarios/editar/<int:pk>/', views.editar_usuario, name='editar_usuario'),
     path('administracion/usuarios/eliminar/<int:pk>/', views.eliminar_usuario, name='eliminar_usuario'),
-    
-    #Solicitar Eliminar cuenta propia
-    path('perfil/confirmar-eliminacion/', views.confirmar_eliminacion_cuenta, name='confirmar_eliminacion_cuenta')
+    path('perfil/confirmar-eliminacion/<int:pk>/', views.confirmar_eliminacion_cuenta, name='confirmar_eliminacion_cuenta'),
 ]
-
->>>>>>> 4877cb84795950d378de70a9c5694b3ce7374643
