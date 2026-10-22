@@ -1,217 +1,797 @@
-{% extends "usuarios/base.html" %}
+{% load static %}
+{# Cargamos la etiqueta 'static' de Django para poder referenciar archivos de la carpeta static #}
 
-{% block title %}Inicio - Veterinaria Mascott{% endblock %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicio - Veterinaria Mascott</title>
 
-{% block usuarios_content %}
+  <!-- Librería Bootstrap 5: sistema de rejilla y componentes visuales -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!-- Tarjeta Principal de Bienvenida -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);">
-        <div class="card-body p-4 p-md-5">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    {% if user.is_authenticated %}
-                        <span class="badge bg-success text-white px-3 py-2 rounded-pill mb-3">
-                            <i class="bi bi-patch-check-fill me-1"></i> Sesión iniciada
-                        </span>
-                        <h1 class="display-6 fw-bold text-dark mb-2">
-                            ¡Hola, {{ user.first_name|default:user.username }}! 🐾
-                        </h1>
-                        <p class="lead text-secondary mb-4">
-                            Bienvenido a tu panel en <strong>Veterinaria Mascott</strong>. Aquí puedes consultar información, gestionar tu perfil y acceder a nuestros servicios médicos.
-                        </p>
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="{% url 'mi_perfil' %}" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
-                                <i class="bi bi-person-circle me-1"></i> Ver Mi Perfil
-                            </a>
-                            <a href="{% url 'logout' %}" class="btn btn-outline-secondary px-3 py-2 rounded-pill fw-semibold">
-                                <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
-                            </a>
-                        </div>
-                    {% else %}
-                        <span class="badge bg-primary text-white px-3 py-2 rounded-pill mb-3">
-                            <i class="bi bi-heart-pulse-fill me-1"></i> Cuidado y Pasión Animal
-                        </span>
-                        <h1 class="display-6 fw-bold text-dark mb-2">
-                            Bienvenido a Veterinaria Mascott 🐾
-                        </h1>
-                        <p class="lead text-secondary mb-4">
-                            Cuidamos la salud, el bienestar y la felicidad de tus mejores amigos con tecnología avanzada y profesionales certificados.
-                        </p>
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="{% url 'crear_usuario' %}" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
-                                <i class="bi bi-person-plus-fill me-1"></i> Registrarme Gratis
-                            </a>
-                            <a href="{% url 'login' %}" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-semibold">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="col-lg-4 text-center d-none d-lg-block">
-                    <div class="p-3 bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 130px; height: 130px;">
-                        <i class="bi bi-shield-heart text-primary display-3"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Iconos de Bootstrap: íconos de palomitas, estrellas, ubicación, etc. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- Hoja de estilos personalizada de esta página (panel-principal.css) -->
+  <link rel="stylesheet" href="{% static 'css/usuarios/panel-principal.css' %}"/>
+</head>
+
+<body class="page-inicio">
+
+  <!-- ============================================================
+       BARRA SUPERIOR (TOPBAR)
+       Muestra dirección, horario y número de urgencias
+  ============================================================ -->
+  <div class="topbar">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+      <!-- Información de contacto: dirección y horario -->
+      <div class="d-flex gap-3">
+        <span><i class="bi bi-geo-alt-fill me-1"></i>Calle 15 #9-54, Sogamoso, Boyacá</span>
+        <span class="d-none d-md-inline">
+          <i class="bi bi-clock me-1"></i>Lun–Sáb 8:00–20:30 · Dom 10:00–12:00
+        </span>
+      </div>
+
+      <!-- Teléfono de urgencias resaltado en rojo -->
+      <div class="topbar-urgencia">
+        <i class="bi bi-lightning-charge-fill me-1"></i>Urgencias 24h: (+57) 311 456 9768
+      </div>
+
     </div>
+  </div>
 
-    <!-- Aviso / Estado del Servicio -->
-    <div class="alert alert-light border shadow-sm rounded-3 d-flex align-items-center mb-4 py-3 px-3">
-        <i class="bi bi-info-circle-fill text-primary fs-3 me-3 flex-shrink-0"></i>
-        <div class="small">
-            <strong>Horario habitual:</strong> Lunes a Sábado de 8:00 AM a 7:00 PM. 
-            <span class="d-block d-sm-inline text-muted mt-1 mt-sm-0">
-                — Servicio de urgencias médicas disponible 24 horas al día.
-            </span>
-        </div>
+
+  <!-- ============================================================
+       BARRA DE NAVEGACIÓN PRINCIPAL (NAVBAR)
+       Logo, buscador, enlaces del menú y botón de agendar cita
+  ============================================================ -->
+  <nav class="mascott-nav">
+    <div class="container d-flex align-items-center gap-3">
+
+      <!-- Logo con enlace a la página de inicio -->
+      <a href="{% url 'inicio' %}" class="navbar-brand me-2">
+        <i class="bi bi-heart-pulse-fill text-primary"></i>
+        Ma<span>scott</span>
+      </a>
+
+      <!-- Campo de búsqueda (solo visible en pantallas grandes) -->
+      <div class="nav-search d-none d-lg-block flex-grow-1">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Buscar servicios, productos..." />
+      </div>
+
+      <!-- Menú de navegación principal (solo visible en pantallas grandes) -->
+      <ul class="nav-links d-none d-lg-flex ms-2">
+        <li><a href="{% url 'inicio' %}">Inicio</a></li>
+        <li><a href="#">Servicios</a></li>
+        <li><a href="#">Tienda</a></li>
+        <li><a href="#">Reseñas</a></li>
+        <li><a href="#">Ubicación</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+
+      <!-- Botón principal para agendar cita (lleva al login) -->
+      <a href="{% url 'login' %}" class="btn-agendar ms-auto ms-lg-2">
+        <i class="bi bi-calendar-check-fill me-1"></i>Agendar Cita
+      </a>
+
+      <!-- Icono de usuario: si está logueado muestra su nombre, si no muestra "Ingresar" -->
+      {% if user.is_authenticated %}
+        <a href="{% url 'mi_perfil' %}" class="nav-user d-none d-sm-flex ms-2">
+          <i class="bi bi-person-circle"></i>
+          <span>{{ user.first_name|default:user.username }}</span>
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-user d-none d-sm-flex ms-2">
+          <i class="bi bi-person-circle"></i>
+          <span>Ingresar</span>
+        </a>
+      {% endif %}
+
     </div>
+  </nav>
 
-    <!-- Sección de Servicios Médicos Responsiva -->
-    <div class="mb-4">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <div>
-                <h3 class="fw-bold mb-1">Servicios Veterinarios</h3>
-                <p class="text-muted small mb-0">Atención integral preventiva, curativa y estética para tu mascota.</p>
-            </div>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill d-none d-sm-inline-block">
-                Especialidades
-            </span>
-        </div>
 
-        <div class="row g-3 g-md-4">
-            <!-- Servicio 1: Consulta Médica -->
-            <div class="col-12 col-sm-6">
-                <div class="card h-100 border-0 shadow-sm hover-card p-3">
-                    <div class="card-body d-flex flex-column p-2">
-                        <div class="service-icon-box bg-danger bg-opacity-10 text-danger">
-                            <i class="bi bi-heart-pulse-fill"></i>
-                        </div>
-                        <span class="badge bg-danger bg-opacity-10 text-danger align-self-start mb-2 px-2 py-1 rounded">Medicina General</span>
-                        <h5 class="card-title fw-bold text-dark">Consulta Médica</h5>
-                        <p class="card-text text-secondary small flex-grow-1">
-                            Diagnóstico oportuno, valoración clínica completa, control de crecimiento y atención personalizada según especie y edad.
-                        </p>
-                        <div class="mt-2 text-primary small fw-semibold">
-                            <i class="bi bi-arrow-right-circle me-1"></i> Chequeos preventivos
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Servicio 2: Vacunación -->
-            <div class="col-12 col-sm-6">
-                <div class="card h-100 border-0 shadow-sm hover-card p-3">
-                    <div class="card-body d-flex flex-column p-2">
-                        <div class="service-icon-box bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <span class="badge bg-success bg-opacity-10 text-success align-self-start mb-2 px-2 py-1 rounded">Prevención</span>
-                        <h5 class="card-title fw-bold text-dark">Vacunas y Desparasitación</h5>
-                        <p class="card-text text-secondary small flex-grow-1">
-                            Esquemas completos de inmunización para cachorros y adultos, carnet digital y protección frente a parásitos internos y externos.
-                        </p>
-                        <div class="mt-2 text-success small fw-semibold">
-                            <i class="bi bi-arrow-right-circle me-1"></i> Esquemas al día
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Servicio 3: Peluquería -->
-            <div class="col-12 col-sm-6">
-                <div class="card h-100 border-0 shadow-sm hover-card p-3">
-                    <div class="card-body d-flex flex-column p-2">
-                        <div class="service-icon-box bg-info bg-opacity-10 text-info">
-                            <i class="bi bi-scissors"></i>
-                        </div>
-                        <span class="badge bg-info bg-opacity-10 text-info align-self-start mb-2 px-2 py-1 rounded">Estética y Spa</span>
-                        <h5 class="card-title fw-bold text-dark">Peluquería y Baños</h5>
-                        <p class="card-text text-secondary small flex-grow-1">
-                            Baños medicados e hidratantes, cortes de pelo según estándar de raza, limpieza de oídos y corte higiénico de uñas.
-                        </p>
-                        <div class="mt-2 text-info small fw-semibold">
-                            <i class="bi bi-arrow-right-circle me-1"></i> Cuidado e higiene
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Servicio 4: Quirófano y Urgencias -->
-            <div class="col-12 col-sm-6">
-                <div class="card h-100 border-0 shadow-sm hover-card p-3">
-                    <div class="card-body d-flex flex-column p-2">
-                        <div class="service-icon-box bg-warning bg-opacity-10 text-warning">
-                            <i class="bi bi-hospital-fill"></i>
-                        </div>
-                        <span class="badge bg-warning bg-opacity-10 text-warning align-self-start mb-2 px-2 py-1 rounded">24/7 Disponible</span>
-                        <h5 class="card-title fw-bold text-dark">Cirugía y Urgencias</h5>
-                        <p class="card-text text-secondary small flex-grow-1">
-                            Quirófano estéril equipado con monitoreo anestésico multiparamétrico y guardia veterinaria permanente para atender imprevistos.
-                        </p>
-                        <div class="mt-2 text-warning small fw-semibold">
-                            <i class="bi bi-arrow-right-circle me-1"></i> Atención prioritaria
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- ============================================================
+       BARRA DE SERVICIOS RÁPIDOS (SUBNAV)
+       Accesos directos a cada categoría de servicio veterinario
+  ============================================================ -->
+  <div class="subnav">
+    <div class="container">
+      <ul>
+        <li><a href="#"><i class="bi bi-stethoscope me-1"></i>Consultas</a></li>
+        <li><a href="#"><i class="bi bi-shield-check me-1"></i>Vacunación</a></li>
+        <li><a href="#"><i class="bi bi-scissors me-1"></i>Estética</a></li>
+        <li><a href="#"><i class="bi bi-activity me-1"></i>Laboratorio</a></li>
+        <li><a href="#"><i class="bi bi-camera me-1"></i>Rayos X</a></li>
+        <li><a href="#"><i class="bi bi-hospital me-1"></i>Cirugías</a></li>
+        <li><a href="#"><i class="bi bi-building me-1"></i>Hospitalización</a></li>
+        <li><a href="#"><i class="bi bi-bag me-1"></i>Tienda</a></li>
+        <!-- Urgencias en rojo para mayor visibilidad -->
+        <li><a href="#" class="urgencias-link"><i class="bi bi-lightning-charge-fill me-1"></i>Urgencias 24h</a></li>
+      </ul>
     </div>
+  </div>
 
-    <!-- Indicadores de Confianza / Estadísticas Rápidas -->
-    <div class="card border-0 bg-white shadow-sm rounded-4 p-3 p-md-4 mb-4">
-        <div class="row g-3 text-center">
-            <div class="col-6 col-md-3">
-                <div class="p-2 border-end">
-                    <i class="bi bi-heart-fill text-danger fs-3 mb-1 d-block"></i>
-                    <h4 class="fw-bold text-dark mb-0">+1,500</h4>
-                    <span class="text-muted small">Mascotas atendidas</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-2 border-end">
-                    <i class="bi bi-award-fill text-primary fs-3 mb-1 d-block"></i>
-                    <h4 class="fw-bold text-dark mb-0">10+</h4>
-                    <span class="text-muted small">Años de experiencia</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-2 border-end">
-                    <i class="bi bi-clock-fill text-success fs-3 mb-1 d-block"></i>
-                    <h4 class="fw-bold text-dark mb-0">24/7</h4>
-                    <span class="text-muted small">Urgencias médicas</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-2">
-                    <i class="bi bi-star-fill text-warning fs-3 mb-1 d-block"></i>
-                    <h4 class="fw-bold text-dark mb-0">4.9 ★</h4>
-                    <span class="text-muted small">Calificación media</span>
-                </div>
-            </div>
+
+  <!-- ============================================================
+       SECCIÓN HÉROE (HERO)
+       Imagen de fondo, titular principal y tarjeta de próxima cita
+  ============================================================ -->
+  <section class="mascott-hero">
+
+    <!-- Imagen de fondo del héroe (se posiciona con CSS, no con img) -->
+    <div class="hero-bg" style="background-image: url('{% static 'img/doctor perro.webp' %}');"></div>
+
+    <div class="container hero-content w-100">
+      <div class="row align-items-center">
+
+        <!-- Columna izquierda: texto, botones y etiquetas -->
+        <div class="col-lg-6">
+
+          <!-- Insignia de nominación -->
+          <div class="hero-badge">
+            <i class="bi bi-trophy-fill"></i>
+            Nominada Mejor Clínica Veterinaria 2024 · 2025 · 2026
+          </div>
+
+          <!-- Título principal con palabra destacada en azul claro -->
+          <h1>
+            Cuidamos a tu<br>
+            <span class="highlight">mascota</span> con amor
+          </h1>
+
+          <!-- Descripción breve de la clínica -->
+          <p class="hero-desc">
+            30 años de experiencia en Sogamoso. Más de 8 médicos veterinarios,
+            laboratorio propio, rayos X, ecografía y hospitalización en una sola sede.
+          </p>
+
+          <!-- Botones de acción: agendar cita y ver servicios -->
+          <div class="hero-btns">
+            <a href="{% url 'login' %}" class="btn-hero-primary">
+              <i class="bi bi-calendar-check-fill"></i> Agendar Cita
+            </a>
+            <a href="#servicios" class="btn-hero-outline">Ver servicios</a>
+          </div>
+
+          <!-- Etiquetas de características destacadas de la clínica -->
+          <div class="hero-tags">
+            <span class="hero-tag"><i class="bi bi-activity"></i> Laboratorio propio</span>
+            <span class="hero-tag"><i class="bi bi-camera"></i> Rayos X y ecografía</span>
+            <span class="hero-tag"><i class="bi bi-hospital"></i> Quirófano</span>
+            <span class="hero-tag"><i class="bi bi-lightning-charge"></i> Urgencias 24h</span>
+          </div>
+
         </div>
-    </div>
 
-    <!-- Llamado a la Acción (CTA) Final -->
-    <div class="card border-0 rounded-4 text-white p-4 p-md-5 text-center shadow-sm" style="background: linear-gradient(135deg, #0d6efd 0%, #0d9488 100%);">
-        <h3 class="fw-bold mb-2">¿Tu mascota necesita chequeo o atención médica?</h3>
-        <p class="text-white-50 mb-4 mx-auto" style="max-width: 540px;">
-            En Veterinaria Mascott te garantizamos un trato cálido, responsable y profesional para el integrante más querido de tu hogar.
-        </p>
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
-            {% if user.is_authenticated %}
-                <a href="{% url 'mi_perfil' %}" class="btn btn-light text-primary fw-bold px-4 py-2 rounded-pill shadow-sm">
-                    <i class="bi bi-person-fill me-1"></i> Ir a Mi Perfil
-                </a>
-            {% else %}
-                <a href="{% url 'crear_usuario' %}" class="btn btn-warning text-dark fw-bold px-4 py-2 rounded-pill shadow-sm">
-                    <i class="bi bi-person-plus-fill me-1"></i> Registrarme Ahora
-                </a>
-                <a href="{% url 'login' %}" class="btn btn-outline-light fw-bold px-4 py-2 rounded-pill">
-                    <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
-                </a>
-            {% endif %}
+        <!-- Columna derecha: tarjeta flotante de próxima cita -->
+        <div class="col-lg-6 d-flex justify-content-center justify-content-lg-end mt-4 mt-lg-0">
+          <div class="cita-card">
+
+            <!-- Encabezado de la tarjeta -->
+            <div class="cita-label">PRÓXIMA CITA</div>
+            <div class="cita-date">
+              <i class="bi bi-heart-pulse-fill text-primary"></i>
+              Mié 21 Oct · 9:30 am
+              <!-- Punto verde que indica que están abiertos -->
+              <span class="dot-online"></span>
+            </div>
+
+            <!-- Información de horario, dirección y estado -->
+            <div class="cita-info">
+              <div class="cita-row">
+                <i class="bi bi-clock"></i>
+                <span>Lun–Sáb · 8:00 am – 8:30 pm</span>
+              </div>
+              <div class="cita-row">
+                <i class="bi bi-geo-alt"></i>
+                <span>Calle 15 #9-54, <span class="text-link">Sogamoso</span></span>
+              </div>
+              <div class="cita-row">
+                <i class="bi bi-circle-fill text-success cita-dot-open"></i>
+                <span class="open-badge">Abierto ahora</span>
+              </div>
+            </div>
+
+            <!-- Botones de reserva y contacto por WhatsApp -->
+            <a href="{% url 'login' %}" class="btn-reservar">
+              <i class="bi bi-calendar-check-fill"></i> Reservar ahora
+            </a>
+            <a href="https://wa.me/573114569768" class="btn-whatsapp" target="_blank">
+              <i class="bi bi-whatsapp"></i> Escribir por WhatsApp
+            </a>
+
+          </div>
         </div>
-    </div>
 
-{% endblock usuarios_content %}
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       BARRA DE ESTADÍSTICAS (STATS BAR)
+       Muestra cifras de experiencia, médicos, pacientes y calificación
+  ============================================================ -->
+  <section class="stats-bar">
+    <div class="container">
+      <div class="row g-3 justify-content-center">
+
+        <!-- Estadística 1: años de experiencia -->
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div><span class="stat-number">30</span><span class="stat-plus">+</span></div>
+            <div class="stat-label">Años en Sogamoso</div>
+          </div>
+        </div>
+
+        <!-- Estadística 2: cantidad de médicos veterinarios -->
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div><span class="stat-number">8</span><span class="stat-plus">+</span></div>
+            <div class="stat-label">Médicos veterinarios</div>
+          </div>
+        </div>
+
+        <!-- Estadística 3: pacientes atendidos -->
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div><span class="stat-number">5000</span><span class="stat-plus">+</span></div>
+            <div class="stat-label">Pacientes atendidos</div>
+          </div>
+        </div>
+
+        <!-- Estadística 4: calificación en Google -->
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-number">4,5</div>
+            <div><i class="bi bi-star-fill stat-star"></i></div>
+            <div class="stat-label">Calificación Google</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN: ¿QUÉ NECESITA TU MASCOTA HOY?
+       Accesos rápidos a cada servicio con ícono y nombre
+  ============================================================ -->
+  <section class="section-servicios-rapidos">
+    <div class="container">
+      <h2 class="section-title">¿Qué necesita tu mascota hoy?</h2>
+      <div class="row g-3">
+
+        <!-- Cada item lleva a la sección correspondiente del catálogo -->
+        <div class="col-6 col-sm-4 col-md-3 col-lg">
+          <a href="#" class="servicio-rapido-item">
+            <div class="servicio-rapido-icon icon-consulta">🩺</div>
+            <span>Consulta</span>
+          </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg">
+          <a href="#" class="servicio-rapido-item">
+            <div class="servicio-rapido-icon icon-vacuna">💉</div>
+            <span>Vacunación</span>
+          </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg">
+          <a href="#" class="servicio-rapido-item">
+            <div class="servicio-rapido-icon icon-estetica">✂️</div>
+            <span>Estética</span>
+          </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg">
+          <a href="#" class="servicio-rapido-item">
+            <div class="servicio-rapido-icon icon-lab">🔬</div>
+            <span>Laboratorio</span>
+          </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg">
+          <a href="#" class="servicio-rapido-item">
+            <div class="servicio-rapido-icon icon-rayos">🩻</div>
+            <span>Rayos X</span>
+          </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg">
+          <a href="#" class="servicio-rapido-item">
+            <div class="servicio-rapido-icon icon-cirugia">🏥</div>
+            <span>Cirugías</span>
+          </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg">
+          <a href="#" class="servicio-rapido-item">
+            <div class="servicio-rapido-icon icon-hosp">🏨</div>
+            <span>Hospitalización</span>
+          </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg">
+          <a href="#" class="servicio-rapido-item">
+            <div class="servicio-rapido-icon icon-tienda">🛒</div>
+            <span>Tienda</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN: NUESTROS SERVICIOS (CATÁLOGO DETALLADO)
+       Tarjetas con descripción y botón de agendar para cada servicio
+  ============================================================ -->
+  <section class="section-servicios" id="servicios">
+    <div class="container">
+      <h2 class="section-title">Nuestros Servicios</h2>
+      <p class="section-subtitle">Todo lo que tu mascota necesita en un solo lugar, con el mismo equipo.</p>
+      <div class="row g-3">
+
+        <!-- Tarjeta: Consulta General -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl">
+          <div class="servicio-card">
+            <div class="servicio-card-icon icon-consulta">🩺</div>
+            <h5>Consulta General</h5>
+            <p>Valoración clínica completa y seguimiento. Sin cita, por orden de llegada.</p>
+            <a href="{% url 'login' %}" class="btn-agendar-card">Agendar →</a>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Vacunación -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl">
+          <div class="servicio-card">
+            <div class="servicio-card-icon icon-vacuna">💉</div>
+            <h5>Vacunación</h5>
+            <p>Esquemas completos para cachorros y adultos, con carné y recordatorios.</p>
+            <a href="{% url 'login' %}" class="btn-agendar-card">Agendar →</a>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Estética Canina -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl">
+          <div class="servicio-card">
+            <div class="servicio-card-icon icon-estetica">✂️</div>
+            <h5>Estética Canina</h5>
+            <p>Baño medicado, corte de raza, limpieza de oídos y corte de uñas.</p>
+            <a href="{% url 'login' %}" class="btn-agendar-card">Agendar →</a>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Laboratorio -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl">
+          <div class="servicio-card">
+            <div class="servicio-card-icon icon-lab">🔬</div>
+            <h5>Laboratorio Propio</h5>
+            <p>Cuadro hemático, química sanguínea, uroanálisis. Resultados el mismo día.</p>
+            <a href="{% url 'login' %}" class="btn-agendar-card">Agendar →</a>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Rayos X y Ecografía -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl">
+          <div class="servicio-card">
+            <div class="servicio-card-icon icon-rayos">🩻</div>
+            <h5>Rayos X y Ecografía</h5>
+            <p>Diagnóstico de fracturas, tórax, abdomen y órganos internos.</p>
+            <a href="{% url 'login' %}" class="btn-agendar-card">Agendar →</a>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Cirugías -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl">
+          <div class="servicio-card">
+            <div class="servicio-card-icon icon-cirugia">🏥</div>
+            <h5>Cirugías</h5>
+            <p>Tejidos blandos, ortopedia, esterilizaciones, odontología y oftalmología.</p>
+            <a href="{% url 'login' %}" class="btn-agendar-card">Agendar →</a>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Hospitalización -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl">
+          <div class="servicio-card">
+            <div class="servicio-card-icon icon-hosp">🏨</div>
+            <h5>Hospitalización</h5>
+            <p>Internación con vigilancia permanente y reportes para la familia.</p>
+            <a href="{% url 'login' %}" class="btn-agendar-card">Agendar →</a>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Urgencias 24h (botón llama directo al teléfono) -->
+        <div class="col-12 col-sm-6 col-lg-4 col-xl">
+          <div class="servicio-card">
+            <div class="servicio-card-icon icon-urgencias">🚨</div>
+            <h5>Urgencias 24h</h5>
+            <p>Atención de emergencias toda la noche. Llámanos antes de venir.</p>
+            <a href="tel:+573114569768" class="btn-agendar-card">Llamar ahora →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       BANNER DE URGENCIAS
+       Franja roja que resalta el servicio de urgencias 24h
+  ============================================================ -->
+  <section class="urgencias-banner">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+
+        <!-- Texto informativo del banner -->
+        <div class="d-flex align-items-center gap-3">
+          <span class="urgencias-icon">🚨</span>
+          <div>
+            <h4>Urgencias 24 horas · Lunes a Sábado</h4>
+            <p>Llámanos antes de salir y te esperamos listos. Describe qué le ocurre a tu mascota para que el equipo se prepare.</p>
+          </div>
+        </div>
+
+        <!-- Botones de contacto de urgencias -->
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="tel:+573114569768" class="btn-llamar">
+            <i class="bi bi-telephone-fill"></i> Llamar ahora
+          </a>
+          <a href="https://wa.me/573114569768" class="btn-whatsapp-red" target="_blank">
+            <i class="bi bi-whatsapp"></i> WhatsApp
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN: PRODUCTOS DESTACADOS
+       Tarjetas de productos de la tienda con precio y botón "Ver"
+  ============================================================ -->
+  <section class="section-productos" id="tienda">
+    <div class="container">
+      <h2 class="section-title">Productos Destacados</h2>
+      <p class="section-subtitle">
+        Farmacia veterinaria, alimento y accesorios en la misma sede.<br>
+        <a href="#" class="link-ver-todos">Ver todos los productos →</a>
+      </p>
+      <div class="row g-3">
+
+        <!-- Producto 1: Alimento -->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="producto-card">
+            <div class="producto-img">🦴</div>
+            <div class="producto-body">
+              <span class="producto-badge badge-nutricion">NUTRICIÓN</span>
+              <h6>Alimento Premium</h6>
+              <p class="producto-desc">Royal Canin, Hill's y Purina para todas las razas y edades.</p>
+              <div class="producto-footer">
+                <div class="precio"><span>desde</span>$45,000</div>
+                <a href="#" class="btn-ver">Ver →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Producto 2: Higiene -->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="producto-card">
+            <div class="producto-img">🧴</div>
+            <div class="producto-body">
+              <span class="producto-badge badge-higiene">HIGIENE</span>
+              <h6>Kit de Grooming</h6>
+              <p class="producto-desc">Todo para el cuidado en casa de tu mejor amigo.</p>
+              <div class="producto-footer">
+                <div class="precio"><span>desde</span>$35,000</div>
+                <a href="#" class="btn-ver">Ver →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Producto 3: Farmacia -->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="producto-card">
+            <div class="producto-img">💊</div>
+            <div class="producto-body">
+              <span class="producto-badge badge-farmacia">FARMACIA</span>
+              <h6>Medicamentos</h6>
+              <p class="producto-desc">Antiparasitarios, vitaminas y medicamentos recetados.</p>
+              <div class="producto-footer">
+                <div class="precio"><span>desde</span>$15,000</div>
+                <a href="#" class="btn-ver">Ver →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Producto 4: Accesorios -->
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="producto-card">
+            <div class="producto-img">🎾</div>
+            <div class="producto-body">
+              <span class="producto-badge badge-accesorios">ACCESORIOS</span>
+              <h6>Juguetes y Accesorios</h6>
+              <p class="producto-desc">Correas, collares, camas y juguetes para mantenerlos activos.</p>
+              <div class="producto-footer">
+                <div class="precio"><span>desde</span>$12,000</div>
+                <a href="#" class="btn-ver">Ver →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN: TU VISITA EN 4 PASOS
+       Explica el proceso de atención de forma visual y numerada
+  ============================================================ -->
+  <section class="section-pasos">
+    <div class="container text-center">
+      <h2 class="pasos-title">Tu visita en 4 pasos</h2>
+      <p class="pasos-subtitle">Sin cita para consulta general. Por orden de llegada.</p>
+      <div class="row g-4 text-start">
+
+        <!-- Paso 1 -->
+        <div class="col-6 col-md-3 paso-item">
+          <div class="paso-number">01</div>
+          <h5>Llegas sin cita</h5>
+          <p>La consulta se atiende por orden de llegada, como en un hospital.</p>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="col-6 col-md-3 paso-item">
+          <div class="paso-number">02</div>
+          <h5>Te valoramos</h5>
+          <p>Un médico examina a tu mascota de principio a fin y escucha la historia completa.</p>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="col-6 col-md-3 paso-item">
+          <div class="paso-number">03</div>
+          <h5>Diagnosticamos</h5>
+          <p>Los exámenes se procesan aquí mismo. Resultados el mismo día.</p>
+        </div>
+
+        <!-- Paso 4 -->
+        <div class="col-6 col-md-3 paso-item">
+          <div class="paso-number">04</div>
+          <h5>Te acompañamos</h5>
+          <p>Recibes un plan claro y hacemos seguimiento hasta que esté bien.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN: RESEÑAS DE CLIENTES
+       Comentarios reales verificados de Google
+  ============================================================ -->
+  <section class="section-resenas">
+    <div class="container">
+      <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+
+      <!-- Insignia de calificación general en Google -->
+      <div class="resenas-badge">
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-half"></i>
+        4.5 · 414 reseñas en Google · Verificadas
+      </div>
+
+      <div class="row g-3">
+
+        <!-- Reseña 1 -->
+        <div class="col-12 col-md-4">
+          <div class="resena-card">
+            <div class="resena-stars">★★★★★</div>
+            <p class="resena-text">"Veterinaria muy completa. Instalaciones con altos estándares y muy buena calidad en cada servicio."</p>
+            <div class="resena-autor">
+              <div class="resena-avatar">J</div>
+              <div>
+                <div class="autor-name">Julio Ramón Sierra Castro</div>
+                <div class="autor-meta">Local Guide · 2024</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reseña 2 -->
+        <div class="col-12 col-md-4">
+          <div class="resena-card">
+            <div class="resena-stars">★★★★★</div>
+            <p class="resena-text">"La atención en horas de la madrugada es excelente. Muy profesionales a cualquier hora del día."</p>
+            <div class="resena-autor">
+              <!-- Avatar con color diferente para distinguir usuarios -->
+              <div class="resena-avatar avatar-v">V</div>
+              <div>
+                <div class="autor-name">Veronica Huertas</div>
+                <div class="autor-meta">Agosto 2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reseña 3 -->
+        <div class="col-12 col-md-4">
+          <div class="resena-card">
+            <div class="resena-stars">★★★★★</div>
+            <p class="resena-text">"Fui por una emergencia y me atendieron muy bien. El doctor muy profesional y su asistente también."</p>
+            <div class="resena-autor">
+              <div class="resena-avatar">J</div>
+              <div>
+                <div class="autor-name">Javier Welsch Prat</div>
+                <div class="autor-meta">Local Guide · Marzo 2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN: UBICACIÓN Y MAPA
+       Horario de atención + mapa embebido de Google Maps
+  ============================================================ -->
+  <section class="section-ubicacion" id="ubicacion">
+    <div class="container">
+      <h2 class="section-title">Dónde estamos</h2>
+      <p class="section-subtitle">
+        A pocas cuadras del centro de Sogamoso.
+        <a href="#" class="link-sin-cita">Sin cita previa.</a>
+      </p>
+
+      <div class="row g-4 align-items-start">
+
+        <!-- Columna izquierda: horarios y botones de contacto -->
+        <div class="col-12 col-md-4 col-lg-3">
+          <div class="horario-card">
+            <h5>Horario de atención</h5>
+
+            <!-- Fila de horario por día -->
+            <div class="horario-row">
+              <span class="dia">Lunes – Viernes</span>
+              <span class="hora">8:00 – 20:30</span>
+            </div>
+            <div class="horario-row">
+              <span class="dia">Sábado</span>
+              <span class="hora">8:00 – 20:30</span>
+            </div>
+            <div class="horario-row">
+              <span class="dia">Domingo</span>
+              <span class="hora">10:00 – 12:00</span>
+            </div>
+
+            <!-- Aviso de urgencias dentro del horario -->
+            <div class="urgencias-inline">
+              <i class="bi bi-lightning-charge-fill"></i>
+              Urgencias 24h · Lunes a Sábado
+            </div>
+
+            <!-- Botones de contacto directo -->
+            <a href="tel:+573114569768" class="btn-llamar-card">
+              <i class="bi bi-telephone-fill"></i> Llamar
+            </a>
+            <a href="https://wa.me/573114569768" class="btn-whatsapp-card" target="_blank">
+              <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+
+          </div>
+        </div>
+
+        <!-- Columna derecha: mapa embebido de Google Maps -->
+        <div class="col-12 col-md-8 col-lg-9">
+          <div class="mapa-embed">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3977.1234567890123!2d-72.9346!3d5.7156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e6a58c4e3b2a0f3%3A0x1234567890abcdef!2sCl.%2015%20%239-54%2C%20Sogamoso%2C%20Boyac%C3%A1!5e0!3m2!1ses!2sco!4v1698000000000!5m2!1ses!2sco"
+              width="100%"
+              height="380"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PIE DE PÁGINA (FOOTER)
+       Logo, columnas de enlaces y datos de contacto
+  ============================================================ -->
+  <footer class="mascott-footer">
+    <div class="container">
+      <div class="row g-4">
+
+        <!-- Columna 1: marca y eslogan -->
+        <div class="col-12 col-md-4">
+          <a href="{% url 'inicio' %}" class="footer-brand">
+            <i class="bi bi-heart-pulse-fill"></i>
+            Ma<span>scott</span>
+          </a>
+          <p class="footer-tagline">Clínica Veterinaria · desde 1997</p>
+        </div>
+
+        <!-- Columna 2: lista de servicios -->
+        <div class="col-6 col-md-2">
+          <div class="footer-col-title">Servicios</div>
+          <ul>
+            <li><a href="#">Consulta General</a></li>
+            <li><a href="#">Vacunación</a></li>
+            <li><a href="#">Estética</a></li>
+            <li><a href="#">Laboratorio</a></li>
+            <li><a href="#">Cirugías</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 3: enlaces de información general -->
+        <div class="col-6 col-md-2">
+          <div class="footer-col-title">Información</div>
+          <ul>
+            <li><a href="#">Reseñas</a></li>
+            <li><a href="#">Ubicación</a></li>
+            <li><a href="#">Tienda</a></li>
+            <li><a href="{% url 'login' %}">Mi cuenta</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 4: datos de contacto con íconos -->
+        <div class="col-12 col-md-4">
+          <div class="footer-col-title">Contacto</div>
+          <div class="footer-contact-item">
+            <i class="bi bi-telephone-fill"></i>
+            <span>(57) 311 456 9768</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="bi bi-whatsapp"></i>
+            <span>WhatsApp</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="bi bi-envelope-fill"></i>
+            <span>contacto@mascott.com</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>Calle 15 #9-54, Sogamoso, Boyacá</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Línea separadora y derechos de autor -->
+      <hr />
+      <p class="footer-copy">© 2026 Clínica Veterinaria Mascott · Sogamoso, Boyacá</p>
+
+    </div>
+  </footer>
+
+
+  <!-- Bootstrap JS: necesario para componentes interactivos (menús, modales, etc.) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JS personalizado de esta página -->
+  <script src="{% static 'js/usuarios/inicio.js' %}"></script>
+
+</body>
+</html>
