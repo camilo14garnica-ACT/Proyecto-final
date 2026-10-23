@@ -5,6 +5,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods, require_POST
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
 from datetime import timedelta
 import random
 
@@ -155,37 +158,51 @@ def recuperar_password_solicitar(request):
     if request.method == 'POST':
         correo = request.POST.get('correo', '').strip()
 
-        # Buscamos el usuario por correo (sin importar mayúsculas)
         try:
             usuario = Usuario.objects.get(email__iexact=correo)
 
             # Generamos código de 6 dígitos aleatorio
             codigo = str(random.randint(100000, 999999))
 
-            # Guardamos el código en la base de datos con 15 minutos de expiración
+            # Guardamos el código con 15 minutos de expiración
             CodigoRecuperacion.objects.create(
                 usuario=usuario,
                 codigo=codigo,
                 expira_en=timezone.now() + timedelta(minutes=15)
             )
 
-            # En desarrollo: mostramos el código en consola (simulación)
-            print(f"\n{'='*40}")
-            print(f"CÓDIGO DE RECUPERACIÓN PARA: {usuario.email}")
-            print(f"CÓDIGO: {codigo}")
-            print(f"Expira en 15 minutos")
-            print(f"{'='*40}\n")
+            # Renderizamos la plantilla HTML del correo
+            cuerpo_html = render_to_string(
+                'usuarios/recuperar_password_email.html',
+                {
+                    'nombre': usuario.first_name or usuario.username,
+                    'codigo': codigo,
+                }
+            )
 
-            # Guardamos el correo en sesión para el siguiente paso
-            request.session['recuperar_correo'] = correo
-
-            return redirect('recuperar_password_codigo')
+            # Enviamos el correo al correo del usuario
+            try:
+                send_mail(
+                    subject='🔑 Tu código de recuperación - Veterinaria Mascott',
+                    message=f'Tu código de recuperación es: {codigo}. Expira en 15 minutos.',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[usuario.email],  # Se envía al correo del usuario
+                    html_message=cuerpo_html,
+                    fail_silently=False,
+                )
+                print(f"\n✅ Correo enviado a: {usuario.email} | Código: {codigo}\n")
+            except Exception as e:
+                # Si falla el envío, mostramos el código en consola como respaldo
+                print(f"\n⚠️ Error al enviar correo: {e}")
+                print(f"CÓDIGO para {usuario.email}: {codigo}\n")
 
         except Usuario.DoesNotExist:
-            # Por seguridad no decimos si el correo existe o no
-            # Igual redirigimos para no revelar usuarios registrados
-            request.session['recuperar_correo'] = correo
-            return redirect('recuperar_password_codigo')
+            # Por seguridad no revelamos si el correo existe o no
+            pass
+
+        # Siempre redirigimos al paso 2 (no revelamos si el correo existe)
+        request.session['recuperar_correo'] = correo
+        return redirect('recuperar_password_codigo')
 
     return render(request, 'usuarios/recuperar_password.html', {'error': error})
 
