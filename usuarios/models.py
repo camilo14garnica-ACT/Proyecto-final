@@ -114,7 +114,7 @@ class Cita(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='citas_asignadas',
+        related_name='citas_asignadas_legacy',
         limit_choices_to={'rol': 'VETERINARIO'},
         verbose_name="Veterinario asignado"
     )
