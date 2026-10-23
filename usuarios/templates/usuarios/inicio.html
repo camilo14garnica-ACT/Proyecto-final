@@ -1,7 +1,6 @@
 {% load static %}
 {# Cargamos la etiqueta 'static' de Django para poder referenciar archivos de la carpeta static #}
 
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -796,17 +795,3 @@
 
 </body>
 </html>
-=======
-{% block title %}Inicio | Veterinaria Mascott{% endblock title %}
-
-{% block content %}
-    <h1>Bienvenido a la veterinaria</h1>
-
-    {% if user.is_authenticated %}
-        <p>Hola, {{ user.first_name }}</p>
-    {% else %}
-        <p>Hola, visitante. <a href="{% url 'login' %}">Inicia sesión</a> para ver tus mascotas.</p>
-    {% endif %}
-
-{% endblock content %}
->>>>>>> 4877cb84795950d378de70a9c5694b3ce7374643

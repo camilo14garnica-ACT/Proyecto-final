@@ -1,12 +1,13 @@
-<<<<<<< HEAD
 {% extends "usuarios/base.html" %}
+{% load static %}
 
 {% block title %}Iniciar sesión - Veterinaria Mascott{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/usuarios/iniciar_sesion.css' %}">
+{% endblock %}
+
 {% block usuarios_content %}
-=======
-{% block content%}
->>>>>>> 4877cb84795950d378de70a9c5694b3ce7374643
   <section class="auth-card" aria-labelledby="login-title">
     <h1 id="login-title">Iniciar sesión</h1>
 
@@ -28,8 +29,8 @@
       </button>
     </form>
 
-    <p class="auth-help"> 
-      <a href="{% url "password_reset" %}">¿Olvidaste tu contraseña?</a>
+    <p class="auth-help">
+      <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
     </p>
 
     <p class="auth-help">
@@ -38,6 +39,4 @@
     </p>
 
   </section>
-
-  
-{% endblock content%}
+{% endblock usuarios_content %}
