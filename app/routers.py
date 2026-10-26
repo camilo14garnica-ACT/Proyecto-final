@@ -3,8 +3,7 @@ from django.db import DEFAULT_DB_ALIAS
 
 class EnrutadorDobleBase:
     """
-    Todas las apps (Usuarios, inventario, etc..) trabajan con la base LOCAL.
-    la copia en la nube se hace con guarda_en_ambas() o using('remota).
+    Todas las apps usan la conexión 'default' configurada en settings.
     """
     
     def db_for_read(self, model, **hints):
