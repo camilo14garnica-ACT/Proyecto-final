@@ -147,6 +147,23 @@ def confirmar_eliminacion_cuenta(request, pk):
     return render(request, 'usuarios/confirmar_eliminacion_cuenta.html', {'usuario': usuario})
 
 
+@login_required
+@require_http_methods(["GET", "POST"])
+def solicitar_eliminacion_cuenta(request):
+    if request.method == 'POST':
+        if request.POST.get('confirmar_eliminacion') != 'SI':
+            messages.error(request, 'Debes confirmar la eliminación de tu cuenta.')
+            return redirect('mi_perfil')
+
+        usuario = request.user
+        logout(request)
+        usuario.delete()
+        messages.success(request, 'Tu cuenta fue eliminada correctamente.')
+        return redirect('inicio')
+
+    return render(request, 'usuarios/confirmar_eliminacion_cuenta.html')
+
+
 # ============================================================
 # RECUPERAR CONTRASEÑA CON CÓDIGO DE 6 DÍGITOS
 # ============================================================

@@ -11,6 +11,7 @@ urlpatterns = [
     path('cerrar-sesion/', views.cerrar_sesion, name='cerrar_sesion'),
     path('logout/', views.cerrar_sesion, name='logout'),
     path('perfil/', views.mi_perfil, name='mi_perfil'),
+    path('perfil/eliminar-cuenta/', views.solicitar_eliminacion_cuenta, name='solicitar_eliminacion_cuenta'),
 
     # Paneles por rol
     path('panel-admin/', views.panel_admin, name='panel_admin'),

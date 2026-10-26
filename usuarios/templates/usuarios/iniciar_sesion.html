@@ -1,42 +1,36 @@
-{% extends "usuarios/base.html" %}
-{% load static %}
+{% extends "usuarios/base_auth.html" %}
 
 {% block title %}Iniciar sesión - Veterinaria Mascott{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/usuarios/iniciar_sesion.css' %}">
-{% endblock %}
+{% block auth_content %}
+  <div class="auth-logo">
+    <i class="bi bi-heart-pulse-fill"></i>
+    <span>Mascott</span>
+  </div>
 
-{% block usuarios_content %}
-  <section class="auth-card" aria-labelledby="login-title">
-    <h1 id="login-title">Iniciar sesión</h1>
+  <h1 id="login-title" class="auth-title">Iniciar sesión</h1>
 
-    <form method="post" class="auth-form">
-      {% csrf_token %}
+  <form method="post" class="auth-form" aria-labelledby="login-title">
+    {% csrf_token %}
 
-      {% if form.non_field_errors %}
-        <p class="text-danger">{{ form.non_field_errors }}</p>
-      {% endif %}
+    {% if form.non_field_errors %}
+      <div class="auth-error">{{ form.non_field_errors }}</div>
+    {% endif %}
 
-      {{ form.as_p }}
+    {{ form.as_p }}
 
-      {% if next %}
-        <input type="hidden" name="next" value="{{ next }}">
-      {% endif %}
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
 
-      <button type="submit" class="button button-primary">
-        Iniciar sesión
-      </button>
-    </form>
+    <button type="submit" class="auth-btn">Iniciar sesión</button>
+  </form>
 
-    <p class="auth-help">
-      <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
-    </p>
-
-    <p class="auth-help">
-      ¿Todavía no tienes una cuenta?
-      <a href="{% url 'crear_usuario' %}">Crear usuario</a>
-    </p>
-
-  </section>
-{% endblock usuarios_content %}
+  <p class="auth-footer">
+    <a href="{% url 'recuperar_password_solicitar' %}">¿Olvidaste tu contraseña?</a>
+  </p>
+  <p class="auth-footer">
+    ¿Todavía no tienes una cuenta?
+    <a href="{% url 'crear_usuario' %}">Crear usuario</a>
+  </p>
+{% endblock auth_content %}

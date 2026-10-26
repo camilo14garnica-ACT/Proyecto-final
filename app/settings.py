@@ -80,7 +80,7 @@ if USE_POSTGRES:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.getenv('DB_NAME', 'veterinaria_db'),
             'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
+            'PASSWORD': os.getenv('DB_LOCAL_PASSWORD', 'postgres'),
             'HOST': os.getenv('DB_HOST', 'localhost'),
             'PORT': os.getenv('DB_PORT', '5432'),
         }
@@ -93,7 +93,7 @@ else:
         }
     }
 
-DATABASE_ROUTERS = ['app.ruoters.EnrutadorDobleBase']
+DATABASE_ROUTERS = ['app.routers.EnrutadorDobleBase']
 
 
 # ============================================================
@@ -119,7 +119,7 @@ USE_TZ = True
 # ============================================================
 # ARCHIVOS ESTÁTICOS Y MEDIA
 # ============================================================
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
