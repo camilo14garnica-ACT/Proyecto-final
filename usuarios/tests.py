@@ -1,10 +1,13 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+from types import SimpleNamespace
 
 from django.db import OperationalError
-from django.test import TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
+from django.urls import reverse
 from django.contrib.auth.hashers import identify_hasher
 from usuarios.models import Usuario
 from usuarios.forms import CrearUsuarioForm
+from usuarios.views import solicitar_eliminacion_cuenta
 
 
 class PasswordEncryptionTests(TestCase):
@@ -74,3 +77,38 @@ class PasswordEncryptionTests(TestCase):
         self.assertTrue(usuario.check_password('SuperPassword789!'))
         hasher = identify_hasher(usuario.password)
         self.assertEqual(hasher.algorithm, 'pbkdf2_sha256')
+
+
+class SolicitarEliminacionCuentaTests(SimpleTestCase):
+
+    def setUp(self):
+        self.url = reverse('solicitar_eliminacion_cuenta')
+        self.user = SimpleNamespace(
+            is_authenticated=True,
+            username='cliente_test',
+            delete=Mock(),
+        )
+
+    def test_muestra_confirmacion_sin_parametros_de_url(self):
+        request = RequestFactory().get(self.url)
+        request.user = self.user
+
+        response = solicitar_eliminacion_cuenta(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Eliminar mi cuenta')
+        self.assertContains(response, self.url)
+
+    def test_elimina_la_cuenta_solo_con_confirmacion(self):
+        request = RequestFactory().post(
+            self.url,
+            {'confirmar_eliminacion': 'SI'},
+        )
+        request.user = self.user
+
+        with patch('usuarios.views.logout') as logout, patch('usuarios.views.messages.success'):
+            response = solicitar_eliminacion_cuenta(request)
+
+        self.assertEqual(response.status_code, 302)
+        self.user.delete.assert_called_once_with()
+        logout.assert_called_once_with(request)
