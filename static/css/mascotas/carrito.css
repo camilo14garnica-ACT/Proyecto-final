@@ -1,0 +1,95 @@
+/* =====================================================
+   CARRITO DE COMPRAS
+   ===================================================== */
+
+/* Badge del carrito */
+.carrito-badge {
+  position: absolute; top: -6px; right: -6px;
+  background: #dc2626; color: #fff;
+  font-size: 0.68rem; font-weight: 700;
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Tarjeta de producto en tienda */
+.producto-tienda-card {
+  border: 1px solid #e5e7eb; border-radius: 12px;
+  overflow: hidden; background: #fff;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.producto-tienda-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+.producto-tienda-img {
+  background: #f9fafb; min-height: 110px;
+  display: flex; align-items: center;
+  justify-content: center; font-size: 2.5rem;
+  padding: 16px;
+}
+.producto-tienda-img img {
+  max-height: 90px; object-fit: contain;
+}
+.producto-tienda-body { padding: 14px; }
+.producto-cat {
+  font-size: 0.68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 2px 8px; border-radius: 4px;
+  margin-bottom: 6px; display: inline-block;
+}
+.cat-nutricion  { background: #dbeafe; color: #1e40af; }
+.cat-higiene    { background: #fce7f3; color: #9d174d; }
+.cat-farmacia   { background: #d1fae5; color: #065f46; }
+.cat-accesorios { background: #fef3c7; color: #92400e; }
+.cat-otros      { background: #f3f4f6; color: #374151; }
+
+.producto-tienda-body h6 {
+  font-size: 0.88rem; font-weight: 700;
+  color: #111827; margin-bottom: 4px;
+}
+.producto-tienda-body p {
+  font-size: 0.78rem; color: #6b7280;
+  margin-bottom: 10px; line-height: 1.4;
+}
+.btn-add-carrito {
+  background: #1a56db; color: #fff;
+  font-size: 0.78rem; font-weight: 600;
+  padding: 6px 12px; border-radius: 7px;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background 0.15s;
+}
+.btn-add-carrito:hover { background: #1e429f; color: #fff; }
+
+/* Items del carrito */
+.carrito-item {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.carrito-item:last-of-type { border-bottom: none; }
+.carrito-item-info { display: flex; flex-direction: column; gap: 2px; }
+.carrito-item-nombre { font-size: 0.85rem; font-weight: 600; color: #111827; }
+.carrito-item-precio { font-size: 0.8rem; color: #6b7280; }
+.carrito-item-ctrl { display: flex; align-items: center; gap: 8px; }
+.carrito-cant { font-size: 0.82rem; color: #374151; font-weight: 600; }
+.carrito-quitar { color: #dc2626; font-size: 1rem; }
+.carrito-quitar:hover { color: #b91c1c; }
+
+/* Total y pagar */
+.carrito-total {
+  display: flex; justify-content: space-between;
+  padding: 14px 0 10px;
+  border-top: 2px solid #e5e7eb;
+  font-size: 1rem; font-weight: 700; color: #111827;
+}
+.btn-pagar {
+  width: 100%; background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff; font-weight: 700; font-size: 0.95rem;
+  padding: 12px; border-radius: 8px; border: none;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 8px;
+  transition: opacity 0.2s; margin-top: 6px;
+}
+.btn-pagar:hover { opacity: 0.9; }

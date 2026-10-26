@@ -44,7 +44,7 @@ def iniciar_sesion(request):
             return redirect('panel_admin')
         elif request.user.rol == 'VETERINARIO':
             return redirect('panel_veterinario')
-        return redirect('inicio')
+        return redirect('mi_perfil')  # Cliente va a su panel de usuario
 
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -56,7 +56,7 @@ def iniciar_sesion(request):
             elif usuario.rol == 'VETERINARIO':
                 return redirect('panel_veterinario')
             else:
-                return redirect('inicio')
+                return redirect('mi_perfil')  # Cliente va a su panel de usuario
     else:
         form = AuthenticationForm()
     return render(request, 'usuarios/iniciar_sesion.html', {'form': form})
@@ -124,7 +124,6 @@ def mi_perfil(request):
         'proximas_citas': proximas_citas,
         'historial_citas': historial_citas,
     })
-
 
 # Eliminar usuario (solo admin)
 @solo_admin
