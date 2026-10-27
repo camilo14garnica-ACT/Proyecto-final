@@ -125,7 +125,7 @@ elif USE_POSTGRES:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.getenv('DB_NAME', 'veterinaria_db'),
             'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_LOCAL_PASSWORD', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', os.getenv('DB_LOCAL_PASSWORD', 'postgres')),
             'HOST': os.getenv('DB_HOST', 'localhost'),
             'PORT': os.getenv('DB_PORT', '5432'),
         }
