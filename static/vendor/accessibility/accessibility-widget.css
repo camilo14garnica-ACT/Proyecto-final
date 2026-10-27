@@ -1,0 +1,12 @@
+/* Accessibility Widget Custom Styles */
+/* Text size adjustment classes */
+.ac-text-size-small { font-size: 0.9rem; }
+.ac-text-size-normal { font-size: 1rem; }
+.ac-text-size-large { font-size: 1.2rem; }
+
+/* Transition for smooth scaling */
+body {
+  transition: font-size 0.3s ease;
+}
+
+/* Example: apply class to body when widget changes */

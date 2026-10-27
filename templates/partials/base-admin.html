@@ -9,12 +9,17 @@
     <!-- CSS PRINCIPAL -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- BOOTSTRAP ICONS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- DATATABLES -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
 
     <!-- SELECT2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+    <!-- ACCESIBILIDAD CSS -->
+    <link rel="stylesheet" href="{% static 'css/modulos/accesibilidad.css' %}">
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -64,6 +69,9 @@
         </div>
     </div>
 
+    <!-- WIDGET DE ACCESIBILIDAD -->
+    {% include 'partials/accesibilidad_widget.html' %}
+
     <!-- JAVASCRIPT: JQUERY -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
@@ -81,8 +89,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'js/modulos/usuarios/sweetalert_usuarios.js' %}"></script>
 
+    <!-- ACCESIBILIDAD JS -->
+    <script src="{% static 'js/modulos/accesibilidad.js' %}"></script>
+
     <!-- SCRIPTS DE CADA PLANTILLA -->
     {% block scripts %}{% endblock scripts %}
 </body>
 </html>
-

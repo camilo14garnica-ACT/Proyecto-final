@@ -1,0 +1,77 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'vendor/accessibility/accessibility-widget.css' %}">
+
+
+
+<script>
+    window.ACCESSIBILITY_WIDGET_CONFIG = {
+        lang: {
+            accessibilityMenu: 'Menú de Accesibilidad Mascott',
+            closeAccessibilityMenu: 'Cerrar Menú de Accesibilidad',
+            accessibilityTools: 'Herramientas de Accesibilidad',
+            resetAllSettings: 'Restablecer Ajustes',
+            screenReader: 'Lector de Pantalla (TTS)',
+            voiceCommand: 'Comandos de Voz',
+            textSpacing: 'Espaciado de Texto',
+            pauseAnimations: 'Pausar Animaciones',
+            hideImages: 'Ocultar Imágenes',
+            dyslexiaFriendly: 'Fuente para Dislexia',
+            biggerCursor: 'Cursor Agrandado',
+            lineHeight: 'Altura de Línea',
+            fontSelection: 'Tipo de Fuente',
+            colorFilter: 'Filtro de Color',
+            textAlign: 'Alineación de Texto',
+            textSize: 'Tamaño de Texto',
+            highContrast: 'Alto Contraste',
+            defaultFont: 'Fuente Predeterminada',
+            noFilter: 'Sin Filtro',
+            default: 'Predeterminado',
+            screenReaderOn: 'Lector de pantalla activado',
+            screenReaderOff: 'Lector de pantalla desactivado',
+            voiceControlActivated: 'Control de voz activado',
+            notSupportedBrowser: 'no es compatible con este navegador',
+            close: 'Cerrar',
+            reset: 'Restablecer',
+            saturation: 'Saturación',
+            selectLanguage: 'Idioma'
+        },
+        colors: {
+            primary: '#198754',         // Verde institucional Mascott
+            secondary: '#ffffff',       // Blanco contraste
+            optionBg: '#ffffff',        // Fondo de opciones
+            optionText: '#212529',      // Texto oscuro legible
+            optionIcon: '#198754'       // Icono verde
+        },
+        button: {
+            size: '56px',
+            borderRadius: '50%',
+            iconSize: '30px',
+            shadow: '0 8px 24px rgba(25, 135, 84, 0.45)'
+        },
+        widgetPosition: {
+            side: 'right',
+            right: '24px',
+            left: '24px',
+            bottom: '24px'
+        }
+    };
+
+    // Forzar idioma en español si no existe configuración previa
+    if (!localStorage.getItem('accessibilityWidgetLanguage')) {
+        localStorage.setItem('accessibilityWidgetLanguage', 'es');
+    }
+</script>
+
+
+<button type="button"
+        id="ac-trigger-btn"
+        class="ac-trigger-btn"
+        aria-label="Abrir panel de herramientas de accesibilidad (Atajo de teclado: Alt + A)"
+        aria-haspopup="dialog"
+        title="Opciones de Accesibilidad Mascott (Alt + A)">
+    <i class="bi bi-universal-access" aria-hidden="true"></i>
+    <span id="ac-badge-count" class="ac-trigger-badge" aria-label="Ajustes activos" style="display:none;">0</span>
+</button>
+
+<!-- Biblioteca Open Source de Accesibilidad Web (Zero-dependency, MIT) -->
+<script src="{% static 'vendor/accessibility/accessibility-widgets.js' %}"></script>

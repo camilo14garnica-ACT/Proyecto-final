@@ -14,6 +14,9 @@
 
   <!-- Hoja de estilos personalizada de esta página (panel-principal.css) -->
   <link rel="stylesheet" href="{% static 'css/usuarios/panel-principal.css' %}"/>
+
+  <!-- Módulo de Accesibilidad CSS -->
+  <link rel="stylesheet" href="{% static 'css/modulos/accesibilidad.css' %}"/>
 </head>
 
 <body class="page-inicio">
@@ -790,6 +793,11 @@
 
   <!-- JS personalizado de esta página -->
   <script src="{% static 'js/usuarios/inicio.js' %}"></script>
+
+  <!-- Widget de Accesibilidad Mascott -->
+  {% include 'partials/accesibilidad_widget.html' %}
+  <!-- Módulo de Accesibilidad JS -->
+  <script src="{% static 'js/modulos/accesibilidad.js' %}"></script>
 
 </body>
 </html>

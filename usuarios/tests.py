@@ -131,3 +131,19 @@ class SincronizacionUsuarioTests(TestCase):
         self.assertEqual(resultado['fallidos'], 1)
         self.assertEqual(pendiente.intentos, 1)
         self.assertIsNotNone(pendiente.reintentar_despues)
+
+
+class AccesibilidadModuloTests(TestCase):
+    def test_inicio_incluye_widget_y_recursos_de_accesibilidad(self):
+        """Verifica que la página de inicio carga el widget de accesibilidad y sus hojas de estilo y scripts."""
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        # Verificar recursos estáticos
+        self.assertContains(response, 'css/modulos/accesibilidad.css')
+        self.assertContains(response, 'js/modulos/accesibilidad.js')
+        # Verificar elementos del widget
+        self.assertContains(response, 'id="ac-trigger-btn"')
+        self.assertContains(response, 'id="ac-modal-overlay"')
+        self.assertContains(response, 'id="ac-reading-guide"')
+        self.assertContains(response, 'id="ac-speech-bar"')
+        self.assertContains(response, 'id="ac-live-announcer"')
