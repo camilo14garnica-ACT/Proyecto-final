@@ -160,3 +160,64 @@ class Cita(models.Model):
 
     def __str__(self):
         return f"{self.mascota.nombre} - {self.servicio.nombre} - {self.fecha_hora.strftime('%d/%m/%Y %H:%M')}"
+
+
+class Producto(models.Model):
+    """Productos de la tienda veterinaria"""
+    CATEGORIAS = [
+        ('NUTRICION',   'Nutrición'),
+        ('HIGIENE',     'Higiene'),
+        ('FARMACIA',    'Farmacia'),
+        ('ACCESORIOS',  'Accesorios'),
+        ('OTROS',       'Otros'),
+    ]
+    ESTADOS = [('ACTIVO', 'Activo'), ('INACTIVO', 'Inactivo')]
+
+    nombre      = models.CharField(max_length=120)
+    descripcion = models.TextField(blank=True)
+    categoria   = models.CharField(max_length=20, choices=CATEGORIAS, default='OTROS')
+    precio      = models.DecimalField(max_digits=10, decimal_places=2)
+    stock       = models.PositiveIntegerField(default=0)
+    imagen      = models.ImageField(upload_to='productos/', null=True, blank=True)
+    estado      = models.CharField(max_length=10, choices=ESTADOS, default='ACTIVO')
+    sync_uuid   = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        verbose_name = "Producto"
+        verbose_name_plural = "Productos"
+
+
+class Carrito(models.Model):
+    """Carrito de compras por usuario"""
+    usuario    = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='carrito'
+    )
+    creado_en  = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(auto_now=True)
+
+    def total(self):
+        return sum(item.subtotal() for item in self.items.all())
+
+    def cantidad_items(self):
+        return sum(item.cantidad for item in self.items.all())
+
+    def __str__(self):
+        return f"Carrito de {self.usuario.username}"
+
+
+class ItemCarrito(models.Model):
+    """Ítem dentro del carrito"""
+    carrito   = models.ForeignKey(Carrito, on_delete=models.CASCADE, related_name='items')
+    producto  = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad  = models.PositiveIntegerField(default=1)
+
+    def subtotal(self):
+        return self.producto.precio * self.cantidad
+
+    def __str__(self):
+        return f"{self.cantidad}x {self.producto.nombre}"

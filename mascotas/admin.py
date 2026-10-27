@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Especie, Raza, Mascota, Servicio, Cita
+from .models import Especie, Raza, Mascota, Servicio, Cita, Producto, Carrito, ItemCarrito
 
 
 @admin.register(Especie)
@@ -37,3 +37,20 @@ class CitaAdmin(admin.ModelAdmin):
     search_fields = ('mascota__nombre', 'veterinario__first_name', 'veterinario__last_name')
     date_hierarchy = 'fecha_hora'
     ordering = ('-fecha_hora',)
+
+
+@admin.register(Producto)
+class ProductoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'categoria', 'precio', 'stock', 'estado')
+    list_filter = ('categoria', 'estado')
+    search_fields = ('nombre',)
+
+
+class ItemCarritoInline(admin.TabularInline):
+    model = ItemCarrito
+    extra = 0
+
+@admin.register(Carrito)
+class CarritoAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'cantidad_items', 'total', 'actualizado')
+    inlines = [ItemCarritoInline]
