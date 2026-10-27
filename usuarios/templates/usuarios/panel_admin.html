@@ -1,85 +1,8 @@
 {% extends 'partials/base-admin.html' %}
 
 {% block content %}
-    <div class="container-fluid py-4">
-
     <h1 class="mb-3">Panel del Administrador</h1>
-
     <p class="text-muted mb-4">
         Bienvenido al sistema de gestión de la Veterinaria Mascott.
     </p>
-
-    <div class="row g-4">
-
-        <!-- Gestión de especies -->
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-
-                    <h5 class="card-title fw-bold">
-                        Gestión de especies
-                    </h5>
-
-                    <p class="card-text text-muted">
-                        Registra, consulta, edita y elimina las especies
-                        de animales de la veterinaria.
-                    </p>
-
-                    <a href="{% url 'lista_especies' %}"
-                       class="btn btn-primary">
-                        Administrar especies
-                    </a>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- Gestión de usuarios -->
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-
-                    <h5 class="card-title fw-bold">
-                        Gestión de usuarios
-                    </h5>
-
-                    <p class="card-text text-muted">
-                        Consulta los usuarios registrados, administra
-                        sus datos personales y gestiona sus cuentas.
-                    </p>
-
-                    <a href="{% url 'lista_usuarios' %}"
-                       class="btn btn-primary">
-                        Administrar usuarios
-                    </a>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- Gestión de mascotas -->
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body p-4">
-
-                    <h5 class="card-title fw-bold">
-                        Gestión de mascotas
-                    </h5>
-
-                    <p class="card-text text-muted">
-                        Consulta, registra, edita y elimina las mascotas
-                        registradas en la veterinaria.
-                    </p>
-
-                    <a href="{% url 'lista_mascotas' %}"
-                       class="btn btn-primary">
-                        Administrar mascotas
-                    </a>
-
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
 {% endblock content %}

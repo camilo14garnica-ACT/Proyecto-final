@@ -93,6 +93,9 @@ def panel_veterinario(request):
 @login_required
 def mi_perfil(request):
     from mascotas.models import Mascota, Cita
+    
+    if request.user.rol != 'CLIENTE':
+        return redirect('editar_perfil_admin')
 
     if request.method == 'POST':
         form = EditarPerfilForm(request.POST, instance=request.user)
@@ -124,6 +127,25 @@ def mi_perfil(request):
         'proximas_citas': proximas_citas,
         'historial_citas': historial_citas,
     })
+
+#PERFIL DE ADMIN Y ADMINISTAOR
+@login_required
+def panel_perfil(request):
+    """Perfil de admin y veterinario, dentro del panel."""
+    if request.user.rol == 'CLIENTE':
+        return redirect('mi_perfil')
+
+    if request.method == 'POST':
+        form = EditarPerfilForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil actualizado correctamente.')
+            return redirect('editar_perfil_admin')
+    else:
+        form = EditarPerfilForm(instance=request.user)
+
+    return render(request, 'usuarios/editar_perfil_admin.html', {'form': form})  
+  
 
 # Eliminar usuario (solo admin)
 @solo_admin

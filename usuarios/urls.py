@@ -36,4 +36,7 @@ urlpatterns = [
     path('administracion/usuarios/editar/<int:pk>/', views.editar_usuario, name='editar_usuario'),
     path('administracion/usuarios/eliminar/<int:pk>/', views.eliminar_usuario, name='eliminar_usuario'),
     path('perfil/confirmar-eliminacion/<int:pk>/', views.confirmar_eliminacion_cuenta, name='confirmar_eliminacion_cuenta'),
+    
+    #Perfil de admin y veterinaria para editar perfil
+    path('editar_perfil_admin/', views.panel_perfil, name='editar_perfil_admin')
 ]
