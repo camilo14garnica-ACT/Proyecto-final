@@ -1,0 +1,74 @@
+:root {
+  --panel-fondo: #0f1b33;
+  --panel-fondo-2: #16264a;
+  --panel-acento: #ffc107;
+  --panel-texto: #cfd8ea;
+  --panel-ancho: 260px;
+}
+
+body.panel-body { background: #f4f6fb; }
+.panel-layout { min-height: 100vh; }
+
+/* Menú lateral: escondido en celular, fijo en pantallas grandes */
+.panel-sidebar {
+  position: fixed; top: 0; bottom: 0; left: 0;
+  width: var(--panel-ancho);
+  background: var(--panel-fondo);
+  display: flex; flex-direction: column;
+  overflow-y: auto; z-index: 1040;
+  transform: translateX(-100%);
+  transition: transform .25s ease;
+}
+.panel-sidebar.abierto { transform: none; }
+
+.panel-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0, 0, 0, .5); z-index: 1030;
+}
+.panel-overlay.visible { display: block; }
+
+.panel-marca {
+  display: flex; align-items: center; gap: .6rem;
+  padding: 1.25rem 1.25rem 1rem;
+  color: #fff; font-size: 1.3rem; font-weight: 700; text-decoration: none;
+}
+.panel-marca i { color: var(--panel-acento); }
+
+.panel-menu { padding: .5rem 0; }
+.panel-menu-pie { margin-top: auto; border-top: 1px solid rgba(255, 255, 255, .1); }
+
+.panel-menu a,
+.panel-menu button {
+  display: flex; align-items: center; gap: .75rem;
+  width: calc(100% - 1.5rem);
+  margin: .15rem .75rem; padding: .7rem 1rem;
+  border: 0; border-radius: .6rem; background: none;
+  color: var(--panel-texto); text-align: left; text-decoration: none;
+}
+.panel-menu a:hover,
+.panel-menu button:hover { background: var(--panel-fondo-2); color: #fff; }
+.panel-menu a.activo { background: var(--panel-acento); color: #1b1b1b; font-weight: 600; }
+
+/* Zona central */
+.panel-main { min-width: 0; }
+.panel-topbar {
+  display: flex; align-items: center; gap: 1rem;
+  padding: .75rem 1.5rem; background: #fff;
+  border-bottom: 1px solid #e3e7ef;
+}
+.panel-content { padding: 1.5rem; }
+
+@media (min-width: 992px) {
+  .panel-sidebar { transform: none; }
+  .panel-main { margin-left: var(--panel-ancho); }
+  #btnMenu, .panel-overlay { display: none !important; }
+}
+
+/* estilos de los campos*/
+.panel-form input,
+.panel-form select,
+.panel-form textarea {
+  display: block; width: 100%;
+  padding: .5rem .75rem;
+  border: 1px solid #ced4da; border-radius: .5rem;
+}
