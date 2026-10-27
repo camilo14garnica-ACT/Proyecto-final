@@ -78,10 +78,9 @@
         </div>
     </div>
 
-    <!-- VOLVER AL PANEL -->
     <div class="mt-3">
-        <a href="{% if user.rol == 'ADMIN' %}{% url 'panel_admin' %}{% else %}{% url 'panel_veterinario' %}{% endif %}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Volver al panel
+        <a href="{% url 'editar_perfil_admin' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Volver a mi perfil
         </a>
     </div>
 </div>
@@ -109,4 +108,3 @@
     });
 </script>
 {% endblock scripts %}
-
