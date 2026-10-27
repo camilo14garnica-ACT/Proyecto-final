@@ -211,3 +211,57 @@ class EliminarEspeciesView(PersonalAutorizadoMixin, DeleteView):
         return super().form_valid(form)
     
 # Create your views here.
+
+
+# ============================================================
+# CARRITO DE COMPRAS
+# ============================================================
+from .models import Producto, Carrito, ItemCarrito
+
+@login_required
+def agregar_al_carrito(request, producto_id):
+    """Agrega un producto al carrito del usuario"""
+    producto = get_object_or_404(Producto, pk=producto_id, estado='ACTIVO')
+    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+
+    item, creado = ItemCarrito.objects.get_or_create(carrito=carrito, producto=producto)
+    if not creado:
+        item.cantidad += 1
+        item.save()
+
+    messages.success(request, f'"{producto.nombre}" agregado al carrito.')
+    return redirect(request.META.get('HTTP_REFERER', 'mi_perfil'))
+
+
+@login_required
+def quitar_del_carrito(request, item_id):
+    """Elimina un ítem del carrito"""
+    item = get_object_or_404(ItemCarrito, pk=item_id, carrito__usuario=request.user)
+    item.delete()
+    messages.success(request, 'Producto eliminado del carrito.')
+    return redirect('ver_carrito')
+
+
+@login_required
+def ver_carrito(request):
+    """Muestra el carrito del usuario"""
+    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+    productos  = Producto.objects.filter(estado='ACTIVO')
+    return render(request, 'mascotas/carrito.html', {
+        'carrito': carrito,
+        'productos': productos,
+    })
+
+
+@login_required
+def pagar_carrito(request):
+    """Procesa el pago del carrito (simulado)"""
+    carrito = get_object_or_404(Carrito, usuario=request.user)
+    if carrito.cantidad_items() == 0:
+        messages.error(request, 'Tu carrito está vacío.')
+        return redirect('ver_carrito')
+
+    # Simulación de pago exitoso — aquí iría la pasarela real
+    carrito.items.all().delete()
+    messages.success(request, '¡Compra realizada con éxito! Pronto recibirás tu pedido.')
+    return redirect('mi_perfil')

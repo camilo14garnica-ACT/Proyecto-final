@@ -14,7 +14,7 @@ class UsuarioAdmin(UserAdmin):
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
         ('Información adicional', {
-            'fields': ('rol', 'Document_Type', 'Number_Document', 'Date_of_birth')
+            'fields': ('rol', 'email', 'first_name', 'last_name', 'Document_Type', 'Number_Document', 'Date_of_birth')
         }),
     )
 
@@ -38,9 +38,3 @@ class HistorialMedicoAdmin(admin.ModelAdmin):
     list_display = ('mascota', 'veterinario', 'fecha')
     search_fields = ('mascota__nombre', 'diagnostico')
     list_filter = ('fecha',)
-
-
-@admin.register(UsuarioSyncPendiente)
-class UsuarioSyncPendienteAdmin(admin.ModelAdmin):
-    list_display = ('sync_uuid', 'operacion', 'intentos', 'creado', 'actualizado')
-    list_filter = ('operacion',)

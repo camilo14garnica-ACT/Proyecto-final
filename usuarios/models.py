@@ -8,7 +8,7 @@ from django.conf import settings
 
 
 class Usuario(AbstractUser):
-    
+
     class Rol(models.TextChoices):
         ADMIN = 'ADMIN', 'Administrador'
         VETERINARIO = 'VETERINARIO', 'Veterinario'
@@ -25,14 +25,14 @@ class Usuario(AbstractUser):
 
     first_name = models.CharField(max_length=50, verbose_name="Nombre", blank=True)
     last_name = models.CharField(max_length=50, verbose_name="Apellido", blank=True)
-    
+
     rol = models.CharField(
         max_length=20,
         choices=Rol.choices,
         default=Rol.CLIENTE,
         verbose_name="Rol"
     )
-    
+
     Document_Type = models.CharField(
         max_length=3,
         choices=TIPO_DOCUMENTO_CHOICES,
@@ -52,24 +52,19 @@ class Usuario(AbstractUser):
         null=True,
         blank=True,
     )
-    sync_uuid = models.UUIDField(
-        default=uuid.uuid4,
-        unique=True,
-        editable=False,
-        verbose_name="UUID de sincronización",
-    )
+    sync_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+
     REQUIRED_FIELDS = ["first_name", "last_name", "Document_Type", "Number_Document", "Date_of_birth"]
 
     def __str__(self):
-        full_name = f"{self.first_name} {self.last_name}".strip()
-        return full_name or self.username
+        return f"{self.first_name} {self.last_name}".strip() or self.username
 
     def es_veterinario(self):
         return self.rol == self.Rol.VETERINARIO
-    
+
     def es_cliente(self):
         return self.rol == self.Rol.CLIENTE
-    
+
     def es_admin(self):
         return self.rol == self.Rol.ADMIN
 
@@ -80,7 +75,7 @@ class Usuario(AbstractUser):
         if self.rol == self.Rol.ADMIN and not self.is_staff:
             self.is_staff = True
 
-        # Asegurar que la contraseña siempre se guarde cifrada usando el hasher por defecto de Django
+        # Asegurar que la contraseña siempre se guarde cifrada
         if self.password and is_password_usable(self.password):
             try:
                 identify_hasher(self.password)
@@ -93,11 +88,10 @@ class Usuario(AbstractUser):
 
 
 class Mascota(models.Model):
-    # Conectamos con el modelo Usuario, filtrando para que solo aparezcan CLIENTES
     propietario = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE, 
-        related_name='mascotas_usuarios',
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mascotas_legacy',
         limit_choices_to={'rol': 'CLIENTE'},
         verbose_name="Dueño"
     )
@@ -118,12 +112,11 @@ class Cita(models.Model):
         CANCELADA = 'CANCELADA', 'Cancelada'
 
     mascota = models.ForeignKey(Mascota, on_delete=models.CASCADE, related_name='citas', verbose_name="Mascota")
-    # Conectamos con el modelo Usuario, filtrando para que solo aparezcan VETERINARIOS
     veterinario = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        related_name='citas_asignadas',
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='citas_asignadas_legacy',
         limit_choices_to={'rol': 'VETERINARIO'},
         verbose_name="Veterinario asignado"
     )
@@ -138,9 +131,9 @@ class Cita(models.Model):
 class HistorialMedico(models.Model):
     mascota = models.ForeignKey(Mascota, on_delete=models.CASCADE, related_name='historiales', verbose_name="Mascota")
     veterinario = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
         limit_choices_to={'rol': 'VETERINARIO'},
         verbose_name="Atendido por"
     )
@@ -154,16 +147,13 @@ class HistorialMedico(models.Model):
 
 
 class UsuarioSyncPendiente(models.Model):
+    """Cola de sincronización entre bases de datos"""
     class Operacion(models.TextChoices):
         GUARDAR = 'guardar', 'Guardar'
         ELIMINAR = 'eliminar', 'Eliminar'
 
     sync_uuid = models.UUIDField(unique=True)
-    operacion = models.CharField(
-        max_length=10,
-        choices=Operacion.choices,
-        default=Operacion.GUARDAR,
-    )
+    operacion = models.CharField(max_length=10, choices=Operacion.choices, default=Operacion.GUARDAR)
     intentos = models.PositiveIntegerField(default=0)
     reintentar_despues = models.DateTimeField(null=True, blank=True)
     ultimo_error = models.TextField(blank=True)
@@ -174,27 +164,30 @@ class UsuarioSyncPendiente(models.Model):
     class Meta:
         ordering = ('creado',)
 
+
+class CodigoRecuperacion(models.Model):
+    """Código de 6 dígitos para recuperar contraseña por correo"""
+
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='codigos_recuperacion'
+    )
+    # Código de 6 dígitos generado aleatoriamente
+    codigo = models.CharField(max_length=6)
+    # Fecha de expiración: 15 minutos desde la creación
+    expira_en = models.DateTimeField()
+    # Si ya fue usado no puede volver a usarse
+    usado = models.BooleanField(default=False)
+    creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-creado',)
+
     def __str__(self):
-        return f"Sync {self.sync_uuid} ({self.operacion})"
+        return f"Código {self.codigo} para {self.usuario.email}"
 
-
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-
-@receiver(post_save, sender=Usuario)
-def encolar_usuario_guardado(sender, instance, **kwargs):
-    pendiente, created = UsuarioSyncPendiente.objects.get_or_create(
-        sync_uuid=instance.sync_uuid,
-        defaults={'operacion': UsuarioSyncPendiente.Operacion.GUARDAR}
-    )
-    if not created:
-        pendiente.revision += 1
-        pendiente.operacion = UsuarioSyncPendiente.Operacion.GUARDAR
-        pendiente.save()
-
-@receiver(post_delete, sender=Usuario)
-def encolar_usuario_eliminado(sender, instance, **kwargs):
-    UsuarioSyncPendiente.objects.update_or_create(
-        sync_uuid=instance.sync_uuid,
-        defaults={'operacion': UsuarioSyncPendiente.Operacion.ELIMINAR}
-    )
+    def es_valido(self):
+        """Retorna True si el código no fue usado y no ha expirado"""
+        from django.utils import timezone
+        return not self.usado and self.expira_en > timezone.now()

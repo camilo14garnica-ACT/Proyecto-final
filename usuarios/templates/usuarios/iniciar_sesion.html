@@ -1,37 +1,36 @@
-{% extends "usuarios/base.html" %}
+{% extends "usuarios/base_auth.html" %}
 
 {% block title %}Iniciar sesión - Veterinaria Mascott{% endblock %}
 
-{% block content %}
-  <section class="auth-card" aria-labelledby="login-title">
-    <h1 id="login-title">Iniciar sesión</h1>
+{% block auth_content %}
+  <div class="auth-logo">
+    <i class="bi bi-heart-pulse-fill"></i>
+    <span>Mascott</span>
+  </div>
 
-    <form method="post" class="auth-form">
-      {% csrf_token %}
+  <h1 id="login-title" class="auth-title">Iniciar sesión</h1>
 
-      {% if form.non_field_errors %}
-        <p class="text-danger">{{ form.non_field_errors }}</p>
-      {% endif %}
+  <form method="post" class="auth-form" aria-labelledby="login-title">
+    {% csrf_token %}
 
-      {{ form.as_p }}
+    {% if form.non_field_errors %}
+      <div class="auth-error">{{ form.non_field_errors }}</div>
+    {% endif %}
 
-      {% if next %}
-        <input type="hidden" name="next" value="{{ next }}">
-      {% endif %}
+    {{ form.as_p }}
 
-      <button type="submit" class="button button-primary">
-        Iniciar sesión
-      </button>
-    </form>
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
 
-    <p class="auth-help"> 
-      <a href="{% url "password_reset" %}">¿Olvidaste tu contraseña?</a>
-    </p>
+    <button type="submit" class="auth-btn">Iniciar sesión</button>
+  </form>
 
-    <p class="auth-help">
-      ¿Todavía no tienes una cuenta?
-      <a href="{% url 'crear_usuario' %}">Crear usuario</a>
-    </p>
-
-  </section>
-{% endblock content %}
+  <p class="auth-footer">
+    <a href="{% url 'recuperar_password_solicitar' %}">¿Olvidaste tu contraseña?</a>
+  </p>
+  <p class="auth-footer">
+    ¿Todavía no tienes una cuenta?
+    <a href="{% url 'crear_usuario' %}">Crear usuario</a>
+  </p>
+{% endblock auth_content %}

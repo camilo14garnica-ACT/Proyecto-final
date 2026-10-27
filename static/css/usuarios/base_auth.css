@@ -1,0 +1,163 @@
+/* =====================================================
+   BASE AUTH — Estilos base para páginas de autenticación
+   El responsivo se maneja con Bootstrap (col, d-flex, etc.)
+   Aquí solo van estilos que Bootstrap no cubre
+   ===================================================== */
+
+/* Fondo azul degradado en toda la pantalla */
+body,
+.auth-body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a8fc1 0%, #2563a8 50%, #1a5f8c 100%) !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Enlace volver al inicio — encima de la tarjeta */
+.auth-volver {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 10px;
+  transition: color 0.2s;
+}
+.auth-volver:hover {
+  color: #fff;
+}
+
+/* Tarjeta blanca central */
+.auth-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsivo: menos padding en móvil */
+@media (max-width: 576px) {
+  .auth-card {
+    padding: 28px 20px;
+    border-radius: 12px;
+  }
+}
+
+/* Logo: icono + nombre */
+.auth-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+}
+.auth-logo i {
+  font-size: 1.6rem;
+  color: #6d28d9;
+}
+
+/* Título del formulario */
+.auth-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+/* Descripción debajo del título */
+.auth-desc {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* Inputs generados por Django (form.as_p) */
+.auth-form p {
+  margin-bottom: 16px;
+}
+.auth-form label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 5px;
+}
+.auth-form input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.auth-form input:focus {
+  border-color: #2563a8;
+  box-shadow: 0 0 0 3px rgba(37, 99, 168, 0.15);
+}
+
+/* Botón principal */
+.auth-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #1a8fc1 0%, #1e429f 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 12px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.auth-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Texto pie del formulario */
+.auth-footer {
+  text-align: center;
+  font-size: 0.83rem;
+  color: #6b7280;
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+.auth-footer a {
+  color: #2563a8;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+
+/* Input grande para el código de 6 dígitos */
+.codigo-input {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  padding: 12px 14px;
+}
+
+/* Mensaje de error dentro del formulario */
+.auth-error {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  font-size: 0.83rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
