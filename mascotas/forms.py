@@ -108,7 +108,7 @@ class MascotaForm(forms.ModelForm):
         fields = [
             'Cliente', 'nombre', 'especie', 'raza', 'sexo',
             'fecha_nacimiento', 'edad_aproximada_meses', 'peso_kg',
-            'color', 'esterilizado', 'microchip', 'estado', 'observaciones',
+            'color', 'esterilizado', 'estado', 'observaciones',
         ]
         labels = {
             'Cliente': 'Propietario',
@@ -121,7 +121,6 @@ class MascotaForm(forms.ModelForm):
             'peso_kg': 'Peso (kg)',
             'color': 'Color',
             'esterilizado': 'Esterilización',
-            'microchip': 'Número de microchip',
             'estado': 'Estado',
             'observaciones': 'Observaciones',
         }
@@ -147,7 +146,6 @@ class MascotaForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ej. Sí, No o Pendiente',
             }),
-            'microchip': forms.TextInput(attrs={'class': 'form-control'}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
             'observaciones': forms.Textarea(attrs={
                 'class': 'form-control',
