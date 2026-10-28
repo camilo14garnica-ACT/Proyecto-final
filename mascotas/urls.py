@@ -4,10 +4,10 @@ from . import views
 
 urlpatterns = [
     #Crud de mascotas
-    path('', views.lista_mascotas, name='lista_mascotas'),
-    path('nueva/', views.registrar_mascota, name='registrar_mascota'),
-    path('editar/<int:pk>', views.eliminar_mascota, name='editar_mascota'),
-    path('eliminar/<int:pk>', views.editar_mascota, name='eliminar_mascota'),
+    path('', views.ListaMascotasView.as_view(), name='lista_mascotas'),
+    path('nueva/', views.CrearMascotaView.as_view(), name='registrar_mascota'),
+    path('editar/<int:pk>/', views.EditarMascotaView.as_view(), name='editar_mascota'),
+    path('eliminar/<int:pk>/', views.EliminarMascotaView.as_view(), name='eliminar_mascota'),
     
     #Consulta de razas por especie
     path('razas_por_especie/<int:especie_id>/', views.razas_por_especie, name='razas_por_especie'),
@@ -18,9 +18,9 @@ urlpatterns = [
     path('especies/editar/<int:pk>/', views.EditarEspecieView.as_view(), name='editar_especie'),
     path('especies/eliminar/<int:pk>/', views.EliminarEspeciesView.as_view(), name='eliminar_especie'),
 
-    # Carrito de compras
-    path('carrito/', views.ver_carrito, name='ver_carrito'),
-    path('carrito/agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_carrito'),
-    path('carrito/quitar/<int:item_id>/', views.quitar_del_carrito, name='quitar_carrito'),
-    path('carrito/pagar/', views.pagar_carrito, name='pagar_carrito'),
+    # CRUD de razas
+    path('razas/', views.ListaRazasView.as_view(), name='lista_razas'),
+    path('razas/crear/', views.CrearRazaView.as_view(), name='registrar_raza'),
+    path('razas/editar/<int:pk>/', views.EditarRazaView.as_view(), name='editar_raza'),
+    path('razas/eliminar/<int:pk>/', views.EliminarRazaView.as_view(), name='eliminar_raza'),
 ]

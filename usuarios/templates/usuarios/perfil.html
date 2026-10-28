@@ -29,12 +29,10 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a href="{% url 'inicio' %}"><i class="bi bi-house-fill"></i> Inicio</a>
+      <a href="#datos" class="activo"><i class="bi bi-person-fill"></i> Mi Perfil</a>
       <a href="#citas"><i class="bi bi-calendar-check"></i> Mis Citas</a>
       <a href="#mascotas"><i class="bi bi-heart-fill"></i> Mis Mascotas</a>
-      <a href="{% url 'ver_carrito' %}"><i class="bi bi-bag-fill"></i> Tienda</a>
       <a href="#historial"><i class="bi bi-clock-history"></i> Historial</a>
-      <a href="#datos" class="activo"><i class="bi bi-person-fill"></i> Mi Perfil</a>
       <a href="#seguridad"><i class="bi bi-shield-lock-fill"></i> Seguridad</a>
     </nav>
 
@@ -149,7 +147,10 @@
     <section id="mascotas" class="perfil-seccion">
       <div class="seccion-header">
         <h2><i class="bi bi-heart-fill me-2"></i>Mis Mascotas</h2>
-        <a href="#" class="seccion-ver-mas">Registrar mascota →</a>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{% url 'lista_mascotas' %}" class="seccion-ver-mas">Ver todas →</a>
+          <a href="{% url 'registrar_mascota' %}" class="seccion-ver-mas">Registrar mascota →</a>
+        </div>
       </div>
 
       {% if mascotas %}
@@ -180,7 +181,7 @@
         <div class="vacio-msg">
           <i class="bi bi-heart"></i>
           <p>Aún no has registrado mascotas.</p>
-          <a href="#" class="btn-vacio">Registrar mascota</a>
+          <a href="{% url 'registrar_mascota' %}" class="btn-vacio">Registrar mascota</a>
         </div>
       {% endif %}
     </section>

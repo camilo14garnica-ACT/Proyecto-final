@@ -35,8 +35,8 @@
         {% with actual=request.resolver_match.url_name %}
         <nav class="panel-menu">
             {% if user.rol == 'ADMIN' %}
-                <a href="{% url 'panel_admin' %}" class="{% if actual == 'panel_admin' %}activo{% endif %}">
-                    <i class="bi bi-grid"></i> Inicio
+
+                <a href="{% url 'editar_perfil_admin' %}"><i class="bi bi-person-circle"></i> Mi perfil</a>
                 </a>
                 <a href="{% url 'lista_usuarios' %}" class="{% if actual == 'lista_usuarios' or actual == 'editar_usuario' or actual == 'eliminar_usuario' %}activo{% endif %}">
                     <i class="bi bi-people"></i> Usuarios
@@ -44,7 +44,7 @@
                 <a href="{% url 'lista_especies' %}" class="{% if actual == 'lista_especies' or actual == 'especie_form' or actual == 'editar_especie' or actual == 'eliminar_especie' %}activo{% endif %}">
                     <i class="bi bi-collection"></i> Especies
                 </a>
-                <a href="#">
+                <a href="{% url 'lista_razas' %}" class="{% if actual == 'lista_razas' or actual == 'registrar_raza' or actual == 'editar_raza' or actual == 'eliminar_raza' %}activo{% endif %}">
                     <i class="bi bi-diagram-3"></i> Razas
                 </a>
                 <a href="{% url 'lista_mascotas' %}" class="{% if actual == 'lista_mascotas' or actual == 'registrar_mascota' or actual == 'editar_mascota' or actual == 'eliminar_mascota' %}activo{% endif %}">
@@ -64,7 +64,7 @@
 
         <nav class="panel-menu panel-menu-pie">
 
-            <a href="{% url 'editar_perfil_admin' %}"><i class="bi bi-person-circle"></i> Mi perfil</a>
+            
             <a href="{% url 'inicio' %}"><i class="bi bi-house"></i> Volver al sitio</a>
             <form method="post" action="{% url 'logout' %}" class="m-0">
                 {% csrf_token %}
