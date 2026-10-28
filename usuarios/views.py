@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
@@ -186,6 +187,7 @@ def confirmar_eliminacion_cuenta(request, pk):
         return redirect('lista_usuarios')
     if request.method == 'POST':
         username = usuario.username
+        logout(request)
         usuario.delete()
         messages.success(request, f'El usuario {username} fue eliminado correctamente.')
         return redirect('lista_usuarios')

@@ -5,7 +5,7 @@ from django.db import OperationalError
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
 from django.contrib.auth.hashers import identify_hasher
-from usuarios.models import Usuario
+from usuarios.models import Usuario, UsuarioSyncPendiente
 from usuarios.forms import CrearUsuarioForm
 from usuarios.views import mi_perfil, panel_perfil, solicitar_eliminacion_cuenta
 
@@ -19,12 +19,9 @@ class PasswordEncryptionTests(TestCase):
             password='Password123Segura!',
             rol=Usuario.Rol.CLIENTE
         )
-        # La contraseña en base de datos no debe ser el texto plano
         self.assertNotEqual(usuario.password, 'Password123Segura!')
-        # Debe ser identificada por el hasher por defecto (PBKDF2)
         hasher = identify_hasher(usuario.password)
         self.assertEqual(hasher.algorithm, 'pbkdf2_sha256')
-        # check_password debe validar la contraseña correctamente
         self.assertTrue(usuario.check_password('Password123Segura!'))
 
     def test_administrador_createsuperuser_cifra_contrasena(self):
@@ -51,7 +48,6 @@ class PasswordEncryptionTests(TestCase):
             password='ClaveValida987!'
         )
         pwd_hash_inicial = usuario.password
-        # Guardar nuevamente sin cambiar la contraseña
         usuario.first_name = 'Nuevo Nombre'
         usuario.save()
         self.assertEqual(usuario.password, pwd_hash_inicial)
@@ -86,6 +82,9 @@ class SolicitarEliminacionCuentaTests(SimpleTestCase):
         self.user = SimpleNamespace(
             is_authenticated=True,
             username='cliente_test',
+            is_superuser=False,
+            es_admin=lambda: False,
+            es_veterinario=lambda: False,
             delete=Mock(),
         )
 

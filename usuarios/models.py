@@ -82,7 +82,9 @@ class Usuario(AbstractUser):
             except ValueError:
                 self.set_password(self.password)
 
-        super().save(*args, **kwargs)
+        using = kwargs.get('using') or router.db_for_write(type(self), instance=self)
+        with transaction.atomic(using=using):
+            return super().save(*args, **kwargs)
 
 
 class Mascota(models.Model):

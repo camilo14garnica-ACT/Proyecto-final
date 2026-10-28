@@ -1,21 +1,32 @@
-<!-- ENCABEZADO -->
-
-<header class="hero-section text-white text-center">
-  <div class="container">
-    <h1 class="display-4 fw-bold mb-3">
-      Descubre el Corazón Salvaje de la Orinoquia
+<!-- ENCABEZADO VETERINARIA MASCOTT -->
+{% load static %}
+<header class="hero-section text-white text-center py-5">
+  <div class="container py-3">
+    <div class="mb-3">
+      <img src="{% static 'usuarios/img/logo mascott.png' %}" alt="Logo Mascott" class="rounded-circle shadow bg-white p-2" style="max-height: 90px; max-width: 90px; object-fit: contain;">
+    </div>
+    <h1 class="display-5 fw-bold mb-3">
+      Clínica Veterinaria Mascott
     </h1>
-    <p class="lead mb-4">
-      Sabanas infinitas, atardeceres mágicos, safaris llaneros y una cultura
-      ancestral esperando por ti.
+    <p class="lead mb-4 mx-auto" style="max-width: 760px;">
+      30 años cuidando perros y gatos en <strong>Sogamoso, Boyacá</strong>. Contamos con laboratorio propio, rayos X, ecografía, cirugía y hospitalización continua.
     </p>
-    <div class="d-flex justify-content-center gap-3">
-      <a href="#destinos" class="btn btn-warning btn-lg fw-bold text-dark"
-        >Explorar Destinos</a
-      >
-      <a href="#experiencias" class="btn btn-outline-light btn-lg"
-        >Planifica tu Viaje</a
-      >
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      {% if user.is_authenticated %}
+        <a href="{% url 'mi_perfil' %}" class="btn btn-warning btn-lg fw-bold text-dark px-4 shadow-sm">
+          <i class="bi bi-person-circle me-1"></i> Mi Perfil
+        </a>
+        <a href="{% url 'cerrar_sesion' %}" class="btn btn-outline-light btn-lg px-4">
+          <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+        </a>
+      {% else %}
+        <a href="{% url 'crear_usuario' %}" class="btn btn-warning btn-lg fw-bold text-dark px-4 shadow-sm">
+          <i class="bi bi-person-plus-fill me-1"></i> Registrarme Gratis
+        </a>
+        <a href="{% url 'iniciar_sesion' %}" class="btn btn-outline-light btn-lg px-4">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+        </a>
+      {% endif %}
     </div>
   </div>
 </header>
