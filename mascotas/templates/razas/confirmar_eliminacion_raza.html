@@ -1,0 +1,19 @@
+{% extends 'partials/base-admin.html' %}
+
+{% block title %}Eliminar raza | Mascott{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow-sm border-danger">
+        <div class="card-body">
+            <h1 class="h3 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Eliminar raza</h1>
+            <p>¿Estás seguro de que deseas eliminar la raza <strong>{{ raza.nombre }}</strong> de la especie <strong>{{ raza.especie.nombre }}</strong>?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                <a href="{% url 'lista_razas' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

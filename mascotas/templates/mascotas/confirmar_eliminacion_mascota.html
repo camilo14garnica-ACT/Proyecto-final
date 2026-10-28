@@ -1,0 +1,19 @@
+{% extends base_template|default:'mascotas/base_cliente.html' %}
+
+{% block title %}Eliminar mascota | Mascott{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    <div class="card shadow-sm border-danger">
+        <div class="card-body">
+            <h1 class="h3 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Eliminar mascota</h1>
+            <p>¿Estás seguro de que deseas eliminar a <strong>{{ mascota.nombre }}</strong>?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                <a href="{% url 'lista_mascotas' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

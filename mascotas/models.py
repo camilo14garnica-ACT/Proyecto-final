@@ -66,9 +66,13 @@ class Mascota(models.Model):
     
     def __str__(self):
         return self.nombre
+
+
 # Create your models here.
 
 
+
+# ESTO LO HIZO EL GAY DE MMIGUEL
 class Servicio(models.Model):
     """Servicios que ofrece la veterinaria (Consulta, Vacunación, Estética, etc.)"""
     ESTADOS = [('ACTIVO', 'Activo'), ('INACTIVO', 'Inactivo')]

@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const especie = document.getElementById('id_especie');
     const raza = document.getElementById('id_raza');
-    const plantillaUrl = document.body.dataset.razasUrl;
+    const formulario = especie ? especie.form : null;
+    const plantillaUrl = formulario?.dataset.razasUrl;
 
     // Inicializar Select2
     if (window.jQuery && jQuery.fn.select2) {

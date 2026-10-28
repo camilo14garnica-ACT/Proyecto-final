@@ -1,12 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from .models import Especie, Raza, Mascota
 from .permisos import es_personal
-
-
-
-from django import forms
-from .models import Especie
 
 
 class EspecieForm(forms.ModelForm):
@@ -57,13 +53,62 @@ class EspecieForm(forms.ModelForm):
         return nombre
 
 
+class RazaForm(forms.ModelForm):
+    class Meta:
+        model = Raza
+        fields = ['especie', 'nombre', 'descripcion', 'estado']
+        labels = {
+            'especie': 'Especie',
+            'nombre': 'Nombre de la raza',
+            'descripcion': 'Descripción',
+            'estado': 'Estado',
+        }
+        widgets = {
+            'especie': forms.Select(attrs={'class': 'form-select'}),
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej. Labrador',
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Describe la raza',
+            }),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        especies = Especie.objects.filter(estado='ACTIVO')
+        if self.instance.pk:
+            especies = Especie.objects.filter(
+                Q(estado='ACTIVO') | Q(pk=self.instance.especie_id)
+            )
+        self.fields['especie'].queryset = especies.order_by('nombre')
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data['nombre'].strip()
+        especie = self.cleaned_data.get('especie')
+        repetida = Raza.objects.filter(
+            especie=especie,
+            nombre__iexact=nombre,
+        ).exclude(pk=self.instance.pk)
+
+        if repetida.exists():
+            raise forms.ValidationError(
+                'Ya existe una raza con ese nombre para esta especie.'
+            )
+
+        return nombre
+
+
 class MascotaForm(forms.ModelForm):
     class Meta:
         model = Mascota
         fields = [
             'Cliente', 'nombre', 'especie', 'raza', 'sexo',
             'fecha_nacimiento', 'edad_aproximada_meses', 'peso_kg',
-            'color', 'esterilizado', 'microchip', 'observaciones',
+            'color', 'esterilizado', 'microchip', 'estado', 'observaciones',
         ]
         labels = {
             'Cliente': 'Propietario',
@@ -77,6 +122,7 @@ class MascotaForm(forms.ModelForm):
             'color': 'Color',
             'esterilizado': 'Esterilización',
             'microchip': 'Número de microchip',
+            'estado': 'Estado',
             'observaciones': 'Observaciones',
         }
         widgets = {
@@ -102,6 +148,7 @@ class MascotaForm(forms.ModelForm):
                 'placeholder': 'Ej. Sí, No o Pendiente',
             }),
             'microchip': forms.TextInput(attrs={'class': 'form-control'}),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
             'observaciones': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
@@ -132,3 +179,34 @@ class MascotaForm(forms.ModelForm):
         self.usuario = kwargs.pop('usuario', None)
         super().__init__(*args, **kwargs)
 
+        if self.usuario is not None and not es_personal(self.usuario):
+            self.fields.pop('Cliente')
+        else:
+            self.fields['Cliente'].queryset = (
+                get_user_model().objects
+                .filter(rol='CLIENTE')
+                .order_by('first_name', 'last_name', 'username')
+            )
+
+        especie_id = (
+            self.data.get('especie')
+            or self.initial.get('especie')
+            or getattr(self.instance, 'especie_id', None)
+        )
+        self.fields['especie'].queryset = Especie.objects.filter(
+            Q(estado='ACTIVO') | Q(pk=getattr(self.instance, 'especie_id', None))
+        ).order_by('nombre')
+
+        razas = Raza.objects.filter(estado='ACTIVO')
+        if especie_id:
+            razas = razas.filter(especie_id=especie_id)
+        else:
+            razas = razas.none()
+
+        if self.instance.pk and self.instance.raza_id:
+            razas = Raza.objects.filter(
+                Q(estado='ACTIVO', especie_id=especie_id)
+                | Q(pk=self.instance.raza_id)
+            )
+
+        self.fields['raza'].queryset = razas.order_by('nombre')

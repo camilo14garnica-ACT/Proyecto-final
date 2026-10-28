@@ -57,6 +57,8 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -124,7 +126,7 @@ else:
         }
     }
 
-DATABASE_ROUTERS = ['app.routers.EnrutadorDobleBase']
+#   DATABASE_ROUTERS = ['app.routers.EnrutadorDobleBase']
 
 
 # ============================================================

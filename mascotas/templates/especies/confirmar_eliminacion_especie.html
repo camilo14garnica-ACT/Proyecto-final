@@ -1,17 +1,19 @@
-<form method="post">
-    {% csrf_token %}
+{% extends 'partials/base-admin.html' %}
 
-    <p>
-        ¿Estás seguro de que deseas eliminar la especie
-        <strong>{{ especie.nombre }}</strong>?
-    </p>
+{% block title %}Eliminar especie | Mascott{% endblock %}
 
-    <button type="submit" class="btn btn-danger">
-        Sí, eliminar
-    </button>
-
-    <a href="{% url 'lista_especies' %}"
-       class="btn btn-secondary">
-        Cancelar
-    </a>
-</form>
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow-sm border-danger">
+        <div class="card-body">
+            <h1 class="h3 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Eliminar especie</h1>
+            <p>¿Estás seguro de que deseas eliminar la especie <strong>{{ especie.nombre }}</strong>?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                <a href="{% url 'lista_especies' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

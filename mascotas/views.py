@@ -1,120 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-
-from .models import Mascota, Especie, Raza
-from .forms import EspecieForm, MascotaForm
-from .permisos import es_personal, solo_admin
-from django.views.decorators.http import require_http_methods
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import ProtectedError
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+
+from .models import Mascota, Especie, Raza
+from .forms import EspecieForm, MascotaForm, RazaForm
+from .permisos import es_personal
 
 
-def mascotas_visible(usuario):
-    mascotas = Mascota.objects.select_related('Cliente', 'especie', 'raza')
-    if es_personal(usuario):
-        return mascotas
-    return mascotas.filter(Cliente=usuario)
-
-
-@login_required
-def lista_mascotas(request):
-    mascotas = mascotas_visible(request.user)
-    return render(request, 'mascotas/lista_mascotas.html', {'mascotas': mascotas})
-
-@login_required
-def registrar_mascota(request):
-
-    form = MascotaForm(request.POST or None, usuario=request.user)
-
-    if request.method == 'POST' and form.is_valid():
-
-        mascota = form.save(commit=False)
-
-        # Si es cliente, se asigna como propietario automáticamente.
-        if request.user.rol == 'CLIENTE':
-            mascota.Cliente = request.user
-
-        mascota.save()
-
-        messages.success(
-            request,
-            'Mascota registrada correctamente.'
-        )
-
-        return redirect('lista_mascotas')
-
-    return render(
-        request,
-        'mascotas/mascota_form.html',
-        {'form': form}
-    )
-@login_required
-def editar_mascota(request, pk):
-    mascota = get_object_or_404(
-        mascotas_visible(request.user),
-        pk=pk
-    )
-    
-    form = MascotaForm(
-        request.POST or None,
-        instance=mascota,
-        usuario=request.user
-    )
-    
-    if request.method == 'POST' and form.is_valid():
-        mascota = form.save(commit=False)
-        
-        #El cliente conserva la propiedad de su mascota
-        if not es_personal(request.user):
-            mascota.Cliente = request.user
-        
-        mascota.save()
-        
-        messages.success(
-            request,
-            'Mascota actualizada correctamente.'
-        )
-        
-        return redirect('lista_mascotas')
-    return render(
-        request,
-        'mascotas/mascota_form.html',
-        {
-            'form': form,
-            'titulo': 'Editar mascota'
-        }
-    )
-
-@login_required
-@require_http_methods(["GET", "POST"])
-def eliminar_mascota(request, pk):
-    mascota = get_object_or_404(
-        mascotas_visible(request.user),
-        pk=pk
-    )
-    if request.method == 'POST':
-        nombre = mascota.nombre
-        mascota.delete()
-        
-        messages.success(
-            request,
-            f'la mascota {nombre} fue eliminada correctamente.'
-        )
-        
-        return redirect('lista_mascotas')
-    return render(
-        request,
-        'mascotas/confirmar_eliminacion_mascota.html',
-        {'mascota': mascota}
-    )
-
-@login_required
 def razas_por_especie(request, especie_id):
     razas = Raza.objects.filter(especie_id=especie_id, estado='ACTIVO').order_by('nombre')
     return JsonResponse({'razas': [{'id': r.id, 'nombre': r.nombre} for r in razas]})
@@ -122,18 +18,20 @@ def razas_por_especie(request, especie_id):
 
 
 
-#PERMISOS PARA EL CRUD DE ESPECIES
+# Permisos para gestionar especies y razas
 class PersonalAutorizadoMixin(LoginRequiredMixin, UserPassesTestMixin):
+    login_url = reverse_lazy('login')
+
     def test_func(self):
-        return self.request.user.rol in ['ADMIN', 'VETERINARIO']
+        return es_personal(self.request.user)
     
     def handle_no_permission(self):
-        if not self.request.user.is_aunthenticated:
+        if not self.request.user.is_authenticated:
             return super().handle_no_permission()
         
         messages.error(
             self.request,
-            'No tienes permisos para gestionar especies'
+            'No tienes permisos para gestionar este módulo.'
         )
         return redirect('inicio')
     
@@ -204,67 +102,156 @@ class EliminarEspeciesView(PersonalAutorizadoMixin, DeleteView):
         return context
 
     def form_valid(self, form):
+        response = super().form_valid(form)
         messages.success(
             self.request,
             'Especie eliminada correctamente.'
         )
+        return response
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            return super().post(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(
+                request,
+                'No se puede eliminar esta especie porque tiene razas o mascotas asociadas.'
+            )
+            return redirect(self.success_url)
+
+
+class PersonalMascotasMixin(LoginRequiredMixin, UserPassesTestMixin):
+    login_url = reverse_lazy('login')
+
+    def test_func(self):
+        usuario = self.request.user
+        return es_personal(usuario) or usuario.rol == 'CLIENTE'
+
+    def get_queryset(self):
+        mascotas = Mascota.objects.select_related(
+            'Cliente', 'especie', 'raza'
+        )
+        if es_personal(self.request.user):
+            return mascotas
+        return mascotas.filter(Cliente=self.request.user)
+
+
+class ListaMascotasView(PersonalMascotasMixin, ListView):
+    model = Mascota
+    template_name = 'mascotas/lista_mascotas.html'
+    context_object_name = 'mascotas'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['es_personal'] = es_personal(self.request.user)
+        context['titulo'] = (
+            'Gestión de mascotas'
+            if context['es_personal']
+            else 'Mis mascotas'
+        )
+        return context
+
+
+class FormularioMascotaMixin(PersonalMascotasMixin):
+    model = Mascota
+    form_class = MascotaForm
+    template_name = 'mascotas/mascota_form.html'
+    success_url = reverse_lazy('lista_mascotas')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['usuario'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        if not es_personal(self.request.user):
+            form.instance.Cliente = self.request.user
+        messages.success(self.request, self.mensaje_exito)
         return super().form_valid(form)
-    
-# Create your views here.
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = self.titulo
+        context['es_personal'] = es_personal(self.request.user)
+        return context
 
 
-# ============================================================
-# CARRITO DE COMPRAS
-# ============================================================
-from .models import Producto, Carrito, ItemCarrito
-
-@login_required
-def agregar_al_carrito(request, producto_id):
-    """Agrega un producto al carrito del usuario"""
-    producto = get_object_or_404(Producto, pk=producto_id, estado='ACTIVO')
-    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-
-    item, creado = ItemCarrito.objects.get_or_create(carrito=carrito, producto=producto)
-    if not creado:
-        item.cantidad += 1
-        item.save()
-
-    messages.success(request, f'"{producto.nombre}" agregado al carrito.')
-    return redirect(request.META.get('HTTP_REFERER', 'mi_perfil'))
+class CrearMascotaView(FormularioMascotaMixin, CreateView):
+    mensaje_exito = 'Mascota registrada correctamente.'
+    titulo = 'Registrar mascota'
 
 
-@login_required
-def quitar_del_carrito(request, item_id):
-    """Elimina un ítem del carrito"""
-    item = get_object_or_404(ItemCarrito, pk=item_id, carrito__usuario=request.user)
-    item.delete()
-    messages.success(request, 'Producto eliminado del carrito.')
-    return redirect('ver_carrito')
+class EditarMascotaView(FormularioMascotaMixin, UpdateView):
+    mensaje_exito = 'Mascota actualizada correctamente.'
+    titulo = 'Editar mascota'
 
 
-@login_required
-def ver_carrito(request):
-    """Muestra el carrito del usuario"""
-    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-    productos  = Producto.objects.filter(estado='ACTIVO')
-    return render(request, 'mascotas/carrito.html', {
-        'carrito': carrito,
-        'productos': productos,
-    })
+class EliminarMascotaView(PersonalMascotasMixin, DeleteView):
+    model = Mascota
+    template_name = 'mascotas/confirmar_eliminacion_mascota.html'
+    context_object_name = 'mascota'
+    success_url = reverse_lazy('lista_mascotas')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Mascota eliminada correctamente.')
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['es_personal'] = es_personal(self.request.user)
+        return context
 
 
-@login_required
-def pagar_carrito(request):
-    """Procesa el pago del carrito (simulado)"""
-    carrito = get_object_or_404(Carrito, usuario=request.user)
-    if carrito.cantidad_items() == 0:
-        messages.error(request, 'Tu carrito está vacío.')
-        return redirect('ver_carrito')
+class ListaRazasView(PersonalAutorizadoMixin, ListView):
+    model = Raza
+    template_name = 'razas/lista_razas.html'
+    context_object_name = 'razas'
+    queryset = Raza.objects.select_related('especie').order_by(
+        'especie__nombre', 'nombre'
+    )
 
-    # Simulación de pago exitoso — aquí iría la pasarela real
-    carrito.items.all().delete()
-    messages.success(request, '¡Compra realizada con éxito! Pronto recibirás tu pedido.')
-    return redirect('mi_perfil')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Gestión de razas'
+        return context
+
+
+class FormularioRazaMixin(PersonalAutorizadoMixin):
+    model = Raza
+    form_class = RazaForm
+    template_name = 'razas/raza_form.html'
+    success_url = reverse_lazy('lista_razas')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = self.titulo
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, self.mensaje_exito)
+        return super().form_valid(form)
+
+
+class CrearRazaView(FormularioRazaMixin, CreateView):
+    titulo = 'Registrar raza'
+    mensaje_exito = 'Raza registrada correctamente.'
+
+
+class EditarRazaView(FormularioRazaMixin, UpdateView):
+    titulo = 'Editar raza'
+    mensaje_exito = 'Raza actualizada correctamente.'
+
+
+class EliminarRazaView(PersonalAutorizadoMixin, DeleteView):
+    model = Raza
+    template_name = 'razas/confirmar_eliminacion_raza.html'
+    context_object_name = 'raza'
+    success_url = reverse_lazy('lista_razas')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Raza eliminada correctamente.')
+        return super().form_valid(form)
 
 
 # ============================================================

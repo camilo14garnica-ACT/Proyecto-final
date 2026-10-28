@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.contrib.auth.hashers import identify_hasher
 from usuarios.models import Usuario
 from usuarios.forms import CrearUsuarioForm
-from usuarios.views import solicitar_eliminacion_cuenta
+from usuarios.views import mi_perfil, panel_perfil, solicitar_eliminacion_cuenta
 
 
 class PasswordEncryptionTests(TestCase):
@@ -112,3 +112,30 @@ class SolicitarEliminacionCuentaTests(SimpleTestCase):
         self.assertEqual(response.status_code, 302)
         self.user.delete.assert_called_once_with()
         logout.assert_called_once_with(request)
+
+
+class PerfilPorRolTests(SimpleTestCase):
+
+    def test_usuario_no_cliente_desde_mi_perfil_va_a_su_perfil(self):
+        request = RequestFactory().get(reverse('mi_perfil'))
+        request.user = SimpleNamespace(
+            rol=Usuario.Rol.ADMIN,
+            is_authenticated=True,
+        )
+
+        response = mi_perfil(request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], reverse('editar_perfil_admin'))
+
+    def test_cliente_desde_perfil_admin_va_a_mi_perfil(self):
+        request = RequestFactory().get(reverse('editar_perfil_admin'))
+        request.user = SimpleNamespace(
+            rol=Usuario.Rol.CLIENTE,
+            is_authenticated=True,
+        )
+
+        response = panel_perfil(request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], reverse('mi_perfil'))
