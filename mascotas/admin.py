@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Especie, Raza, Mascota, Servicio, Cita, Producto, Carrito, ItemCarrito
+from .models import Especie, Raza, Mascota, Servicio, Cita, Producto, Carrito, ItemCarrito, HorarioDisponible
 
 
 @admin.register(Especie)
@@ -54,3 +54,9 @@ class ItemCarritoInline(admin.TabularInline):
 class CarritoAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'cantidad_items', 'total', 'actualizado')
     inlines = [ItemCarritoInline]
+
+
+@admin.register(HorarioDisponible)
+class HorarioDisponibleAdmin(admin.ModelAdmin):
+    list_display = ('veterinario', 'dia_semana', 'hora_inicio', 'hora_fin', 'activo')
+    list_filter = ('dia_semana', 'activo', 'veterinario')

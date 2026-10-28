@@ -11,8 +11,16 @@
 </head>
 <body>
 
+  <!-- Botón hamburguesa — solo visible en móvil -->
+  <button class="hamburguesa" id="btnHamburguesa" aria-label="Abrir menú">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <!-- Overlay oscuro cuando el menú está abierto en móvil -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <!-- ===== SIDEBAR ===== -->
-  <aside class="perfil-sidebar">
+  <aside class="perfil-sidebar" id="sidebar">
 
     <a href="{% url 'inicio' %}" class="sidebar-logo">
       <i class="bi bi-heart-pulse-fill"></i> Mascott
@@ -64,32 +72,35 @@
 
     <!-- Tarjetas resumen rápido -->
     <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-sm-3">
         <div class="resumen-card">
           <i class="bi bi-heart-fill resumen-icon text-danger"></i>
           <div class="resumen-num">{{ mascotas|length }}</div>
           <div class="resumen-label">Mascotas</div>
         </div>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-sm-3">
         <div class="resumen-card">
           <i class="bi bi-calendar-check-fill resumen-icon text-primary"></i>
           <div class="resumen-num">{{ proximas_citas|length }}</div>
           <div class="resumen-label">Citas próximas</div>
         </div>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-sm-3">
         <div class="resumen-card">
           <i class="bi bi-check-circle-fill resumen-icon text-success"></i>
           <div class="resumen-num">{{ historial_citas|length }}</div>
           <div class="resumen-label">Atenciones</div>
         </div>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-sm-3">
         <div class="resumen-card">
-          <i class="bi bi-patch-check-fill resumen-icon text-warning"></i>
-          <div class="resumen-num">{{ user.rol|capfirst }}</div>
-          <div class="resumen-label">Tipo de cuenta</div>
+          <div class="resumen-num">
+            {% if user.rol == 'ADMIN' %}👑
+            {% elif user.rol == 'VETERINARIO' %}🩺
+            {% else %}🐾{% endif %}
+          </div>
+          <div class="resumen-label">{{ user.get_rol_display }}</div>
         </div>
       </div>
     </div>
@@ -315,5 +326,29 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Hamburguesa — abre y cierra el sidebar en móvil
+    const btn      = document.getElementById('btnHamburguesa');
+    const sidebar  = document.getElementById('sidebar');
+    const overlay  = document.getElementById('sidebarOverlay');
+
+    btn.addEventListener('click', function () {
+      sidebar.classList.toggle('abierto');
+      overlay.classList.toggle('activo');
+    });
+
+    overlay.addEventListener('click', function () {
+      sidebar.classList.remove('abierto');
+      overlay.classList.remove('activo');
+    });
+
+    // Cierra el menú al hacer clic en un enlace (móvil)
+    sidebar.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        sidebar.classList.remove('abierto');
+        overlay.classList.remove('activo');
+      });
+    });
+  </script>
 </body>
 </html>

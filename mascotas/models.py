@@ -217,3 +217,30 @@ class ItemCarrito(models.Model):
 
     def __str__(self):
         return f"{self.cantidad}x {self.producto.nombre}"
+
+
+class HorarioDisponible(models.Model):
+    """VM-71: Horarios de atención por veterinario y día de la semana"""
+
+    DIAS = [
+        (0, 'Lunes'), (1, 'Martes'), (2, 'Miércoles'),
+        (3, 'Jueves'), (4, 'Viernes'), (5, 'Sábado'), (6, 'Domingo'),
+    ]
+
+    veterinario  = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        limit_choices_to={'rol': 'VETERINARIO'},
+        related_name='horarios'
+    )
+    dia_semana   = models.IntegerField(choices=DIAS)
+    hora_inicio  = models.TimeField()
+    hora_fin     = models.TimeField()
+    activo       = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('veterinario', 'dia_semana', 'hora_inicio')
+        ordering = ['dia_semana', 'hora_inicio']
+
+    def __str__(self):
+        return f"{self.veterinario} - {self.get_dia_semana_display()} {self.hora_inicio:%H:%M}-{self.hora_fin:%H:%M}"
