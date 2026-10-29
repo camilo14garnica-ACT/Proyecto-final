@@ -12,7 +12,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="post" novalidate data-razas-url="{% url 'razas_por_especie' 0 %}">
+            <form method="post" data-razas-url="{% url 'razas_por_especie' 0 %}">
                 {% csrf_token %}
                 {% for field in form %}
                     <div class="mb-3">
