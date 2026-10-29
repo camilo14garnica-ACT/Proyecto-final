@@ -10,6 +10,9 @@ from .models import Mascota, Especie, Raza
 from .forms import EspecieForm, MascotaForm, RazaForm
 from .permisos import es_personal
 
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
 
 def razas_por_especie(request, especie_id):
     razas = Raza.objects.filter(especie_id=especie_id, estado='ACTIVO').order_by('nombre')
@@ -252,3 +255,6 @@ class EliminarRazaView(PersonalAutorizadoMixin, DeleteView):
     def form_valid(self, form):
         messages.success(self.request, 'Raza eliminada correctamente.')
         return super().form_valid(form)
+    
+
+#VISTA PARA ESCOGER RAZA A LA HORA DE REGISTRAR MASCOTAS

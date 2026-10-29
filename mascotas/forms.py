@@ -162,6 +162,9 @@ class MascotaForm(forms.ModelForm):
             'especie': {
                 'required': 'Debes seleccionar una especie.',
             },
+            'raza' : {
+                'requerid': 'debes de selecciona una raza'
+            },
             'sexo': {
                 'required': 'Debes seleccionar el sexo de la mascota.',
             },

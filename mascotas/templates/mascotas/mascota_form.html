@@ -1,4 +1,4 @@
-{% extends base_template|default:'mascotas/base_cliente.html' %}
+{% extends 'partials/base-admin.html' %}
 {% load static %}
 
 {% block title %}{{ titulo }} | Mascott{% endblock %}
@@ -35,4 +35,5 @@
 
 {% block scripts %}
 <script src="{% static 'js/modulos/mascotas/crear_mascota.js' %}"></script>
+
 {% endblock %}
