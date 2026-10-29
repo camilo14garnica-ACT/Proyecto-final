@@ -352,3 +352,70 @@ def recuperar_password_nueva(request):
 def recuperar_password_completo(request):
     """Paso 4: Confirmación de que la contraseña fue cambiada"""
     return render(request, 'usuarios/recuperar_password_completo.html')
+
+
+# ============================================================
+# CHATBOT ASISTENTE DE ACCESIBILIDAD
+# ============================================================
+import json
+from django.http import JsonResponse
+from django.core.exceptions import PermissionDenied
+from .services.chatbot_service import consultar_chatbot_accesibilidad
+
+
+@login_required
+@require_POST
+def chatbot_accesibilidad_view(request):
+    """
+    Endpoint API para interactuar con el chatbot de accesibilidad.
+    Verifica que el usuario tenga créditos (> 0), envía los últimos 3 mensajes
+    de contexto, invoca a Gemini 1.5 Flash restringido a accesibilidad/UI
+    (máx 200 tokens de salida) y descuenta los tokens consumidos del saldo.
+    """
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError, AttributeError):
+        return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+    mensaje = data.get("mensaje", "").strip()
+    if not mensaje:
+        return JsonResponse({"error": "El mensaje no puede estar vacío."}, status=400)
+
+    if len(mensaje) > 500:
+        return JsonResponse({"error": "El mensaje supera los 500 caracteres permitidos."}, status=400)
+
+    historial = data.get("historial", [])
+
+    try:
+        resultado = consultar_chatbot_accesibilidad(
+            usuario=request.user,
+            mensaje_usuario=mensaje,
+            historial_previo=historial
+        )
+        return JsonResponse({
+            "status": "success",
+            "respuesta": resultado["respuesta"],
+            "tokens_consumidos": resultado["tokens_consumidos"],
+            "creditos_restantes": resultado["creditos_restantes"]
+        }, status=200)
+
+    except PermissionDenied as e:
+        return JsonResponse({
+            "status": "error",
+            "codigo": "CREDITOS_INSUFICIENTES",
+            "mensaje": str(e)
+        }, status=403)
+
+    except RuntimeError as e:
+        return JsonResponse({
+            "status": "error",
+            "codigo": "API_ERROR",
+            "mensaje": str(e)
+        }, status=503)
+
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "codigo": "SERVER_ERROR",
+            "mensaje": "Ocurrió un error inesperado al procesar tu consulta."
+        }, status=500)
