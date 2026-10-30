@@ -30,9 +30,9 @@
 
     <nav class="sidebar-nav">
       <a href="#datos" class="activo"><i class="bi bi-person-fill"></i> Mi Perfil</a>
-      <a href="#citas"><i class="bi bi-calendar-check"></i> Mis Citas</a>
+      {% comment "" %} <a href="#citas"><i class="bi bi-calendar-check"></i> Mis Citas</a> {% endcomment %}
       <a href="#mascotas"><i class="bi bi-heart-fill"></i> Mis Mascotas</a>
-      <a href="#historial"><i class="bi bi-clock-history"></i> Historial</a>
+      {% comment "" %}<a href="#historial"><i class="bi bi-clock-history"></i> Historial</a> {% endcomment %}
       <a href="#seguridad"><i class="bi bi-shield-lock-fill"></i> Seguridad</a>
     </nav>
 
@@ -53,13 +53,9 @@
     <div class="perfil-bienvenida">
       <div>
         <h1 class="perfil-titulo">Hola, {{ user.first_name }} 👋</h1>
-        <p class="perfil-subtitulo">Gestiona tu perfil, mascotas y citas desde aquí.</p>
+        <p class="perfil-subtitulo">Gestiona tu perfil, mascotas desde aqui.</p>
       </div>
-      <a href="#citas" class="btn-agendar-cita">
-        <i class="bi bi-calendar-plus-fill me-2"></i>Agendar Cita
-      </a>
     </div>
-
     <!-- Tarjetas resumen rápido -->
     <div class="row g-3 mb-4">
       <div class="col-6 col-md-3">
@@ -71,29 +67,14 @@
       </div>
       <div class="col-6 col-md-3">
         <div class="resumen-card">
-          <i class="bi bi-calendar-check-fill resumen-icon text-primary"></i>
-          <div class="resumen-num">{{ proximas_citas|length }}</div>
-          <div class="resumen-label">Citas próximas</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="resumen-card">
-          <i class="bi bi-check-circle-fill resumen-icon text-success"></i>
-          <div class="resumen-num">{{ historial_citas|length }}</div>
-          <div class="resumen-label">Atenciones</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="resumen-card">
           <i class="bi bi-patch-check-fill resumen-icon text-warning"></i>
           <div class="resumen-num">{{ user.rol|capfirst }}</div>
           <div class="resumen-label">Tipo de cuenta</div>
         </div>
       </div>
     </div>
-
     <!-- ===== PRÓXIMAS CITAS ===== -->
-    <section id="citas" class="perfil-seccion">
+    {% comment "" %} <section id="citas" class="perfil-seccion">
       <div class="seccion-header">
         <h2><i class="bi bi-calendar-check me-2"></i>Próximas Citas</h2>
         <a href="#" class="seccion-ver-mas">Ver todas →</a>
@@ -141,7 +122,7 @@
           <a href="#" class="btn-vacio">Agendar primera cita</a>
         </div>
       {% endif %}
-    </section>
+    </section>  {% endcomment %}
 
     <!-- ===== MIS MASCOTAS ===== -->
     <section id="mascotas" class="perfil-seccion">
@@ -187,7 +168,7 @@
     </section>
 
     <!-- ===== HISTORIAL DE CITAS ===== -->
-    <section id="historial" class="perfil-seccion">
+    {% comment "" %}<section id="historial" class="perfil-seccion">
       <div class="seccion-header">
         <h2><i class="bi bi-clock-history me-2"></i>Historial de Atenciones</h2>
       </div>
@@ -231,7 +212,7 @@
           <p>Sin atenciones registradas aún.</p>
         </div>
       {% endif %}
-    </section>
+    </section> {% endcomment %} 
 
     <!-- ===== MIS DATOS PERSONALES ===== -->
     <section id="datos" class="perfil-seccion">

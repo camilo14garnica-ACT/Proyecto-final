@@ -110,24 +110,9 @@ def mi_perfil(request):
     # Mascotas del usuario
     mascotas = Mascota.objects.filter(Cliente=request.user, estado='ACTIVO')
 
-    # Próximas citas (programadas o confirmadas)
-    proximas_citas = Cita.objects.filter(
-        mascota__Cliente=request.user,
-        estado__in=['PROGRAMADA', 'CONFIRMADA'],
-    ).order_by('fecha_hora')[:5]
 
-    # Últimas citas completadas
-    historial_citas = Cita.objects.filter(
-        mascota__Cliente=request.user,
-        estado='COMPLETADA',
-    ).order_by('-fecha_hora')[:5]
 
-    return render(request, 'usuarios/perfil.html', {
-        'form': form,
-        'mascotas': mascotas,
-        'proximas_citas': proximas_citas,
-        'historial_citas': historial_citas,
-    })
+
 
 #PERFIL DE ADMIN Y ADMINISTAOR
 @login_required
