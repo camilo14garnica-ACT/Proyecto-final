@@ -73,56 +73,7 @@
         </div>
       </div>
     </div>
-    <!-- ===== PRÓXIMAS CITAS ===== -->
-    {% comment "" %} <section id="citas" class="perfil-seccion">
-      <div class="seccion-header">
-        <h2><i class="bi bi-calendar-check me-2"></i>Próximas Citas</h2>
-        <a href="#" class="seccion-ver-mas">Ver todas →</a>
-      </div>
 
-      {% if proximas_citas %}
-        <div class="table-responsive">
-          <table class="tabla-perfil">
-            <thead>
-              <tr>
-                <th>Mascota</th>
-                <th>Servicio</th>
-                <th>Veterinario</th>
-                <th>Fecha y hora</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for cita in proximas_citas %}
-              <tr>
-                <td><i class="bi bi-heart-fill text-danger me-1"></i>{{ cita.mascota.nombre }}</td>
-                <td>{{ cita.servicio.nombre }}</td>
-                <td>
-                  {% if cita.veterinario %}
-                    Dr. {{ cita.veterinario.first_name }} {{ cita.veterinario.last_name }}
-                  {% else %}
-                    <span class="text-muted">Por asignar</span>
-                  {% endif %}
-                </td>
-                <td>{{ cita.fecha_hora|date:"d/m/Y H:i" }}</td>
-                <td>
-                  <span class="estado-badge estado-{{ cita.estado|lower }}">
-                    {{ cita.get_estado_display }}
-                  </span>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="vacio-msg">
-          <i class="bi bi-calendar-x"></i>
-          <p>No tienes citas programadas.</p>
-          <a href="#" class="btn-vacio">Agendar primera cita</a>
-        </div>
-      {% endif %}
-    </section>  {% endcomment %}
 
     <!-- ===== MIS MASCOTAS ===== -->
     <section id="mascotas" class="perfil-seccion">

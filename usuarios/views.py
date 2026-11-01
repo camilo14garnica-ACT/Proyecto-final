@@ -93,7 +93,7 @@ def panel_veterinario(request):
 # Editar perfil propio
 @login_required
 def mi_perfil(request):
-    from mascotas.models import Mascota, Cita
+    from mascotas.models import Mascota
     
     if request.user.rol != 'CLIENTE':
         return redirect('editar_perfil_admin')
