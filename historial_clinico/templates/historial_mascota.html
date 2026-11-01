@@ -1,0 +1,51 @@
+{% extends 'partials/base-admin.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h1 class="h3 mb-0">Historial clínico: {{ mascota.nombre }}</h1>
+    <span class="text-muted">
+      {{ mascota.especie }}{% if mascota.raza %} · {{ mascota.raza.nombre }}{% endif %}
+      · Dueño: {{ mascota.Cliente.get_full_name|default:mascota.Cliente.username }}
+    </span>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'lista_mascotas' %}" class="btn btn-outline-secondary">Volver</a>
+    {% if es_personal %}
+      <a href="{% url 'agregar_registro' mascota.pk %}" class="btn btn-primary">Agregar registro</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+  {% endfor %}
+{% endif %}
+
+{% for r in pagina %}
+  <div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between">
+      <strong>{{ r.fecha|date:"d/m/Y" }} · {{ r.motivo }}</strong>
+      <small class="text-muted">
+        {% if r.registrado_por %}Atendió: {{ r.registrado_por.get_full_name|default:r.registrado_por.username }}{% endif %}
+      </small>
+    </div>
+    <div class="card-body">
+      <p class="mb-1"><strong>Diagnóstico:</strong> {{ r.diagnostico }}</p>
+      {% if r.tratamiento %}<p class="mb-1"><strong>Tratamiento:</strong> {{ r.tratamiento }}</p>{% endif %}
+      {% if r.observaciones %}<p class="mb-0"><strong>Observaciones:</strong> {{ r.observaciones }}</p>{% endif %}
+    </div>
+  </div>
+{% empty %}
+  <div class="alert alert-light border text-center">Esta mascota aún no tiene historial clínico.</div>
+{% endfor %}
+
+{% if pagina.has_other_pages %}
+  <nav class="d-flex justify-content-center gap-2">
+    {% if pagina.has_previous %}<a class="btn btn-outline-secondary btn-sm" href="?page={{ pagina.previous_page_number }}">Anterior</a>{% endif %}
+    <span class="align-self-center">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+    {% if pagina.has_next %}<a class="btn btn-outline-secondary btn-sm" href="?page={{ pagina.next_page_number }}">Siguiente</a>{% endif %}
+  </nav>
+{% endif %}
+{% endblock %}
