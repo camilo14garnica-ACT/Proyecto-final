@@ -71,24 +71,59 @@ def cerrar_sesion(request):
 cerrar_secion = cerrar_sesion
 
 
+def _contexto_resumen(es_admin):
+    """Datos del resumen. El veterinario no recibe lo de usuarios, especies y razas."""
+    from django.db.models import Count, Q
+    from historial_clinico.models import RegistroClinico
+    from mascotas.models import Especie, Mascota, Raza
+
+    mascotas_activas = Mascota.objects.filter(estado='ACTIVO')
+
+    contexto = {
+        'es_admin': es_admin,
+        'total_mascotas': mascotas_activas.count(),
+        'total_registros': RegistroClinico.objects.filter(estado='ACTIVO').count(),
+        'mascotas_recientes': (
+            mascotas_activas
+            .select_related('especie', 'raza', 'Cliente')
+            .order_by('-fecha_registro')[:5]
+        ),
+        'registros_recientes': (
+            RegistroClinico.objects
+            .filter(estado='ACTIVO')
+            .select_related('mascota', 'registrado_por')[:5]
+        ),
+        'mascotas_buscador': (
+            mascotas_activas.select_related('Cliente').order_by('nombre')
+        ),
+    }
+
+    if es_admin:
+        contexto.update({
+            'total_usuarios': Usuario.objects.count(),
+            'total_especies': Especie.objects.filter(estado='ACTIVO').count(),
+            'total_razas': Raza.objects.filter(estado='ACTIVO').count(),
+            'usuarios_recientes': Usuario.objects.order_by('-date_joined')[:5],
+            'especies': (
+                Especie.objects
+                .filter(estado='ACTIVO')
+                .annotate(num_razas=Count('raza', filter=Q(raza__estado='ACTIVO')))
+                .order_by('nombre')
+            ),
+        })
+    return contexto
+
+
 # Panel de Administrador
 @solo_admin
 def panel_admin(request):
-    return render(request, 'usuarios/panel_admin.html')
-
-
-# Listar usuarios (solo admin)
-@solo_admin
-def listar_usuarios(request):
-    usuarios = Usuario.objects.all().order_by('last_name', 'first_name')
-    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
+    return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=True))
 
 
 # Panel del Veterinario
 @solo_veterinario
 def panel_veterinario(request):
-    return render(request, 'usuarios/panel_veterinario.html')
-
+    return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=False))
 
 # Editar perfil propio
 @login_required
@@ -345,3 +380,66 @@ def recuperar_password_nueva(request):
 def recuperar_password_completo(request):
     """Paso 4: Confirmación de que la contraseña fue cambiada"""
     return render(request, 'usuarios/recuperar_password_completo.html')
+
+
+
+def _contexto_resumen(es_admin):
+    """Datos del resumen. El veterinario no recibe lo de usuarios, especies y razas."""
+    from django.db.models import Count, Q
+    from historial_clinico.models import RegistroClinico
+    from mascotas.models import Especie, Mascota, Raza
+
+    mascotas_activas = Mascota.objects.filter(estado='ACTIVO')
+
+    contexto = {
+        'es_admin': es_admin,
+        'total_mascotas': mascotas_activas.count(),
+        'total_registros': RegistroClinico.objects.filter(estado='ACTIVO').count(),
+        'mascotas_recientes': (
+            mascotas_activas
+            .select_related('especie', 'raza', 'Cliente')
+            .order_by('-fecha_registro')[:5]
+        ),
+        'registros_recientes': (
+            RegistroClinico.objects
+            .filter(estado='ACTIVO')
+            .select_related('mascota', 'registrado_por')[:5]
+        ),
+        'mascotas_buscador': (
+            mascotas_activas.select_related('Cliente').order_by('nombre')
+        ),
+    }
+
+    if es_admin:
+        contexto.update({
+            'total_usuarios': Usuario.objects.count(),
+            'total_especies': Especie.objects.filter(estado='ACTIVO').count(),
+            'total_razas': Raza.objects.filter(estado='ACTIVO').count(),
+            'usuarios_recientes': Usuario.objects.order_by('-date_joined')[:5],
+            'especies': (
+                Especie.objects
+                .filter(estado='ACTIVO')
+                .annotate(num_razas=Count('raza', filter=Q(raza__estado='ACTIVO')))
+                .order_by('nombre')
+            ),
+        })
+    return contexto
+
+
+# Panel de Administrador
+@solo_admin
+def panel_admin(request):
+    return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=True))
+
+
+# Listar usuarios (solo admin)
+@solo_admin
+def listar_usuarios(request):
+    usuarios = Usuario.objects.all().order_by('last_name', 'first_name')
+    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
+
+
+# Panel del Veterinario
+@solo_veterinario
+def panel_veterinario(request):
+    return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=False))

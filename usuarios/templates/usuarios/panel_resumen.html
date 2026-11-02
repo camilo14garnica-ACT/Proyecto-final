@@ -1,0 +1,176 @@
+{% extends 'partials/base-admin.html' %}
+
+{% block title %}Resumen - Veterinaria Mascott{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h1 class="dash-titulo">Hola, {{ user.first_name|default:user.username }} 👋</h1>
+  <p class="text-muted mb-0">{% if es_admin %} Este es el resumen general de la Veterinaria. {% else %} Estas son las mascotas y consultas de la Veterinaria{% endif %}</p>
+</div>
+
+<!-- Tarjetas de resumen -->
+<div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
+  {% if es_admin %}
+    <div class="col"><div class="dash-card">
+      <i class="bi bi-people-fill text-primary"></i>
+      <div class="dash-num">{{ total_usuarios }}</div><div class="dash-label">Usuarios</div>
+    </div></div>
+  {% endif %}
+  <div class="col"><div class="dash-card">
+    <i class="bi bi-balloon-heart-fill text-danger"></i>
+    <div class="dash-num">{{ total_mascotas }}</div><div class="dash-label">Mascotas</div>
+  </div></div>
+  <div class="col"><div class="dash-card">
+    <i class="bi bi-journal-medical text-success"></i>
+    <div class="dash-num">{{ total_registros }}</div><div class="dash-label">Registros clínicos</div>
+  </div></div>
+  {% if es_admin %}
+    <div class="col"><div class="dash-card">
+      <i class="bi bi-collection-fill text-warning"></i>
+      <div class="dash-num">{{ total_especies }}</div><div class="dash-label">Especies</div>
+    </div></div>
+  {% endif %}
+  {% if es_admin %}
+    <div class="col"><div class="dash-card">
+    <i class="bi bi-diagram-3-fill text-info"></i>
+    <div class="dash-num">{{ total_razas }}</div><div class="dash-label">Razas</div>
+  </div></div>
+  {% endif %}
+</div>
+
+<!-- Historial clínico: buscador + últimos registros -->
+<section class="dash-seccion" id="historial">
+  <div class="dash-seccion-header">
+    <h2><i class="bi bi-journal-medical me-2"></i>Historial clínico</h2>
+  </div>
+
+  <label for="buscarMascota" class="form-label">Buscar la mascota para ver su historial</label>
+  <select id="buscarMascota" class="mb-4">
+    <option></option>
+    {% for m in mascotas_buscador %}
+      <option value="{{ m.pk }}">
+        {{ m.nombre }} — {{ m.Cliente.get_full_name|default:m.Cliente.username }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <h3 class="dash-subtitulo">Últimos registros</h3>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead><tr><th>Fecha</th><th>Mascota</th><th>Motivo</th><th>Atendió</th><th></th></tr></thead>
+      <tbody>
+        {% for r in registros_recientes %}
+        <tr>
+          <td>{{ r.fecha|date:"d/m/Y" }}</td>
+          <td>{{ r.mascota.nombre }}</td>
+          <td>{{ r.motivo }}</td>
+          <td>{{ r.registrado_por.get_full_name|default:r.registrado_por.username|default:"—" }}</td>
+          <td class="text-end">
+            <a href="{% url 'historial_mascota' r.mascota.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted py-3">Aún no hay registros clínicos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Mascotas recientes -->
+<section class="dash-seccion" id="mascotas">
+  <div class="dash-seccion-header">
+    <h2><i class="bi bi-balloon-heart me-2"></i>Mascotas recientes</h2>
+    <div class="d-flex gap-3">
+      <a href="{% url 'lista_mascotas' %}" class="dash-link">Ver todas →</a>
+      <a href="{% url 'registrar_mascota' %}" class="dash-link">Registrar mascota →</a>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead><tr><th>Nombre</th><th>Propietario</th><th>Especie</th><th>Raza</th><th></th></tr></thead>
+      <tbody>
+        {% for m in mascotas_recientes %}
+        <tr>
+          <td>{{ m.nombre }}</td>
+          <td>{{ m.Cliente.get_full_name|default:m.Cliente.username }}</td>
+          <td>{{ m.especie }}</td>
+          <td>{{ m.raza.nombre|default:"—" }}</td>
+          <td class="text-end">
+            <a href="{% url 'historial_mascota' m.pk %}" class="btn btn-sm btn-info">Historial</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted py-3">Aún no hay mascotas registradas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="row g-3">
+  <!-- Usuarios recientes -->
+  <div class="col-lg-6">
+    <section class="dash-seccion h-100" id="usuarios">
+      <div class="dash-seccion-header">
+        <h2><i class="bi bi-people me-2"></i>Usuarios recientes</h2>
+        <a href="{% url 'lista_usuarios' %}" class="dash-link">Ver todos →</a>
+      </div>
+      <ul class="dash-lista">
+        {% for u in usuarios_recientes %}
+        <li>
+          <div>
+            <strong>{{ u.first_name }} {{ u.last_name }}</strong>
+            <small class="text-muted d-block">{{ u.email|default:u.username }}</small>
+          </div>
+          <span class="badge text-bg-secondary">{{ u.get_rol_display }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+
+  <!-- Especies y razas -->
+  <div class="col-lg-6">
+    <section class="dash-seccion h-100" id="especies">
+      <div class="dash-seccion-header">
+        <h2><i class="bi bi-collection me-2"></i>Especies y razas</h2>
+        <div class="d-flex gap-3">
+          <a href="{% url 'lista_especies' %}" class="dash-link">Especies →</a>
+          <a href="{% url 'lista_razas' %}" class="dash-link">Razas →</a>
+        </div>
+      </div>
+      <ul class="dash-lista">
+        {% for e in especies %}
+        <li>
+          <strong>{{ e.nombre }}</strong>
+          <span class="badge text-bg-light border">{{ e.num_razas }} raza{{ e.num_razas|pluralize }}</span>
+        </li>
+        {% empty %}
+        <li class="text-muted">Aún no hay especies registradas.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+$(function () {
+  const $buscar = $('#buscarMascota');
+  $buscar.select2({
+    width: '100%',
+    placeholder: 'Escribe el nombre de la mascota o del dueño...',
+    allowClear: true
+  });
+
+  const plantilla = "{% url 'historial_mascota' 0 %}";
+  $buscar.on('select2:select', function () {
+    if (this.value) {
+      window.location.href = plantilla.replace('/0/', '/' + this.value + '/');
+    }
+  });
+});
+</script>
+{% endblock scripts %}
