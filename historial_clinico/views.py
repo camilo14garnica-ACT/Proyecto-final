@@ -53,4 +53,3 @@ def agregar_registro(request, mascota_id):
         'mascota': mascota,
         'form': form,
     })
-# Create your views here.

@@ -53,11 +53,11 @@ def iniciar_sesion(request):
             usuario = form.get_user()
             login(request, usuario)
             if usuario.rol == 'ADMIN':
-                return redirect('panel_admin')
+                return redirect('inicio')
             elif usuario.rol == 'VETERINARIO':
                 return redirect('panel_veterinario')
             else:
-                return redirect('mi_perfil')  # Cliente va a su panel de usuario
+                return redirect('inicio')  # Cliente va a su panel de usuario
     else:
         form = AuthenticationForm()
     return render(request, 'usuarios/iniciar_sesion.html', {'form': form})
@@ -94,7 +94,7 @@ def panel_veterinario(request):
 @login_required
 def mi_perfil(request):
     from mascotas.models import Mascota
-    
+
     if request.user.rol != 'CLIENTE':
         return redirect('editar_perfil_admin')
 
@@ -107,9 +107,17 @@ def mi_perfil(request):
     else:
         form = EditarPerfilForm(instance=request.user)
 
-    # Mascotas del usuario
-    mascotas = Mascota.objects.filter(Cliente=request.user, estado='ACTIVO')
+    # Mascotas activas del cliente
+    mascotas = (
+        Mascota.objects
+        .filter(Cliente=request.user, estado='ACTIVO')
+        .select_related('especie', 'raza')
+    )
 
+    return render(request, 'usuarios/perfil.html', {
+        'form': form,
+        'mascotas': mascotas,
+    })
 
 
 
