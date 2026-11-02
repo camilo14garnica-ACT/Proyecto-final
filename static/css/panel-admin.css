@@ -86,7 +86,7 @@ body.panel-body { background: #f4f6fb; }
 .dash-descripcion { color: #64748b; }
 
 .dash-card {
-  --dash-acento: #2563eb;
+  --dash-acento: #064bb3;
   --dash-tinte: #eff6ff;
   position: relative; overflow: hidden; height: 100%; min-height: 158px;
   padding: 1.25rem 1rem 1.1rem; border: 1px solid #e8edf5;
