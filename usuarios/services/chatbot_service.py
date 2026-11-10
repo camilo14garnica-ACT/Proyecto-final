@@ -54,7 +54,8 @@ def _consultar_gemini_api(mensaje_usuario: str, historial_contexto: list, api_ke
     Realiza la petición directa al endpoint REST de Google Gemini 1.5 Flash.
     Retorna (texto_respuesta, total_tokens_consumidos).
     """
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    modelo = getattr(settings, 'GEMINI_MODEL', os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite'))
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent?key={api_key}"
 
     # Construir contenido con historial recortado + mensaje actual
     contents = list(historial_contexto)

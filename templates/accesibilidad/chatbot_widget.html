@@ -1,4 +1,3 @@
-{% if user.is_authenticated %}
 <!-- Widget Flotante del Chatbot de Accesibilidad (Mascott IA) -->
 <div id="chatbot-accesibilidad-container" aria-label="Asistente de Accesibilidad Web">
     <!-- Botón activador del Chatbot -->
@@ -16,12 +15,16 @@
         <!-- Cabecera -->
         <div class="chatbot-header">
             <div class="chatbot-header-info">
-                <i class="bi bi-universal-access-circle" aria-hidden="true"></i>
+                <i class="bi bi-robot" aria-hidden="true"></i>
                 <div>
-                    <h3 id="chatbot-header-title">Guía de Accesibilidad</h3>
-                    <small class="chatbot-credits-badge">
-                        Saldo: <span id="chatbot-creditos-val">{{ user.creditos_chatbot }}</span> tokens
-                    </small>
+                    <h3 id="chatbot-header-title">Asistente Accesibilidad</h3>
+                    {% if user.is_authenticated %}
+                        <small class="chatbot-credits-badge">
+                            Saldo: <span id="chatbot-creditos-val">{{ user.creditos_chatbot }}</span> tokens
+                        </small>
+                    {% else %}
+                        <small class="chatbot-credits-badge">Requiere cuenta</small>
+                    {% endif %}
                 </div>
             </div>
             <button id="chatbot-close-btn" type="button" aria-label="Cerrar asistente" title="Cerrar">&times;</button>
@@ -29,26 +32,40 @@
 
         <!-- Historial de mensajes -->
         <div id="chatbot-messages" role="log" aria-live="polite" tabindex="0">
-            <div class="chatbot-msg bot-msg">
-                <p>👋 ¡Hola <strong>{{ user.first_name|default:user.username }}</strong>! Soy tu asistente de accesibilidad. Pregúntame cómo activar el alto contraste, ajustar tamaños de texto o navegar por la clínica.</p>
-            </div>
+            {% if user.is_authenticated %}
+                <div class="chatbot-msg bot-msg">
+                    <p>👋 ¡Hola <strong>{{ user.first_name|default:user.username }}</strong>! Soy tu asistente de accesibilidad. Pregúntame cómo activar el alto contraste, ajustar tamaños de texto o navegar por la clínica.</p>
+                </div>
+            {% else %}
+                <div class="chatbot-msg bot-msg">
+                    <p>👋 ¡Hola! Soy el asistente de accesibilidad de Mascott. Para realizar preguntas y utilizar créditos de consulta, por favor <a href="{% url 'login' %}" style="color: #005a9c; font-weight: 700; text-decoration: underline;">inicia sesión aquí</a>.</p>
+                </div>
+            {% endif %}
         </div>
 
         <!-- Formulario de envío -->
-        <form id="chatbot-form" autocomplete="off">
-            {% csrf_token %}
-            <div class="chatbot-input-group">
-                <input type="text" 
-                       id="chatbot-input" 
-                       placeholder="Pregunta sobre accesibilidad o navegación..." 
-                       maxlength="400" 
-                       required 
-                       aria-label="Pregunta al asistente de accesibilidad">
-                <button type="submit" id="chatbot-send-btn" aria-label="Enviar pregunta">
-                    <i class="bi bi-send-fill" aria-hidden="true"></i>
-                </button>
+        {% if user.is_authenticated %}
+            <form id="chatbot-form" autocomplete="off">
+                {% csrf_token %}
+                <div class="chatbot-input-group">
+                    <input type="text" 
+                           id="chatbot-input" 
+                           placeholder="Pregunta sobre accesibilidad o navegación..." 
+                           maxlength="400" 
+                           required 
+                           aria-label="Pregunta al asistente de accesibilidad">
+                    <button type="submit" id="chatbot-send-btn" aria-label="Enviar pregunta">
+                        <i class="bi bi-send-fill" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </form>
+        {% else %}
+            <div class="chatbot-guest-footer">
+                <a href="{% url 'login' %}" class="btn-guest-login">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión para chatear
+                </a>
             </div>
-        </form>
+        {% endif %}
     </div>
 </div>
 
@@ -122,7 +139,7 @@
 }
 
 .chatbot-header-info i {
-    font-size: 26px;
+    font-size: 24px;
 }
 
 .chatbot-header h3 {
@@ -144,10 +161,11 @@
     background: transparent;
     border: none;
     color: #ffffff;
-    font-size: 24px;
+    font-size: 26px;
     line-height: 1;
     cursor: pointer;
     border-radius: 4px;
+    padding: 0 4px;
 }
 
 #chatbot-close-btn:focus {
@@ -243,6 +261,30 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.chatbot-guest-footer {
+    padding: 12px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+.btn-guest-login {
+    display: inline-block;
+    width: 100%;
+    background-color: #005a9c;
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btn-guest-login:hover {
+    background-color: #004377;
+    color: #ffffff;
+}
 </style>
 
 <script>
@@ -261,7 +303,7 @@
     function toggleChat() {
         const isHidden = win.classList.toggle('chatbot-hidden');
         toggleBtn.setAttribute('aria-expanded', !isHidden);
-        if (!isHidden) {
+        if (!isHidden && input) {
             input.focus();
         }
     }
@@ -338,5 +380,3 @@
     }
 })();
 </script>
-{% endif %}
-

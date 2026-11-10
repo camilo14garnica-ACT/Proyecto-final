@@ -44,8 +44,12 @@ class Usuario(AbstractUser):
         max_length=20,
         unique=True,
         verbose_name="Número de documento",
-        blank=True,
+        blank=False,
         null=True,
+        error_messages={
+            'unique': 'Ya existe un usuario registrado con este número de documento.',
+            'blank': 'El número de documento es obligatorio.'
+        }
     )
     Date_of_birth = models.DateField(
         verbose_name="Fecha de nacimiento",
@@ -84,6 +88,10 @@ class Usuario(AbstractUser):
         return self.rol == self.Rol.ADMIN
 
     def save(self, *args, **kwargs):
+        # Convertir cadena vacía a NULL para evitar violaciones UNIQUE
+        if not self.Number_Document:
+            self.Number_Document = None
+
         # Sincronizar roles y permisos administrativos
         if self.is_superuser and self.rol != self.Rol.ADMIN:
             self.rol = self.Rol.ADMIN

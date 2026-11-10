@@ -206,3 +206,4 @@ LOGOUT_REDIRECT_URL = 'login'
 # CHATBOT IA — ACCESIBILIDAD (Gemini 1.5 Flash)
 # ============================================================
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite')

@@ -234,3 +234,44 @@ class ChatbotAccesibilidadTests(TestCase):
         self.assertEqual(response.status_code, 403)
         data = response.json()
         self.assertEqual(data["codigo"], "CREDITOS_INSUFICIENTES")
+
+class DocumentValidationTests(TestCase):
+
+    def test_crear_usuario_form_requiere_numero_documento(self):
+        form_data = {
+            'username': 'nuevo_usuario',
+            'first_name': 'Juan',
+            'last_name': 'Perez',
+            'email': 'juan@test.com',
+            'Document_Type': 'CC',
+            'Number_Document': '',
+            'Date_of_birth': '2000-01-01',
+            'password': 'PasswordSegura123!',
+            'password_confirmacion': 'PasswordSegura123!'
+        }
+        form = CrearUsuarioForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('Number_Document', form.errors)
+        self.assertIn('El número de documento es obligatorio.', form.errors['Number_Document'])
+
+    def test_crear_usuario_form_rechaza_documento_duplicado(self):
+        Usuario.objects.create_user(
+            username='existente',
+            password='Password123!',
+            Number_Document='10203040'
+        )
+        form_data = {
+            'username': 'otro_usuario',
+            'first_name': 'Carlos',
+            'last_name': 'Gomez',
+            'email': 'carlos@test.com',
+            'Document_Type': 'CC',
+            'Number_Document': '10203040',
+            'Date_of_birth': '2000-01-01',
+            'password': 'PasswordSegura123!',
+            'password_confirmacion': 'PasswordSegura123!'
+        }
+        form = CrearUsuarioForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('Number_Document', form.errors)
+        self.assertIn('Ya existe un usuario registrado con este número de documento.', form.errors['Number_Document'])
