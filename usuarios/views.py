@@ -414,6 +414,8 @@ def chatbot_accesibilidad_view(request):
         }, status=503)
 
     except Exception as e:
+        import logging
+        logging.getLogger(__name__).exception("Error en chatbot_accesibilidad_view: %s", e)
         return JsonResponse({
             "status": "error",
             "codigo": "SERVER_ERROR",

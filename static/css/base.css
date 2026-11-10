@@ -1,7 +1,7 @@
-/* Colores de la marca: Boostrap los toma de aqui*/
+/* Colores de la marca: Bootstrap los toma de aquí */
 
 :root {
-    --bs-primary: #156c0;
+    --bs-primary: #1565c0;
     --bs-primary-rgb: 21, 101, 192;
     --bs-link-color: #1565c0;
     --bs-link-color-rgb: 21, 101, 192;
@@ -11,14 +11,21 @@
     --mascott-azul-claro: #e3f2fd;
 }
 
--btn-primary {
+.btn-primary {
     --bs-btn-bg: #1565c0;
-    -bs-btn-border-color: #1565c0;
+    --bs-btn-border-color: #1565c0;
     --bs-btn-hover-bg: #0d47a1;
     --bs-btn-hover-border-color: #0d47a1;
     --bs-btn-active-bg: #0d47a1;
     --bs-btn-active-border-color: #0d47a1;   
 }
 
-.bg-mascott-oscuro { background-color: var(--mascott-azul-claro);}
-.bg-mascott-calro { background-color: var(--mascott-azul-claro);}
+.bg-mascott-oscuro { background-color: var(--mascott-azul-oscuro); color: #fff; }
+.bg-mascott-claro { background-color: var(--mascott-azul-claro); }
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+    padding: 3rem 1rem;
+    box-shadow: inset 0 -4px 12px rgba(0, 0, 0, 0.08);
+}

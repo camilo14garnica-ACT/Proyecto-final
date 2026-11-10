@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <!-- Módulo de Accesibilidad CSS -->
     <link rel="stylesheet" href="{% static 'css/modulos/accesibilidad.css' %}">
     {% block extra_css %}{% endblock extra_css %}
@@ -20,7 +21,7 @@
     <a href="#contenido" class="visually-hidden-focusable">Saltar al contenido</a>
 
     {% block nav %}{% include 'partials/nav.html' %}{% endblock nav %}
-    {% block header %}{% include 'partials/header.html' %}{% endblock header %}
+    {% block header %}{% endblock header %}
 
     <main id="contenido" class="flex-grow-1">
         {% block content %}{% endblock content %}

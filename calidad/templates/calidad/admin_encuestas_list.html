@@ -1,0 +1,162 @@
+{% extends 'partials/base-admin.html' %}
+{% load static %}
+
+{% block title %}Encuestas de Satisfacción | Panel Mascott{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h1 class="h3 mb-1"><i class="bi bi-star-fill text-warning me-2"></i> Encuestas de Satisfacción</h1>
+            <p class="text-muted mb-0">Monitoreo de la percepción y satisfacción del cliente sobre el servicio veterinario.</p>
+        </div>
+    </div>
+
+    <!-- TARJETAS DE SATISFACCIÓN / KPI -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm p-4 text-center bg-primary text-white h-100">
+                <span class="text-white-50 text-uppercase small fw-semibold">Índice Promedio de Satisfacción</span>
+                <div class="display-3 fw-bold my-2">{{ promedio }} <span class="fs-4 text-white-50">/ 5.0</span></div>
+                <div>
+                    {% if promedio >= 4.5 %}
+                        <span class="badge bg-success fs-6">⭐⭐⭐⭐⭐ Excelente</span>
+                    {% elif promedio >= 3.5 %}
+                        <span class="badge bg-info text-dark fs-6">⭐⭐⭐⭐ Bueno</span>
+                    {% elif promedio >= 2.5 %}
+                        <span class="badge bg-warning text-dark fs-6">⭐⭐⭐ Regular</span>
+                    {% else %}
+                        <span class="badge bg-danger fs-6">⭐ Requiere Atención</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8">
+            <div class="card border-0 shadow-sm p-4 h-100">
+                <h6 class="text-muted text-uppercase small fw-semibold mb-3">Distribución de Calificaciones (Total: {{ total }} encuestas)</h6>
+                <div class="row align-items-center mb-2">
+                    <div class="col-3 col-sm-2 text-nowrap small">5 estrellas</div>
+                    <div class="col-7 col-sm-8">
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" style="width: {% widthratio distribucion.5 total 100 %}%;"></div>
+                        </div>
+                    </div>
+                    <div class="col-2 text-end fw-semibold small">{{ distribucion.5 }}</div>
+                </div>
+                <div class="row align-items-center mb-2">
+                    <div class="col-3 col-sm-2 text-nowrap small">4 estrellas</div>
+                    <div class="col-7 col-sm-8">
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" style="width: {% widthratio distribucion.4 total 100 %}%;"></div>
+                        </div>
+                    </div>
+                    <div class="col-2 text-end fw-semibold small">{{ distribucion.4 }}</div>
+                </div>
+                <div class="row align-items-center mb-2">
+                    <div class="col-3 col-sm-2 text-nowrap small">3 estrellas</div>
+                    <div class="col-7 col-sm-8">
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" style="width: {% widthratio distribucion.3 total 100 %}%;"></div>
+                        </div>
+                    </div>
+                    <div class="col-2 text-end fw-semibold small">{{ distribucion.3 }}</div>
+                </div>
+                <div class="row align-items-center mb-2">
+                    <div class="col-3 col-sm-2 text-nowrap small">2 estrellas</div>
+                    <div class="col-7 col-sm-8">
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-orange" style="width: {% widthratio distribucion.2 total 100 %}%; background-color: #fd7e14;"></div>
+                        </div>
+                    </div>
+                    <div class="col-2 text-end fw-semibold small">{{ distribucion.2 }}</div>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-3 col-sm-2 text-nowrap small">1 estrella</div>
+                    <div class="col-7 col-sm-8">
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-danger" style="width: {% widthratio distribucion.1 total 100 %}%;"></div>
+                        </div>
+                    </div>
+                    <div class="col-2 text-end fw-semibold small">{{ distribucion.1 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white py-3">
+            <h5 class="mb-0">Opiniones y Evaluaciones de Clientes</h5>
+        </div>
+        <div class="card-body table-responsive">
+            <table id="tablaEncuestas" class="table table-striped table-hover align-middle w-100">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Cita / Servicio</th>
+                        <th>Puntuación</th>
+                        <th>Comentarios</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in encuestas %}
+                        <tr>
+                            <td class="fw-bold">#{{ item.pk }}</td>
+                            <td class="small">{{ item.fecha|date:"d/m/Y H:i" }}</td>
+                            <td>{{ item.cliente.get_full_name|default:item.cliente.username }}</td>
+                            <td class="small text-muted">{{ item.cita|default:'General' }}</td>
+                            <td>
+                                <span class="badge {% if item.puntuacion >= 4 %}bg-success{% elif item.puntuacion == 3 %}bg-warning text-dark{% else %}bg-danger{% endif %} px-2 py-1">
+                                    {{ item.puntuacion }} ★
+                                </span>
+                            </td>
+                            <td>
+                                <div class="text-truncate" style="max-width: 300px;" title="{{ item.comentarios|default:'Sin comentarios' }}">
+                                    {{ item.comentarios|default:'—' }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if item.puntuacion <= 2 %}
+                                    <a href="{% url 'admin_no_conformidad_crear' %}?encuesta_id={{ item.pk }}" class="btn btn-sm btn-outline-danger" title="Abrir No Conformidad por mala calificación">
+                                        <i class="bi bi-shield-exclamation"></i> Investigar
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">OK</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Aún no se han recibido encuestas de satisfacción.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#tablaEncuestas').DataTable({
+            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
+            order: [[0, 'desc']],
+            pageLength: 10
+        });
+    });
+</script>
+{% endblock extra_js %}
+
