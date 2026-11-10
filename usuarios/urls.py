@@ -38,5 +38,8 @@ urlpatterns = [
     path('perfil/confirmar-eliminacion/<int:pk>/', views.confirmar_eliminacion_cuenta, name='confirmar_eliminacion_cuenta'),
     
     #Perfil de admin y veterinaria para editar perfil
-    path('editar_perfil_admin/', views.panel_perfil, name='editar_perfil_admin')
+    path('editar_perfil_admin/', views.panel_perfil, name='editar_perfil_admin'),
+
+    # API Chatbot Asistente de Accesibilidad
+    path('api/chatbot-accesibilidad/', views.chatbot_accesibilidad_view, name='chatbot_accesibilidad'),
 ]

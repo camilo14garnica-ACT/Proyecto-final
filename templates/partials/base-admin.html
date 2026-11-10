@@ -1,129 +1,143 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Panel Interno - Veterinaria Mascott{% endblock %}</title>
-
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <!-- BOOTSTRAP ICONS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- DATATABLES -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-
-    <!-- ACCESIBILIDAD CSS -->
-    <link rel="stylesheet" href="{% static 'css/modulos/accesibilidad.css' %}">
-    <link rel="stylesheet" href="{% static 'css/panel-admin.css' %}">
-
-    {% block extra_css %}{% endblock %}
-</head>
-<body class="panel-body">
-
-<div class="panel-layout">
-
-    <!-- MENÚ LATERAL -->
-    <aside class="panel-sidebar" id="menuLateral">
-        <a class="panel-marca" href="{% if user.rol == 'ADMIN' %}{% url 'panel_admin' %}{% else %}{% url 'panel_veterinario' %}{% endif %}">
-            <i class="bi bi-heart-pulse-fill"></i> Mascott
-        </a>
-
-        {% block sidebar %}
-        {% with actual=request.resolver_match.url_name %}
-        <nav class="panel-menu">
-            {% if user.rol == 'ADMIN' %}
-
-                <a href="{% url 'editar_perfil_admin' %}"><i class="bi bi-person-circle"></i> Mi perfil</a>
-                </a>
-                <a href="{% url 'lista_usuarios' %}" class="{% if actual == 'lista_usuarios' or actual == 'editar_usuario' or actual == 'eliminar_usuario' %}activo{% endif %}">
-                    <i class="bi bi-people"></i> Usuarios
-                </a>
-                <a href="{% url 'lista_especies' %}" class="{% if actual == 'lista_especies' or actual == 'especie_form' or actual == 'editar_especie' or actual == 'eliminar_especie' %}activo{% endif %}">
-                    <i class="bi bi-collection"></i> Especies
-                </a>
-                <a href="{% url 'lista_razas' %}" class="{% if actual == 'lista_razas' or actual == 'registrar_raza' or actual == 'editar_raza' or actual == 'eliminar_raza' %}activo{% endif %}">
-                    <i class="bi bi-diagram-3"></i> Razas
-                </a>
-                <a href="{% url 'lista_mascotas' %}" class="{% if actual == 'lista_mascotas' or actual == 'registrar_mascota' or actual == 'editar_mascota' or actual == 'eliminar_mascota' %}activo{% endif %}">
-                    <i class="bi bi-balloon-heart"></i> Mascotas
-                </a>
-            {% elif user.rol == 'VETERINARIO' %}
-                <a href="{% url 'panel_veterinario' %}" class="{% if actual == 'panel_veterinario' %}activo{% endif %}">
-                    <i class="bi bi-grid"></i> Inicio
-                </a>
-                <a href="{% url 'lista_mascotas' %}" class="{% if actual == 'lista_mascotas' or actual == 'registrar_mascota' or actual == 'editar_mascota' or actual == 'eliminar_mascota' %}activo{% endif %}">
-                    <i class="bi bi-balloon-heart"></i> Mascotas
-                </a>
-            {% endif %}
-        </nav>
-        {% endwith %}
-        {% endblock sidebar %}
-
-        <nav class="panel-menu panel-menu-pie">
-
-            
-            <a href="{% url 'inicio' %}"><i class="bi bi-house"></i> Volver al sitio</a>
-            <form method="post" action="{% url 'logout' %}" class="m-0">
-                {% csrf_token %}
-                <button type="submit"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
-            </form>
-        </nav>
-    </aside>
-    <div class="panel-overlay" id="panelOverlay"></div>
-
-    <!-- ZONA CENTRAL -->
-    <div class="panel-main">
-        <header class="panel-topbar">
-            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnMenu" aria-label="Abrir menú">
-                <i class="bi bi-list fs-5"></i>
-            </button>
-            <span class="ms-auto fw-semibold">
-                {{ user.first_name|default:user.username }}
-                <small class="text-muted">({{ user.get_rol_display }})</small>
-            </span>
-        </header>
-
-        <main class="panel-content">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="mensaje-django d-none" data-tipo="{{ message.tags }}" data-mensaje="{{ message|escape }}"></div>
-                {% endfor %}
-            {% endif %}
-
-            {% block content %}{% endblock content %}
-        </main>
-    </div>
-</div>
-
-    <!-- WIDGET DE ACCESIBILIDAD -->
-    {% include 'partials/accesibilidad_widget.html' %}
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{% static 'js/modulos/usuarios/sweetalert_usuarios.js' %}"></script>
-
-    <!-- ACCESIBILIDAD JS -->
-    <script src="{% static 'js/modulos/accesibilidad.js' %}"></script>
-
-<script>
-    // Abrir y cerrar el menú en celular
-    const menu = document.getElementById('menuLateral');
-    const fondo = document.getElementById('panelOverlay');
-    function alternarMenu() {
-        menu.classList.toggle('abierto');
-        fondo.classList.toggle('visible');
-    }
-    document.getElementById('btnMenu').addEventListener('click', alternarMenu);
-    fondo.addEventListener('click', alternarMenu);
-</script>
-
-{% block scripts %}{% endblock scripts %}
-</body>
-</html>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel Interno - Veterinaria Mascott{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- BOOTSTRAP ICONS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- DATATABLES -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+    <!-- ACCESIBILIDAD CSS -->
+    <link rel="stylesheet" href="{% static 'css/modulos/accesibilidad.css' %}">
+    <link rel="stylesheet" href="{% static 'css/panel-admin.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="panel-body">
+
+<div class="panel-layout">
+
+    <!-- MENÚ LATERAL -->
+    <aside class="panel-sidebar" id="menuLateral">
+        <a class="panel-marca" href="{% if user.rol == 'ADMIN' %}{% url 'panel_admin' %}{% else %}{% url 'panel_veterinario' %}{% endif %}">
+            <i class="bi bi-heart-pulse-fill"></i> Mascott
+        </a>
+
+        {% block sidebar %}
+        {% with actual=request.resolver_match.url_name %}
+        <nav class="panel-menu">
+            {% if user.rol == 'ADMIN' %}
+
+                <a href="{% url 'editar_perfil_admin' %}"><i class="bi bi-person-circle"></i> Mi perfil</a>
+                </a>
+                <a href="{% url 'lista_usuarios' %}" class="{% if actual == 'lista_usuarios' or actual == 'editar_usuario' or actual == 'eliminar_usuario' %}activo{% endif %}">
+                    <i class="bi bi-people"></i> Usuarios
+                </a>
+                <a href="{% url 'lista_especies' %}" class="{% if actual == 'lista_especies' or actual == 'especie_form' or actual == 'editar_especie' or actual == 'eliminar_especie' %}activo{% endif %}">
+                    <i class="bi bi-collection"></i> Especies
+                </a>
+                <a href="{% url 'lista_razas' %}" class="{% if actual == 'lista_razas' or actual == 'registrar_raza' or actual == 'editar_raza' or actual == 'eliminar_raza' %}activo{% endif %}">
+                    <i class="bi bi-diagram-3"></i> Razas
+                </a>
+                <a href="{% url 'lista_mascotas' %}" class="{% if actual == 'lista_mascotas' or actual == 'registrar_mascota' or actual == 'editar_mascota' or actual == 'eliminar_mascota' %}activo{% endif %}">
+                    <i class="bi bi-balloon-heart"></i> Mascotas
+                </a>
+
+                <div class="panel-seccion-titulo text-muted small text-uppercase px-3 pt-3 pb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">Calidad y Servicio</div>
+                <a href="{% url 'admin_pqrs_list' %}" class="{% if 'pqrs' in actual %}activo{% endif %}">
+                    <i class="bi bi-chat-square-text"></i> PQRS y Quejas
+                </a>
+                <a href="{% url 'admin_lotes_list' %}" class="{% if 'lote' in actual %}activo{% endif %}">
+                    <i class="bi bi-box-seam"></i> Lotes y Vencimientos
+                </a>
+                <a href="{% url 'admin_no_conformidades_list' %}" class="{% if 'no_conformidad' in actual %}activo{% endif %}">
+                    <i class="bi bi-shield-exclamation"></i> No Conformidades
+                </a>
+                <a href="{% url 'admin_encuestas_list' %}" class="{% if 'encuestas' in actual %}activo{% endif %}">
+                    <i class="bi bi-star"></i> Satisfacción
+                </a>
+            {% elif user.rol == 'VETERINARIO' %}
+                <a href="{% url 'panel_veterinario' %}" class="{% if actual == 'panel_veterinario' %}activo{% endif %}">
+                    <i class="bi bi-grid"></i> Inicio
+                </a>
+                <a href="{% url 'lista_mascotas' %}" class="{% if actual == 'lista_mascotas' or actual == 'registrar_mascota' or actual == 'editar_mascota' or actual == 'eliminar_mascota' %}activo{% endif %}">
+                    <i class="bi bi-balloon-heart"></i> Mascotas
+                </a>
+            {% endif %}
+        </nav>
+        {% endwith %}
+        {% endblock sidebar %}
+
+        <nav class="panel-menu panel-menu-pie">
+
+            
+            <a href="{% url 'inicio' %}"><i class="bi bi-house"></i> Volver al sitio</a>
+            <form method="post" action="{% url 'logout' %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
+            </form>
+        </nav>
+    </aside>
+    <div class="panel-overlay" id="panelOverlay"></div>
+
+    <!-- ZONA CENTRAL -->
+    <div class="panel-main">
+        <header class="panel-topbar">
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnMenu" aria-label="Abrir menú">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <span class="ms-auto fw-semibold">
+                {{ user.first_name|default:user.username }}
+                <small class="text-muted">({{ user.get_rol_display }})</small>
+            </span>
+        </header>
+
+        <main class="panel-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mensaje-django d-none" data-tipo="{{ message.tags }}" data-mensaje="{{ message|escape }}"></div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock content %}
+        </main>
+    </div>
+</div>
+
+    <!-- WIDGET DE ACCESIBILIDAD -->
+    {% include 'accesibilidad/widget.html' %}
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/modulos/usuarios/sweetalert_usuarios.js' %}"></script>
+
+    <!-- ACCESIBILIDAD JS -->
+    <script src="{% static 'js/modulos/accesibilidad.js' %}"></script>
+
+<script>
+    // Abrir y cerrar el menú en celular
+    const menu = document.getElementById('menuLateral');
+    const fondo = document.getElementById('panelOverlay');
+    function alternarMenu() {
+        menu.classList.toggle('abierto');
+        fondo.classList.toggle('visible');
+    }
+    document.getElementById('btnMenu').addEventListener('click', alternarMenu);
+    fondo.addEventListener('click', alternarMenu);
+</script>
+
+{% block scripts %}{% endblock scripts %}
+</body>
+</html>

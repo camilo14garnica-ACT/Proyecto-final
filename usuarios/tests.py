@@ -1,3 +1,4 @@
+import json
 from unittest.mock import Mock, patch
 from types import SimpleNamespace
 
@@ -138,3 +139,139 @@ class PerfilPorRolTests(SimpleTestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], reverse('mi_perfil'))
+
+
+class ChatbotAccesibilidadTests(TestCase):
+
+    def setUp(self):
+        self.usuario = Usuario.objects.create_user(
+            username='user_chat_test',
+            password='Password123!',
+            rol=Usuario.Rol.CLIENTE,
+            creditos_chatbot=500
+        )
+        self.url = reverse('chatbot_accesibilidad')
+
+    def test_creditos_chatbot_descuento_y_verificacion(self):
+        self.assertTrue(self.usuario.tiene_creditos())
+        self.assertEqual(self.usuario.creditos_chatbot, 500)
+        
+        saldo = self.usuario.descontar_creditos(120)
+        self.assertEqual(saldo, 380)
+        self.usuario.refresh_from_db()
+        self.assertEqual(self.usuario.creditos_chatbot, 380)
+
+        # Descontar más de lo disponible nunca da negativo
+        saldo = self.usuario.descontar_creditos(1000)
+        self.assertEqual(saldo, 0)
+        self.assertFalse(self.usuario.tiene_creditos())
+
+    def test_recortar_contexto_a_ultimos_tres_mensajes(self):
+        from usuarios.services.chatbot_service import recortar_contexto
+        historial = [
+            {"role": "user", "text": "Mensaje 1"},
+            {"role": "model", "text": "Respuesta 1"},
+            {"role": "user", "text": "Mensaje 2"},
+            {"role": "model", "text": "Respuesta 2"},
+            {"role": "user", "text": "Mensaje 3"},
+        ]
+        recortado = recortar_contexto(historial, max_mensajes=3)
+        self.assertEqual(len(recortado), 3)
+        self.assertEqual(recortado[0]["parts"][0]["text"], "Mensaje 2")
+        self.assertEqual(recortado[1]["parts"][0]["text"], "Respuesta 2")
+        self.assertEqual(recortado[2]["parts"][0]["text"], "Mensaje 3")
+
+    @patch('usuarios.services.chatbot_service.requests.post')
+    def test_chatbot_view_descuenta_tokens_exitosamente(self, mock_post):
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [{"text": "Para aumentar el contraste presiona el botón de accesibilidad."}]
+                    }
+                }
+            ],
+            "usageMetadata": {
+                "promptTokenCount": 35,
+                "candidatesTokenCount": 15,
+                "totalTokenCount": 50
+            }
+        }
+        mock_post.return_value = mock_response
+
+        self.client.login(username='user_chat_test', password='Password123!')
+        
+        with patch.dict('os.environ', {'GEMINI_API_KEY': 'fake-key-test'}):
+            response = self.client.post(
+                self.url,
+                data=json.dumps({"mensaje": "¿Cómo activo el alto contraste?"}),
+                content_type='application/json'
+            )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["status"], "success")
+        self.assertIn("Para aumentar el contraste", data["respuesta"])
+        self.assertEqual(data["tokens_consumidos"], 50)
+        self.assertEqual(data["creditos_restantes"], 450)
+
+        self.usuario.refresh_from_db()
+        self.assertEqual(self.usuario.creditos_chatbot, 450)
+
+    def test_chatbot_view_rechaza_si_creditos_cero(self):
+        self.usuario.creditos_chatbot = 0
+        self.usuario.save()
+
+        self.client.login(username='user_chat_test', password='Password123!')
+        response = self.client.post(
+            self.url,
+            data=json.dumps({"mensaje": "¿Dónde veo el tamaño de letra?"}),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 403)
+        data = response.json()
+        self.assertEqual(data["codigo"], "CREDITOS_INSUFICIENTES")
+
+class DocumentValidationTests(TestCase):
+
+    def test_crear_usuario_form_requiere_numero_documento(self):
+        form_data = {
+            'username': 'nuevo_usuario',
+            'first_name': 'Juan',
+            'last_name': 'Perez',
+            'email': 'juan@test.com',
+            'Document_Type': 'CC',
+            'Number_Document': '',
+            'Date_of_birth': '2000-01-01',
+            'password': 'PasswordSegura123!',
+            'password_confirmacion': 'PasswordSegura123!'
+        }
+        form = CrearUsuarioForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('Number_Document', form.errors)
+        self.assertIn('El número de documento es obligatorio.', form.errors['Number_Document'])
+
+    def test_crear_usuario_form_rechaza_documento_duplicado(self):
+        Usuario.objects.create_user(
+            username='existente',
+            password='Password123!',
+            Number_Document='10203040'
+        )
+        form_data = {
+            'username': 'otro_usuario',
+            'first_name': 'Carlos',
+            'last_name': 'Gomez',
+            'email': 'carlos@test.com',
+            'Document_Type': 'CC',
+            'Number_Document': '10203040',
+            'Date_of_birth': '2000-01-01',
+            'password': 'PasswordSegura123!',
+            'password_confirmacion': 'PasswordSegura123!'
+        }
+        form = CrearUsuarioForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('Number_Document', form.errors)
+        self.assertIn('Ya existe un usuario registrado con este número de documento.', form.errors['Number_Document'])

@@ -4,7 +4,5 @@ gunicorn>=23,<24
 psycopg[binary]>=3.2,<4
 python-dotenv>=1.1,<2
 whitenoise>=6.9,<7
-Pillow>=10,<13
-
-
-}
+Pillow>=11.0.0
+requests>=2.31.0

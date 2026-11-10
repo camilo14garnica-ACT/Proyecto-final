@@ -12,6 +12,7 @@ urlpatterns = [
     path('', usuarios_views.inicio, name='inicio'),
     path('usuarios/', include('usuarios.urls')),
     path('mascotas/', include('mascotas.urls')),
+    path('calidad/', include('calidad.urls')),
 ]
 
 if settings.DEBUG:

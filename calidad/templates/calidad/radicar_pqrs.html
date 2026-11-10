@@ -1,0 +1,86 @@
+{% extends 'partials/base-user.html' %}
+{% load static %}
+
+{% block title %}Radicar PQRS | Veterinaria Mascott{% endblock title %}
+
+{% block content %}
+<div class="container py-4 my-2">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'inicio' %}" class="text-decoration-none">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'mis_pqrs' %}" class="text-decoration-none">Mis PQRS</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Radicar Solicitud</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white py-3 px-4">
+                    <h1 class="h4 mb-1 text-white"><i class="bi bi-chat-square-dots-fill me-2"></i> Radicar Petición, Queja, Reclamo o Sugerencia</h1>
+                    <p class="small mb-0 text-white-50">Tu opinión nos permite mejorar continuamente el cuidado y bienestar de tus mascotas.</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="alert alert-light border d-flex align-items-center mb-4">
+                        <i class="bi bi-info-circle-fill text-primary fs-3 me-3"></i>
+                        <div class="small text-muted">
+                            <strong>Usuario solicitante:</strong> {{ request.user.get_full_name|default:request.user.username }}<br>
+                            <strong>Correo de contacto:</strong> {{ request.user.email }}
+                        </div>
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.tipo.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.tipo }}
+                            <div class="form-text text-muted small mt-1">
+                                {{ form.tipo.help_text }}
+                            </div>
+                            {% if form.tipo.errors %}
+                                <div class="text-danger small mt-1">{{ form.tipo.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.descripcion.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.descripcion }}
+                            <div class="form-text text-muted small mt-1">
+                                Sé lo más específico posible. Incluye fechas, nombres del personal o servicio si aplica.
+                            </div>
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger small mt-1">{{ form.descripcion.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a href="{% url 'mis_pqrs' %}" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-arrow-left me-1"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                                <i class="bi bi-send-fill me-1"></i> Radicar Solicitud
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
