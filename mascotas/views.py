@@ -257,6 +257,7 @@ class EliminarRazaView(PersonalAutorizadoMixin, DeleteView):
 # ============================================================
 # GESTIÓN DE CITAS
 # ============================================================
+from django.contrib.auth.decorators import login_required
 from .models import Cita, Servicio, HorarioDisponible
 from django.utils import timezone
 from datetime import timedelta
