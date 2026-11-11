@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'usuarios',
     'mascotas',
     'historial_clinico',
+    'citas',
 ]
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
