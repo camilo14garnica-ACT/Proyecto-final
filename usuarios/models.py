@@ -44,8 +44,12 @@ class Usuario(AbstractUser):
         max_length=20,
         unique=True,
         verbose_name="Número de documento",
-        blank=True,
+        blank=False,
         null=True,
+        error_messages={
+            'unique': 'Ya existe un usuario registrado con este número de documento.',
+            'blank': 'El número de documento es obligatorio.'
+        }
     )
     Date_of_birth = models.DateField(
         verbose_name="Fecha de nacimiento",
@@ -53,11 +57,26 @@ class Usuario(AbstractUser):
         blank=True,
     )
     sync_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    creditos_chatbot = models.PositiveIntegerField(
+        default=5000,
+        verbose_name="Créditos Chatbot IA (Tokens)",
+        help_text="Tokens disponibles para interactuar con el asistente de accesibilidad"
+    )
 
     REQUIRED_FIELDS = ["first_name", "last_name", "Document_Type", "Number_Document", "Date_of_birth"]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}".strip() or self.username
+
+    def tiene_creditos(self):
+        return self.creditos_chatbot > 0
+
+    def descontar_creditos(self, tokens_consumidos):
+        if tokens_consumidos <= 0:
+            return self.creditos_chatbot
+        self.creditos_chatbot = max(0, self.creditos_chatbot - tokens_consumidos)
+        self.save(update_fields=['creditos_chatbot'])
+        return self.creditos_chatbot
 
     def es_veterinario(self):
         return self.rol == self.Rol.VETERINARIO
@@ -69,6 +88,10 @@ class Usuario(AbstractUser):
         return self.rol == self.Rol.ADMIN
 
     def save(self, *args, **kwargs):
+        # Convertir cadena vacía a NULL para evitar violaciones UNIQUE
+        if not self.Number_Document:
+            self.Number_Document = None
+
         # Sincronizar roles y permisos administrativos
         if self.is_superuser and self.rol != self.Rol.ADMIN:
             self.rol = self.Rol.ADMIN

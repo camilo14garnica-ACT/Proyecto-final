@@ -33,6 +33,20 @@ class CrearUsuarioForm(forms.ModelForm):
             'Date_of_birth': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['Number_Document'].required = True
+        self.fields['Number_Document'].error_messages['required'] = 'El número de documento es obligatorio.'
+
+    def clean_Number_Document(self):
+        doc = self.cleaned_data.get('Number_Document')
+        if not doc or not str(doc).strip():
+            raise forms.ValidationError('El número de documento es obligatorio.')
+        doc = str(doc).strip()
+        if Usuario.objects.filter(Number_Document=doc).exists():
+            raise forms.ValidationError('Ya existe un usuario registrado con este número de documento.')
+        return doc
+
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password')
@@ -56,6 +70,20 @@ class CrearUsuarioForm(forms.ModelForm):
 
 
 class EditarPerfilForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['Number_Document'].required = True
+        self.fields['Number_Document'].error_messages['required'] = 'El número de documento es obligatorio.'
+
+    def clean_Number_Document(self):
+        doc = self.cleaned_data.get('Number_Document')
+        if not doc or not str(doc).strip():
+            raise forms.ValidationError('El número de documento es obligatorio.')
+        doc = str(doc).strip()
+        if Usuario.objects.filter(Number_Document=doc).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Ya existe otro usuario registrado con este número de documento.')
+        return doc
+
     class Meta:
         model = Usuario
         fields = ['first_name', 'last_name', 'email', 'Document_Type', 'Number_Document', 'Date_of_birth']
@@ -75,6 +103,20 @@ class EditarPerfilForm(forms.ModelForm):
 
 
 class EditarUsuarioForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['Number_Document'].required = True
+        self.fields['Number_Document'].error_messages['required'] = 'El número de documento es obligatorio.'
+
+    def clean_Number_Document(self):
+        doc = self.cleaned_data.get('Number_Document')
+        if not doc or not str(doc).strip():
+            raise forms.ValidationError('El número de documento es obligatorio.')
+        doc = str(doc).strip()
+        if Usuario.objects.filter(Number_Document=doc).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Ya existe otro usuario registrado con este número de documento.')
+        return doc
+
     class Meta:
         model = Usuario
         fields = ['username', 'first_name', 'last_name', 'email', 'Document_Type', 'Number_Document', 'Date_of_birth', 'rol', 'is_active']

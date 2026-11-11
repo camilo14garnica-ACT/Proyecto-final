@@ -1,0 +1,134 @@
+{% extends 'partials/base-admin.html' %}
+{% load static %}
+
+{% block title %}Lotes y Vencimientos | Panel Mascott{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h1 class="h3 mb-1"><i class="bi bi-box-seam-fill text-primary me-2"></i> Control de Lotes y Vencimientos</h1>
+            <p class="text-muted mb-0">Gestión de calidad de medicamentos, insumos y productos de la veterinaria.</p>
+        </div>
+        <a href="{% url 'admin_lote_crear' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Registrar Nuevo Lote
+        </a>
+    </div>
+
+    <!-- TARJETAS DE ALERTA -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <a href="{% url 'admin_lotes_list' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 border-start border-4 border-primary">
+                    <span class="text-muted small text-uppercase">Total Lotes</span>
+                    <h3 class="fw-bold mb-0 text-primary">{{ total_lotes }}</h3>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'admin_lotes_list' %}?alerta=vencidos" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 border-start border-4 border-danger">
+                    <span class="text-muted small text-uppercase">⚠️ Ya Vencidos</span>
+                    <h3 class="fw-bold mb-0 text-danger">{{ vencidos_count }}</h3>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'admin_lotes_list' %}?alerta=por_vencer" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 border-start border-4 border-warning">
+                    <span class="text-muted small text-uppercase">⏳ Próximos 30 días</span>
+                    <h3 class="fw-bold mb-0 text-warning">{{ por_vencer_count }}</h3>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'admin_lotes_list' %}?alerta=vigentes" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 border-start border-4 border-success">
+                    <span class="text-muted small text-uppercase">✅ Vigentes</span>
+                    <h3 class="fw-bold mb-0 text-success">{{ vigentes_count }}</h3>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">Inventario de Lotes</h5>
+            {% if filtro_alerta %}
+                <a href="{% url 'admin_lotes_list' %}" class="btn btn-sm btn-outline-light">Ver todos</a>
+            {% endif %}
+        </div>
+        <div class="card-body table-responsive">
+            <table id="tablaLotes" class="table table-striped table-hover align-middle w-100">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Lote #</th>
+                        <th>Producto</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Alerta</th>
+                        <th>Estado de Calidad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lote in lotes %}
+                        <tr>
+                            <td class="fw-bold">{{ lote.numero_lote }}</td>
+                            <td>{{ lote.producto.nombre }}</td>
+                            <td>{{ lote.fecha_vencimiento|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if lote.fecha_vencimiento < hoy %}
+                                    <span class="badge bg-danger"><i class="bi bi-exclamation-octagon me-1"></i> Vencido</span>
+                                {% elif lote.fecha_vencimiento <= en_30_dias %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i> Por vencer</span>
+                                {% else %}
+                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Vigente</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if lote.estado_calidad == 'APROBADO' %}
+                                    <span class="badge bg-success">Aprobado</span>
+                                {% elif lote.estado_calidad == 'RECHAZADO' %}
+                                    <span class="badge bg-danger">Rechazado</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">En revisión</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'admin_lote_editar' lote.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No hay lotes registrados para mostrar.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#tablaLotes').DataTable({
+            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
+            order: [[2, 'asc']],
+            pageLength: 10
+        });
+    });
+</script>
+{% endblock extra_js %}
+
