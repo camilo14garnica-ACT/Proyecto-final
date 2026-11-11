@@ -14,7 +14,7 @@ class EncuestaSatisfaccion(models.Model):
         verbose_name='Cliente',
     )
     cita = models.ForeignKey(
-        'mascotas.Cita',
+        'citas.Cita',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
