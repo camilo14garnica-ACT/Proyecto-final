@@ -2,8 +2,8 @@ from datetime import date, timedelta
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from mascotas.models import Producto
 from calidad.models import EncuestaSatisfaccion, PQRS, LoteProducto, NoConformidad
+from productos.models import Categoria, Producto
 
 Usuario = get_user_model()
 
@@ -36,10 +36,12 @@ class CalidadModuloTests(TestCase):
         )
 
         # Producto para Lotes
+        self.categoria = Categoria.objects.create(nombre='Farmacia')
         self.producto = Producto.objects.create(
             nombre='Vacuna Antirrábica',
             precio=45000.00,
             stock=10,
+            categoria=self.categoria,
         )
 
     def test_creacion_modelos_calidad(self):
