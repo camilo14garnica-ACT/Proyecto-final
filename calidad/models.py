@@ -102,7 +102,7 @@ class LoteProducto(models.Model):
         EN_REVISION = 'EN_REVISION', 'En revisión'
 
     producto = models.ForeignKey(
-        'mascotas.Producto',
+        'productos.Producto',
         on_delete=models.CASCADE,
         related_name='lotes',
         verbose_name='Producto',

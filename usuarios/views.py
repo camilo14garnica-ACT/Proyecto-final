@@ -40,12 +40,9 @@ def crear_usuario(request):
 
 # Inicio de sesión
 def iniciar_sesion(request):
+    # Renderizar el saludo y las opciones de rol para sesiones ya autenticadas.
     if request.user.is_authenticated:
-        if request.user.rol == 'ADMIN':
-            return redirect('panel_admin')
-        elif request.user.rol == 'VETERINARIO':
-            return redirect('panel_veterinario')
-        return redirect('mi_perfil')  # Cliente va a su panel de usuario
+        return render(request, 'usuarios/iniciar_sesion.html', {'form': None})
 
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -53,7 +50,7 @@ def iniciar_sesion(request):
             usuario = form.get_user()
             login(request, usuario)
             if usuario.rol == 'ADMIN':
-                return redirect('inicio')
+                return redirect('panel_admin')
             elif usuario.rol == 'VETERINARIO':
                 return redirect('panel_veterinario')
             else:
@@ -234,7 +231,7 @@ def solicitar_eliminacion_cuenta(request):
         logout(request)
         usuario.delete()
         messages.success(request, 'Tu cuenta fue eliminada correctamente.')
-        return redirect('inicio')
+        return redirect('lista_usuarios')
 
     return render(request, 'usuarios/confirmar_eliminacion_cuenta.html')
 
