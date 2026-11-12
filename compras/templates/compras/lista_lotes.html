@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lotes - Mascott</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="{% static 'css/usuarios/perfil.css' %}"/>
+</head>
+<body>
+  <button class="hamburguesa" id="btnHamburguesa"><i class="bi bi-list"></i></button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="perfil-sidebar" id="sidebar">
+    <a href="{% url 'inicio' %}" class="sidebar-logo"><i class="bi bi-heart-pulse-fill"></i> Mascott</a>
+    <nav class="sidebar-nav">
+      <a href="{% url 'lista_ordenes' %}"><i class="bi bi-cart-fill"></i> Compras</a>
+      <a href="{% url 'lista_lotes' %}" class="activo"><i class="bi bi-box-fill"></i> Lotes</a>
+      <a href="{% url 'lista_proveedores' %}"><i class="bi bi-truck"></i> Proveedores</a>
+    </nav>
+    <div class="sidebar-sep"></div>
+    <a href="{% url 'logout' %}" class="sidebar-logout"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+  </aside>
+
+  <main class="perfil-main">
+    <div class="perfil-bienvenida">
+      <h1 class="perfil-titulo"><i class="bi bi-box-fill me-2"></i>Gestión de Lotes</h1>
+    </div>
+
+    <!-- Filtros -->
+    <div class="perfil-seccion mb-3">
+      <form method="get" class="row g-2 align-items-end">
+        <div class="col-12 col-sm-4">
+          <select name="producto" class="form-select form-select-sm">
+            <option value="">Todos los productos</option>
+            {% for p in productos %}<option value="{{ p.pk }}">{{ p.nombre }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="vencidos" value="1" id="chkVencidos"/>
+            <label class="form-check-label small" for="chkVencidos">Solo vencidos</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="por_vencer" value="1" id="chkPorVencer"/>
+            <label class="form-check-label small" for="chkPorVencer">Por vencer (30 días)</label>
+          </div>
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="perfil-seccion">
+      {% if lotes %}
+        <div class="table-responsive">
+          <table class="tabla-perfil">
+            <thead><tr><th>Producto</th><th>Lote</th><th>Cantidad</th><th>Ingreso</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+            <tbody>
+              {% for lote in lotes %}
+              <tr>
+                <td>{{ lote.producto.nombre }}</td>
+                <td>{{ lote.numero_lote|default:"-" }}</td>
+                <td>{{ lote.cantidad }}</td>
+                <td>{{ lote.fecha_ingreso|date:"d/m/Y" }}</td>
+                <td>{% if lote.fecha_vence %}{{ lote.fecha_vence|date:"d/m/Y" }}{% else %}-{% endif %}</td>
+                <td>
+                  {% if lote.vencido %}
+                    <span class="estado-badge estado-cancelada">Vencido</span>
+                  {% elif lote.fecha_vence %}
+                    <span class="estado-badge estado-completada">Vigente</span>
+                  {% else %}
+                    <span class="estado-badge" style="background:#f3f4f6;color:#6b7280;">Sin fecha</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="vacio-msg">
+          <i class="bi bi-box"></i>
+          <p>No hay lotes registrados.</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const btn=document.getElementById('btnHamburguesa'),sidebar=document.getElementById('sidebar'),overlay=document.getElementById('sidebarOverlay');
+    btn.addEventListener('click',()=>{sidebar.classList.toggle('abierto');overlay.classList.toggle('activo');});
+    overlay.addEventListener('click',()=>{sidebar.classList.remove('abierto');overlay.classList.remove('activo');});
+  </script>
+</body>
+</html>

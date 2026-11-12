@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OC-{{ orden.pk }} - Mascott</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="{% static 'css/usuarios/perfil.css' %}"/>
+</head>
+<body>
+  <button class="hamburguesa" id="btnHamburguesa"><i class="bi bi-list"></i></button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="perfil-sidebar" id="sidebar">
+    <a href="{% url 'inicio' %}" class="sidebar-logo"><i class="bi bi-heart-pulse-fill"></i> Mascott</a>
+    <nav class="sidebar-nav">
+      <a href="{% url 'inicio' %}"><i class="bi bi-house-fill"></i> Inicio</a>
+      <a href="{% url 'lista_ordenes' %}" class="activo"><i class="bi bi-cart-fill"></i> Compras</a>
+      <a href="{% url 'lista_lotes' %}"><i class="bi bi-box-fill"></i> Lotes</a>
+      <a href="{% url 'lista_proveedores' %}"><i class="bi bi-truck"></i> Proveedores</a>
+    </nav>
+    <div class="sidebar-sep"></div>
+    <a href="{% url 'logout' %}" class="sidebar-logout"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+  </aside>
+
+  <main class="perfil-main">
+    <div class="perfil-bienvenida">
+      <div>
+        <h1 class="perfil-titulo">OC-{{ orden.pk }} — {{ orden.proveedor.nombre }}</h1>
+        <p class="perfil-subtitulo">{{ orden.fecha_orden|date:"d/m/Y" }} · <span class="estado-badge estado-{{ orden.estado|lower }}">{{ orden.get_estado_display }}</span></p>
+      </div>
+      <div class="d-flex gap-2">
+        {% if orden.estado != 'CANCELADA' and orden.estado != 'COMPLETADA' %}
+          <a href="{% url 'recibir_orden' orden.pk %}" class="btn-agendar-cita"><i class="bi bi-box-arrow-in-down me-1"></i>Recepcionar</a>
+        {% endif %}
+        <a href="{% url 'lista_ordenes' %}" class="btn-agendar-cita" style="background:#6b7280;"><i class="bi bi-arrow-left me-1"></i>Volver</a>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-md-4">
+        <div class="perfil-seccion">
+          <h5 class="fw-bold mb-3">Información</h5>
+          <p><strong>Proveedor:</strong> {{ orden.proveedor.nombre }}</p>
+          <p><strong>Creada por:</strong> {{ orden.creada_por }}</p>
+          <p><strong>Fecha:</strong> {{ orden.fecha_orden|date:"d/m/Y" }}</p>
+          <p><strong>Entrega esperada:</strong> {{ orden.fecha_esperada|date:"d/m/Y"|default:"-" }}</p>
+          <p><strong>Estado:</strong> <span class="estado-badge estado-{{ orden.estado|lower }}">{{ orden.get_estado_display }}</span></p>
+          {% if orden.notas %}<p><strong>Notas:</strong> {{ orden.notas }}</p>{% endif %}
+        </div>
+      </div>
+      <div class="col-12 col-md-8">
+        <div class="perfil-seccion">
+          <h5 class="fw-bold mb-3">Productos</h5>
+          <table class="tabla-perfil">
+            <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio unit.</th><th>Subtotal</th></tr></thead>
+            <tbody>
+              {% for item in orden.items.all %}
+              <tr>
+                <td>{{ item.producto.nombre }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.precio_unit|floatformat:0 }}</td>
+                <td>${{ item.subtotal|floatformat:0 }}</td>
+              </tr>
+              {% endfor %}
+              <tr class="fw-bold">
+                <td colspan="3" class="text-end">Total</td>
+                <td>${{ orden.total|floatformat:0 }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const btn=document.getElementById('btnHamburguesa'),sidebar=document.getElementById('sidebar'),overlay=document.getElementById('sidebarOverlay');
+    btn.addEventListener('click',()=>{sidebar.classList.toggle('abierto');overlay.classList.toggle('activo');});
+    overlay.addEventListener('click',()=>{sidebar.classList.remove('abierto');overlay.classList.remove('activo');});
+  </script>
+</body>
+</html>
