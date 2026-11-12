@@ -112,10 +112,15 @@
           <div class="col-12 col-sm-6 col-lg-4">
             <div class="mascota-card">
               <div class="mascota-icon">
-                {% if mascota.especie.nombre|lower == "perro" %}🐕 {% elif
-                mascota.especie.nombre|lower == "gato" %}🐈 {% elif
-                mascota.especie.nombre|lower == "ave" %}🦜 {% else %}🐾{% endif
-                %}
+                {% if mascota.especie.nombre|lower == "perro" %}
+                  🐕
+                {% elif mascota.especie.nombre|lower == "gato" %}
+                  🐈
+                {% elif mascota.especie.nombre|lower == "ave" %}
+                  🦜
+                {% else %}
+                  🐾
+                {% endif %}
               </div>
               <div class="mascota-info">
                 <h5>{{ mascota.nombre }}</h5>
