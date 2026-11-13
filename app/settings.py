@@ -66,8 +66,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'usuarios',
     'mascotas',
+    'historial_clinico',
+    'citas',
     'calidad',
     'compras',
+    'productos',
 ]
 
 AUTH_USER_MODEL = 'usuarios.Usuario'

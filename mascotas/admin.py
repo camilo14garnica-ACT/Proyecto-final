@@ -23,6 +23,7 @@ class MascotaAdmin(admin.ModelAdmin):
     list_filter = ('especie', 'estado')
 
 
+<<<<<<< HEAD
 @admin.register(Servicio)
 class ServicioAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'duracion_minutos', 'precio', 'estado')

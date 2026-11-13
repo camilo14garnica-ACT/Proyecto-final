@@ -11,7 +11,8 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('mascotas', '0007_alter_carrito_id_alter_itemcarrito_id_and_more'),
+        ('citas', '0001_initial'),
+        ('productos', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -23,7 +24,7 @@ class Migration(migrations.Migration):
                 ('puntuacion', models.PositiveSmallIntegerField(help_text='1 = Muy malo, 5 = Excelente', validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(5)], verbose_name='Puntuación (1-5)')),
                 ('comentarios', models.TextField(blank=True, verbose_name='Comentarios')),
                 ('fecha', models.DateTimeField(auto_now_add=True, verbose_name='Fecha de registro')),
-                ('cita', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='encuestas', to='mascotas.cita', verbose_name='Cita / Servicio evaluado')),
+                ('cita', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='encuestas', to='citas.cita', verbose_name='Cita / Servicio evaluado')),
                 ('cliente', models.ForeignKey(limit_choices_to={'rol': 'CLIENTE'}, on_delete=django.db.models.deletion.CASCADE, related_name='encuestas_satisfaccion', to=settings.AUTH_USER_MODEL, verbose_name='Cliente')),
             ],
             options={
@@ -39,7 +40,7 @@ class Migration(migrations.Migration):
                 ('numero_lote', models.CharField(max_length=80, unique=True, verbose_name='Número de lote')),
                 ('fecha_vencimiento', models.DateField(verbose_name='Fecha de vencimiento')),
                 ('estado_calidad', models.CharField(choices=[('APROBADO', 'Aprobado'), ('RECHAZADO', 'Rechazado'), ('EN_REVISION', 'En revisión')], default='EN_REVISION', max_length=12, verbose_name='Estado de calidad')),
-                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lotes', to='mascotas.producto', verbose_name='Producto')),
+                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lotes', to='productos.producto', verbose_name='Producto')),
             ],
             options={
                 'verbose_name': 'Lote de producto',

@@ -72,3 +72,118 @@ body.panel-body { background: #f4f6fb; }
   padding: .5rem .75rem;
   border: 1px solid #ced4da; border-radius: .5rem;
 }
+
+/* ===== Resumen del panel ===== */
+.dash-intro { padding: .25rem 0 .25rem .9rem; border-left: 4px solid #ffc107; }
+.dash-eyebrow {
+  display: block; margin-bottom: .35rem; color: #64748b;
+  font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+}
+.dash-titulo {
+  color: #0f1b33; font-size: clamp(1.65rem, 2.5vw, 2.15rem);
+  font-weight: 800; letter-spacing: -.035em; margin-bottom: .25rem;
+}
+.dash-descripcion { color: #64748b; }
+
+.dash-card {
+  --dash-acento: #064bb3;
+  --dash-tinte: #eff6ff;
+  position: relative; overflow: hidden; height: 100%; min-height: 158px;
+  padding: 1.25rem 1rem 1.1rem; border: 1px solid #e8edf5;
+  border-top: 3px solid var(--dash-acento); border-radius: 14px;
+  background: #fff; text-align: center;
+  box-shadow: 0 3px 12px rgba(15, 27, 51, .06);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.dash-card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(15, 27, 51, .12); }
+.dash-card--usuarios { --dash-acento: #2563eb; --dash-tinte: #eff6ff; }
+.dash-card--mascotas { --dash-acento: #e11d48; --dash-tinte: #fff1f2; }
+.dash-card--registros { --dash-acento: #16a34a; --dash-tinte: #f0fdf4; }
+.dash-card--especies { --dash-acento: #d97706; --dash-tinte: #fffbeb; }
+.dash-card--razas { --dash-acento: #0891b2; --dash-tinte: #ecfeff; }
+.dash-card-icon {
+  display: grid; width: 3rem; height: 3rem; margin: 0 auto .65rem;
+  place-items: center; border-radius: 12px; background: var(--dash-tinte);
+}
+.dash-card-icon i { font-size: 1.35rem; }
+.dash-num { color: #111827; font-size: 1.65rem; font-weight: 800; line-height: 1.15; }
+.dash-label { margin-top: .3rem; color: #64748b; font-size: .78rem; font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-card { transition: none; }
+  .dash-card:hover { transform: none; }
+}
+
+.dash-seccion {
+  margin-bottom: 1.5rem; padding: 1.5rem;
+  border: 1px solid #e5eaf2; border-radius: 16px;
+  background: #fff; box-shadow: 0 4px 16px rgba(15, 27, 51, .06);
+}
+.dash-seccion-header {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  align-items: center; gap: .75rem; margin-bottom: 1rem;
+  padding-bottom: .9rem; border-bottom: 1px solid #edf0f5;
+}
+.dash-seccion-header h2 { color: #0f1b33; font-size: 1.15rem; font-weight: 700; margin: 0; }
+.dash-seccion-header h2 i { color: #2563eb; }
+.dash-subtitulo { font-size: .95rem; font-weight: 600; color: #6b7280; margin-bottom: .5rem; }
+.dash-link { font-weight: 600; font-size: .9rem; text-decoration: none; }
+
+.dash-lista { list-style: none; margin: 0; padding: 0; }
+.dash-lista li + li { margin-top: .65rem; }
+.dash-lista li {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 1rem; padding: .9rem 1rem;
+  border: 1px solid #e2e8f0; border-radius: 12px;
+  background: #f8fafc;
+  transition: border-color .2s ease, background-color .2s ease;
+}
+.dash-lista li:hover { border-color: #bfdbfe; background: #f5f9ff; }
+
+@media (max-width: 575.98px) {
+  .dash-seccion { padding: 1rem; margin-bottom: 1rem; }
+  .dash-seccion-header { align-items: flex-start; }
+  .dash-lista li { padding: .8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-lista li { transition: none; }
+}
+
+
+/* Contenedores independientes del resumen administrativo */
+.resumen-card,
+.historial-card,
+.mascotas-card,
+.usuarios-card,
+.especies-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Separación entre tarjetas */
+.resumen-card {
+    padding: 24px;
+}
+
+.historial-card,
+.mascotas-card,
+.usuarios-card,
+.especies-card {
+    margin-top: 18px;
+}
+
+/* Efecto visual */
+.historial-card:hover,
+.mascotas-card:hover,
+.usuarios-card:hover,
+.especies-card:hover {
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s ease;
+}
+
+

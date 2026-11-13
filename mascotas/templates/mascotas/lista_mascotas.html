@@ -1,4 +1,4 @@
-{% extends base_template|default:'mascotas/base_cliente.html' %}
+{% extends 'partials/base-admin.html' %}
 
 {% block title %}{{ titulo }} | Mascott{% endblock %}
 
@@ -59,6 +59,9 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center text-nowrap">
+                                    <a href={% url "historial_mascota" mascota.pk %} class="btn btn-sm btn-info">
+                                        <i class"bi bi-journal-medical"> </i> Historial
+                                    </a>
                                     <a href="{% url 'editar_mascota' mascota.pk %}" class="btn btn-warning btn-sm">
                                         <i class="bi bi-pencil-square"></i> Editar
                                     </a>

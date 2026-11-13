@@ -15,8 +15,7 @@ class Especie(models.Model):
         return self.nombre
     
 
-class Raza(models.Model):
-    ESTADOS = [('ACTIVO', 'Activo'), ('INACTIVO', 'Inactivo')]
+class Raza(models.Model):    ESTADOS = [('ACTIVO', 'Activo'), ('INACTIVO', 'Inactivo')]
 
     especie = models.ForeignKey(Especie, on_delete=models.PROTECT)
     nombre = models.CharField(max_length=100)
@@ -48,7 +47,6 @@ class Mascota(models.Model):
     sexo = models.CharField(max_length=1, choices=SEXOS)
     peso_kg = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     color = models.CharField(max_length=80, blank=True)
-    microchip = models.CharField(max_length=80, blank=True)
     estado = models.CharField(max_length=10, choices=ESTADOS, default='ACTIVO')
     fecha_registro = models.DateTimeField(auto_now_add=True)
     esterilizado = models.CharField(max_length=20)

@@ -1,36 +1,30 @@
-{% extends "usuarios/base_auth.html" %}
+{% extends "usuarios/base_auth.html" %} {% block title %}Iniciar sesión -
+Veterinaria Mascott{% endblock %} {% block auth_content %}
+<div class="auth-logo">
+  <i class="bi bi-heart-pulse-fill"></i>
+  <span>Mascott</span>
+</div>
 
-{% block title %}Iniciar sesión - Veterinaria Mascott{% endblock %}
 
-{% block auth_content %}
-  <div class="auth-logo">
-    <i class="bi bi-heart-pulse-fill"></i>
-    <span>Mascott</span>
-  </div>
+<h1 id="login-title" class="auth-title">Iniciar sesión</h1>
 
-  <h1 id="login-title" class="auth-title">Iniciar sesión</h1>
+<form method="post" class="auth-form" aria-labelledby="login-title">
+  {% csrf_token %} {% if form.non_field_errors %}
+  <div class="auth-error">{{ form.non_field_errors }}</div>
+  {% endif %} {{ form.as_p }} {% if next %}
+  <input type="hidden" name="next" value="{{ next }}" />
+  {% endif %}
 
-  <form method="post" class="auth-form" aria-labelledby="login-title">
-    {% csrf_token %}
+  <button type="submit" class="auth-btn">Iniciar sesión</button>
+</form>
 
-    {% if form.non_field_errors %}
-      <div class="auth-error">{{ form.non_field_errors }}</div>
-    {% endif %}
-
-    {{ form.as_p }}
-
-    {% if next %}
-      <input type="hidden" name="next" value="{{ next }}">
-    {% endif %}
-
-    <button type="submit" class="auth-btn">Iniciar sesión</button>
-  </form>
-
-  <p class="auth-footer">
-    <a href="{% url 'recuperar_password_solicitar' %}">¿Olvidaste tu contraseña?</a>
-  </p>
-  <p class="auth-footer">
-    ¿Todavía no tienes una cuenta?
-    <a href="{% url 'crear_usuario' %}">Crear usuario</a>
-  </p>
+<p class="auth-footer">
+  <a href="{% url 'recuperar_password_solicitar' %}"
+    >¿Olvidaste tu contraseña?</a
+  >
+</p>
+<p class="auth-footer">
+  ¿Todavía no tienes una cuenta?
+  <a href="{% url 'crear_usuario' %}">Crear usuario</a>
+</p>
 {% endblock auth_content %}

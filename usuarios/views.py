@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods, require_POST
 from django.utils import timezone
@@ -15,6 +15,7 @@ import random
 from .decorators import solo_admin, solo_veterinario, solo_veterianrio
 from .forms import CrearUsuarioForm, EditarPerfilForm, EditarUsuarioForm
 from .models import Usuario, CodigoRecuperacion
+
 
 
 # Página de inicio pública
@@ -40,12 +41,9 @@ def crear_usuario(request):
 
 # Inicio de sesión
 def iniciar_sesion(request):
+    # Renderizar el saludo y las opciones de rol para sesiones ya autenticadas.
     if request.user.is_authenticated:
-        if request.user.rol == 'ADMIN':
-            return redirect('panel_admin')
-        elif request.user.rol == 'VETERINARIO':
-            return redirect('panel_veterinario')
-        return redirect('mi_perfil')  # Cliente va a su panel de usuario
+        return render(request, 'usuarios/iniciar_sesion.html', {'form': None})
 
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -57,7 +55,7 @@ def iniciar_sesion(request):
             elif usuario.rol == 'VETERINARIO':
                 return redirect('panel_veterinario')
             else:
-                return redirect('mi_perfil')  # Cliente va a su panel de usuario
+                return redirect('inicio')  # Cliente va a su panel de usuario
     else:
         form = AuthenticationForm()
     return render(request, 'usuarios/iniciar_sesion.html', {'form': form})
@@ -71,30 +69,65 @@ def cerrar_sesion(request):
 cerrar_secion = cerrar_sesion
 
 
+def _contexto_resumen(es_admin):
+    """Datos del resumen. El veterinario no recibe lo de usuarios, especies y razas."""
+    from django.db.models import Count, Q
+    from historial_clinico.models import RegistroClinico
+    from mascotas.models import Especie, Mascota, Raza
+
+    mascotas_activas = Mascota.objects.filter(estado='ACTIVO')
+
+    contexto = {
+        'es_admin': es_admin,
+        'total_mascotas': mascotas_activas.count(),
+        'total_registros': RegistroClinico.objects.filter(estado='ACTIVO').count(),
+        'mascotas_recientes': (
+            mascotas_activas
+            .select_related('especie', 'raza', 'Cliente')
+            .order_by('-fecha_registro')[:5]
+        ),
+        'registros_recientes': (
+            RegistroClinico.objects
+            .filter(estado='ACTIVO')
+            .select_related('mascota', 'registrado_por')[:5]
+        ),
+        'mascotas_buscador': (
+            mascotas_activas.select_related('Cliente').order_by('nombre')
+        ),
+    }
+
+    if es_admin:
+        contexto.update({
+            'total_usuarios': Usuario.objects.count(),
+            'total_especies': Especie.objects.filter(estado='ACTIVO').count(),
+            'total_razas': Raza.objects.filter(estado='ACTIVO').count(),
+            'usuarios_recientes': Usuario.objects.order_by('-date_joined')[:5],
+            'especies': (
+                Especie.objects
+                .filter(estado='ACTIVO')
+                .annotate(num_razas=Count('raza', filter=Q(raza__estado='ACTIVO')))
+                .order_by('nombre')
+            ),
+        })
+    return contexto
+
+
 # Panel de Administrador
 @solo_admin
 def panel_admin(request):
-    return render(request, 'usuarios/panel_admin.html')
-
-
-# Listar usuarios (solo admin)
-@solo_admin
-def listar_usuarios(request):
-    usuarios = Usuario.objects.all().order_by('last_name', 'first_name')
-    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
+    return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=True))
 
 
 # Panel del Veterinario
 @solo_veterinario
 def panel_veterinario(request):
-    return render(request, 'usuarios/panel_veterinario.html')
-
+    return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=False))
 
 # Editar perfil propio
 @login_required
 def mi_perfil(request):
-    from mascotas.models import Mascota, Cita
-    
+    from mascotas.models import Mascota
+
     if request.user.rol != 'CLIENTE':
         return redirect('editar_perfil_admin')
 
@@ -107,27 +140,20 @@ def mi_perfil(request):
     else:
         form = EditarPerfilForm(instance=request.user)
 
-    # Mascotas del usuario
-    mascotas = Mascota.objects.filter(Cliente=request.user, estado='ACTIVO')
-
-    # Próximas citas (programadas o confirmadas)
-    proximas_citas = Cita.objects.filter(
-        mascota__Cliente=request.user,
-        estado__in=['PROGRAMADA', 'CONFIRMADA'],
-    ).order_by('fecha_hora')[:5]
-
-    # Últimas citas completadas
-    historial_citas = Cita.objects.filter(
-        mascota__Cliente=request.user,
-        estado='COMPLETADA',
-    ).order_by('-fecha_hora')[:5]
+    # Mascotas activas del cliente
+    mascotas = (
+        Mascota.objects
+        .filter(Cliente=request.user, estado='ACTIVO')
+        .select_related('especie', 'raza')
+    )
 
     return render(request, 'usuarios/perfil.html', {
         'form': form,
         'mascotas': mascotas,
-        'proximas_citas': proximas_citas,
-        'historial_citas': historial_citas,
     })
+
+
+
 
 #PERFIL DE ADMIN Y ADMINISTAOR
 @login_required
@@ -206,7 +232,7 @@ def solicitar_eliminacion_cuenta(request):
         logout(request)
         usuario.delete()
         messages.success(request, 'Tu cuenta fue eliminada correctamente.')
-        return redirect('inicio')
+        return redirect('lista_usuarios')
 
     return render(request, 'usuarios/confirmar_eliminacion_cuenta.html')
 
@@ -421,3 +447,107 @@ def chatbot_accesibilidad_view(request):
             "codigo": "SERVER_ERROR",
             "mensaje": "Ocurrió un error inesperado al procesar tu consulta."
         }, status=500)
+
+
+
+def _contexto_resumen(es_admin):
+    """Datos del resumen. El veterinario no recibe lo de usuarios, especies y razas."""
+    from django.db.models import Count, Q
+    from historial_clinico.models import RegistroClinico
+    from mascotas.models import Especie, Mascota, Raza
+
+    mascotas_activas = Mascota.objects.filter(estado='ACTIVO')
+
+    contexto = {
+        'es_admin': es_admin,
+        'total_mascotas': mascotas_activas.count(),
+        'total_registros': RegistroClinico.objects.filter(estado='ACTIVO').count(),
+        'mascotas_recientes': (
+            mascotas_activas
+            .select_related('especie', 'raza', 'Cliente')
+            .order_by('-fecha_registro')[:5]
+        ),
+        'registros_recientes': (
+            RegistroClinico.objects
+            .filter(estado='ACTIVO')
+            .select_related('mascota', 'registrado_por')[:5]
+        ),
+        'mascotas_buscador': (
+            mascotas_activas.select_related('Cliente').order_by('nombre')
+        ),
+    }
+
+    if es_admin:
+        contexto.update({
+            'total_usuarios': Usuario.objects.count(),
+            'total_especies': Especie.objects.filter(estado='ACTIVO').count(),
+            'total_razas': Raza.objects.filter(estado='ACTIVO').count(),
+            'usuarios_recientes': Usuario.objects.order_by('-date_joined')[:5],
+            'especies': (
+                Especie.objects
+                .filter(estado='ACTIVO')
+                .annotate(num_razas=Count('raza', filter=Q(raza__estado='ACTIVO')))
+                .order_by('nombre')
+            ),
+        })
+    return contexto
+
+
+# Panel de Administrador
+@solo_admin
+def panel_admin(request):
+    return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=True))
+
+
+# Listar usuarios (solo admin)
+@solo_admin
+def listar_usuarios(request):
+    usuarios = Usuario.objects.all().order_by('last_name', 'first_name')
+    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
+
+
+# Panel del Veterinario
+@solo_veterinario
+def panel_veterinario(request):
+    return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=False))
+
+
+
+# A donde va cada rol cuando termina la bienvenida
+
+DESTINOS = {
+    'ADMIN': 'panel_admin',
+    'VETERINARIO': 'panel_veterinario',
+    'CLIENTE': 'inicio',
+}
+
+
+# Como se vada rol en la pantalla del personal
+
+PERSONAL = {
+    'ADMIN': {'clase': 'rol-admin', 'etiqueta': 'administrador/a', 'inicio': '💻'},
+    'VETERINARIO': {'clase': 'rol-veterinario', 'etiqueta': 'Vterinario/a', 'icono': '🩺'}
+}
+
+@login_required
+def bienvenida(request):
+    rol = request.user.rol
+    destino = resolve_url(DESTINOS.get(rol, DESTINOS['CLIENTE']))
+    
+    #La pantalla solo sale una vez por cada inicio de sesion
+    #Si alguien entra a /bienvenida/ por su cuenta, pasa directo a su destino.
+    if not request.session.pop('mostrar_bienvenida', False):
+        return redirect(destino)
+    
+    if rol == 'CLIENTE':
+        return render(request, 'usuarios/bienvenida_cliente.html', {'destinino': destino})
+    
+    datos = PERSONAL.get(rol)
+    if datos is None:
+        return redirect(destino)
+    
+    return render(request, 'usuarios/bienvenida_personal.html' {
+        'destino': destino,
+        'nombre': 
+    })
+    
