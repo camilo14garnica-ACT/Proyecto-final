@@ -1,44 +1,52 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{{ titulo }} - Mascott</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-  <link rel="stylesheet" href="{% static 'css/usuarios/perfil.css' %}"/>
-  <link rel="stylesheet" href="{% static 'css/usuarios/base_auth.css' %}"/>
-</head>
-<body>
-  <aside class="perfil-sidebar">
-    <a href="{% url 'inicio' %}" class="sidebar-logo"><i class="bi bi-heart-pulse-fill"></i> Mascott</a>
-    <nav class="sidebar-nav">
-      <a href="{% url 'lista_ordenes' %}"><i class="bi bi-cart-fill"></i> Compras</a>
-      <a href="{% url 'lista_proveedores' %}" class="activo"><i class="bi bi-truck"></i> Proveedores</a>
-    </nav>
-    <div class="sidebar-sep"></div>
-    <a href="{% url 'logout' %}" class="sidebar-logout"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
-  </aside>
+{% extends 'partials/base-admin.html' %}
+{% block title %}{{ titulo }} – Mascott{% endblock %}
 
-  <main class="perfil-main">
-    <div class="perfil-bienvenida">
-      <h1 class="perfil-titulo">{{ titulo }}</h1>
-      <a href="{% url 'lista_proveedores' %}" class="btn-agendar-cita" style="background:#6b7280;"><i class="bi bi-arrow-left me-1"></i>Volver</a>
-    </div>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-0"><i class="bi bi-truck me-2 text-primary"></i>{{ titulo }}</h1>
+  </div>
+  <a href="{% url 'lista_proveedores' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Volver
+  </a>
+</div>
 
-    <div class="perfil-seccion" style="max-width:520px;">
-      <form method="post" class="auth-form">
-        {% csrf_token %}
-        <p><label>Nombre <span class="text-danger">*</span></label><input type="text" name="nombre" required placeholder="Nombre del proveedor"/></p>
-        <p><label>Contacto</label><input type="text" name="contacto" placeholder="Nombre del contacto"/></p>
-        <p><label>Teléfono</label><input type="text" name="telefono" placeholder="Ej: 310 000 0000"/></p>
-        <p><label>Email</label><input type="email" name="email" placeholder="proveedor@correo.com"/></p>
-        <p><label>Dirección</label><input type="text" name="direccion" placeholder="Dirección física"/></p>
-        <button type="submit" class="auth-btn"><i class="bi bi-check-circle-fill me-2"></i>Guardar proveedor</button>
-      </form>
-    </div>
-  </main>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<div class="card shadow-sm" style="max-width:560px;">
+  <div class="card-header bg-dark text-white">
+    <i class="bi bi-person-lines-fill me-1"></i>Datos del proveedor
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label fw-bold">Nombre <span class="text-danger">*</span></label>
+        <input type="text" name="nombre" class="form-control" placeholder="Nombre del proveedor" required/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-bold">Contacto</label>
+        <input type="text" name="contacto" class="form-control" placeholder="Nombre de la persona de contacto"/>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label fw-bold">Teléfono</label>
+          <input type="text" name="telefono" class="form-control" placeholder="310 000 0000"/>
+        </div>
+        <div class="col-6">
+          <label class="form-label fw-bold">Email</label>
+          <input type="email" name="email" class="form-control" placeholder="proveedor@correo.com"/>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-bold">Dirección</label>
+        <input type="text" name="direccion" class="form-control" placeholder="Dirección física"/>
+      </div>
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'lista_proveedores' %}" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-circle-fill me-1"></i>Guardar proveedor
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

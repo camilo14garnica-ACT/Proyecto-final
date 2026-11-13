@@ -95,6 +95,31 @@
             class="panel-seccion-titulo text-muted small text-uppercase px-3 pt-3 pb-1"
             style="font-size: 0.72rem; letter-spacing: 0.5px"
           >
+            Compras
+          </div>
+          <a
+            href="{% url 'lista_ordenes' %}"
+            class="{% if actual == 'lista_ordenes' or actual == 'crear_orden' or actual == 'detalle_orden' or actual == 'recibir_orden' or actual == 'cancelar_orden' %}activo{% endif %}"
+          >
+            <i class="bi bi-cart"></i> Órdenes de Compra
+          </a>
+          <a
+            href="{% url 'lista_lotes' %}"
+            class="{% if actual == 'lista_lotes' %}activo{% endif %}"
+          >
+            <i class="bi bi-box-seam"></i> Lotes
+          </a>
+          <a
+            href="{% url 'lista_proveedores' %}"
+            class="{% if actual == 'lista_proveedores' or actual == 'crear_proveedor' %}activo{% endif %}"
+          >
+            <i class="bi bi-truck"></i> Proveedores
+          </a>
+
+          <div
+            class="panel-seccion-titulo text-muted small text-uppercase px-3 pt-3 pb-1"
+            style="font-size: 0.72rem; letter-spacing: 0.5px"
+          >
             Clínico
           </div>
           <a

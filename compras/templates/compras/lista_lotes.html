@@ -1,99 +1,127 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lotes - Mascott</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-  <link rel="stylesheet" href="{% static 'css/usuarios/perfil.css' %}"/>
-</head>
-<body>
-  <button class="hamburguesa" id="btnHamburguesa"><i class="bi bi-list"></i></button>
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-  <aside class="perfil-sidebar" id="sidebar">
-    <a href="{% url 'inicio' %}" class="sidebar-logo"><i class="bi bi-heart-pulse-fill"></i> Mascott</a>
-    <nav class="sidebar-nav">
-      <a href="{% url 'lista_ordenes' %}"><i class="bi bi-cart-fill"></i> Compras</a>
-      <a href="{% url 'lista_lotes' %}" class="activo"><i class="bi bi-box-fill"></i> Lotes</a>
-      <a href="{% url 'lista_proveedores' %}"><i class="bi bi-truck"></i> Proveedores</a>
-    </nav>
-    <div class="sidebar-sep"></div>
-    <a href="{% url 'logout' %}" class="sidebar-logout"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
-  </aside>
+{% extends 'partials/base-admin.html' %}
+{% block title %}Gestión de Lotes – Mascott{% endblock %}
 
-  <main class="perfil-main">
-    <div class="perfil-bienvenida">
-      <h1 class="perfil-titulo"><i class="bi bi-box-fill me-2"></i>Gestión de Lotes</h1>
+{% block extra_css %}
+<style>
+  .estado-badge { display:inline-block; border-radius:20px; padding:.2rem .7rem; font-size:.76rem; font-weight:600; }
+  .badge-vencido  { background:#fee2e2; color:#991b1b; }
+  .badge-vigente  { background:#dcfce7; color:#166534; }
+  .badge-sinfecha { background:#f3f4f6; color:#6b7280; }
+  .badge-porvencer{ background:#fef9c3; color:#92400e; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-0"><i class="bi bi-box-seam me-2 text-warning"></i>Gestión de Lotes</h1>
+    <p class="text-muted small mb-0">Control de lotes y fechas de vencimiento de productos.</p>
+  </div>
+  <a href="{% url 'lista_ordenes' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Órdenes
+  </a>
+</div>
+
+<!-- Filtros -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-sm-4">
+        <label class="form-label small fw-bold">Producto</label>
+        <select name="producto" class="form-select form-select-sm">
+          <option value="">Todos los productos</option>
+          {% for p in productos %}
+          <option value="{{ p.pk }}">{{ p.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-sm-4 d-flex gap-3 align-items-end pb-1">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="vencidos" value="1" id="chkVencidos"/>
+          <label class="form-check-label small" for="chkVencidos">Solo vencidos</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="por_vencer" value="1" id="chkPorVencer"/>
+          <label class="form-check-label small" for="chkPorVencer">Por vencer (30 días)</label>
+        </div>
+      </div>
+      <div class="col-12 col-sm-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">
+          <i class="bi bi-funnel me-1"></i>Filtrar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="card shadow-sm">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-list-ul me-1"></i>Lotes registrados</span>
+    <span class="badge bg-secondary">{{ lotes|length }}</span>
+  </div>
+  <div class="card-body p-0">
+    {% if lotes %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="tablaLotes">
+        <thead class="table-light">
+          <tr>
+            <th>Producto</th>
+            <th>Número de lote</th>
+            <th class="text-center">Cantidad</th>
+            <th>Fecha ingreso</th>
+            <th>Fecha vencimiento</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lote in lotes %}
+          {% with dias_restantes=lote.fecha_vence|timeuntil %}
+          <tr>
+            <td class="fw-semibold">{{ lote.producto.nombre }}</td>
+            <td>{{ lote.numero_lote|default:"—" }}</td>
+            <td class="text-center">{{ lote.cantidad }}</td>
+            <td>{{ lote.fecha_ingreso|date:"d/m/Y" }}</td>
+            <td>
+              {% if lote.fecha_vence %}
+                {{ lote.fecha_vence|date:"d/m/Y" }}
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if lote.vencido %}
+                <span class="estado-badge badge-vencido"><i class="bi bi-exclamation-triangle-fill me-1"></i>Vencido</span>
+              {% elif lote.fecha_vence %}
+                {% if lote.fecha_vence <= hoy %}
+                  <span class="estado-badge badge-vencido"><i class="bi bi-exclamation-triangle-fill me-1"></i>Vencido</span>
+                {% else %}
+                  <span class="estado-badge badge-vigente"><i class="bi bi-check-circle-fill me-1"></i>Vigente</span>
+                {% endif %}
+              {% else %}
+                <span class="estado-badge badge-sinfecha">Sin fecha</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-
-    <!-- Filtros -->
-    <div class="perfil-seccion mb-3">
-      <form method="get" class="row g-2 align-items-end">
-        <div class="col-12 col-sm-4">
-          <select name="producto" class="form-select form-select-sm">
-            <option value="">Todos los productos</option>
-            {% for p in productos %}<option value="{{ p.pk }}">{{ p.nombre }}</option>{% endfor %}
-          </select>
-        </div>
-        <div class="col-auto">
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="vencidos" value="1" id="chkVencidos"/>
-            <label class="form-check-label small" for="chkVencidos">Solo vencidos</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="por_vencer" value="1" id="chkPorVencer"/>
-            <label class="form-check-label small" for="chkPorVencer">Por vencer (30 días)</label>
-          </div>
-        </div>
-        <div class="col-auto">
-          <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
-        </div>
-      </form>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="bi bi-box fs-1 text-muted"></i>
+      <p class="mt-2 text-muted">No hay lotes registrados. Se crean automáticamente al recepcionar una orden.</p>
     </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
 
-    <div class="perfil-seccion">
-      {% if lotes %}
-        <div class="table-responsive">
-          <table class="tabla-perfil">
-            <thead><tr><th>Producto</th><th>Lote</th><th>Cantidad</th><th>Ingreso</th><th>Vencimiento</th><th>Estado</th></tr></thead>
-            <tbody>
-              {% for lote in lotes %}
-              <tr>
-                <td>{{ lote.producto.nombre }}</td>
-                <td>{{ lote.numero_lote|default:"-" }}</td>
-                <td>{{ lote.cantidad }}</td>
-                <td>{{ lote.fecha_ingreso|date:"d/m/Y" }}</td>
-                <td>{% if lote.fecha_vence %}{{ lote.fecha_vence|date:"d/m/Y" }}{% else %}-{% endif %}</td>
-                <td>
-                  {% if lote.vencido %}
-                    <span class="estado-badge estado-cancelada">Vencido</span>
-                  {% elif lote.fecha_vence %}
-                    <span class="estado-badge estado-completada">Vigente</span>
-                  {% else %}
-                    <span class="estado-badge" style="background:#f3f4f6;color:#6b7280;">Sin fecha</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="vacio-msg">
-          <i class="bi bi-box"></i>
-          <p>No hay lotes registrados.</p>
-        </div>
-      {% endif %}
-    </div>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const btn=document.getElementById('btnHamburguesa'),sidebar=document.getElementById('sidebar'),overlay=document.getElementById('sidebarOverlay');
-    btn.addEventListener('click',()=>{sidebar.classList.toggle('abierto');overlay.classList.toggle('activo');});
-    overlay.addEventListener('click',()=>{sidebar.classList.remove('abierto');overlay.classList.remove('activo');});
-  </script>
-</body>
-</html>
+{% block scripts %}
+<script>
+  if (document.getElementById('tablaLotes')) {
+    new DataTable('#tablaLotes', { language: { url: '//cdn.datatables.net/plug-ins/2.0.0/i18n/es-ES.json' }, pageLength: 15 });
+  }
+</script>
+{% endblock %}
