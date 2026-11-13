@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods, require_POST
 from django.utils import timezone
@@ -15,6 +15,7 @@ import random
 from .decorators import solo_admin, solo_veterinario, solo_veterianrio
 from .forms import CrearUsuarioForm, EditarPerfilForm, EditarUsuarioForm
 from .models import Usuario, CodigoRecuperacion
+
 
 
 # Página de inicio pública
@@ -509,3 +510,44 @@ def listar_usuarios(request):
 @solo_veterinario
 def panel_veterinario(request):
     return render(request, 'usuarios/panel_resumen.html', _contexto_resumen(es_admin=False))
+
+
+
+# A donde va cada rol cuando termina la bienvenida
+
+DESTINOS = {
+    'ADMIN': 'panel_admin',
+    'VETERINARIO': 'panel_veterinario',
+    'CLIENTE': 'inicio',
+}
+
+
+# Como se vada rol en la pantalla del personal
+
+PERSONAL = {
+    'ADMIN': {'clase': 'rol-admin', 'etiqueta': 'administrador/a', 'inicio': '💻'},
+    'VETERINARIO': {'clase': 'rol-veterinario', 'etiqueta': 'Vterinario/a', 'icono': '🩺'}
+}
+
+@login_required
+def bienvenida(request):
+    rol = request.user.rol
+    destino = resolve_url(DESTINOS.get(rol, DESTINOS['CLIENTE']))
+    
+    #La pantalla solo sale una vez por cada inicio de sesion
+    #Si alguien entra a /bienvenida/ por su cuenta, pasa directo a su destino.
+    if not request.session.pop('mostrar_bienvenida', False):
+        return redirect(destino)
+    
+    if rol == 'CLIENTE':
+        return render(request, 'usuarios/bienvenida_cliente.html', {'destinino': destino})
+    
+    datos = PERSONAL.get(rol)
+    if datos is None:
+        return redirect(destino)
+    
+    return render(request, 'usuarios/bienvenida_personal.html' {
+        'destino': destino,
+        'nombre': 
+    })
+    
