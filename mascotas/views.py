@@ -255,7 +255,6 @@ class EliminarRazaView(PersonalAutorizadoMixin, DeleteView):
     def form_valid(self, form):
         messages.success(self.request, 'Raza eliminada correctamente.')
         return super().form_valid(form)
-<<<<<<< HEAD
 
 
 # ============================================================

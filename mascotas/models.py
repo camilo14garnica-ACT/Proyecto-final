@@ -15,7 +15,8 @@ class Especie(models.Model):
         return self.nombre
     
 
-class Raza(models.Model):    ESTADOS = [('ACTIVO', 'Activo'), ('INACTIVO', 'Inactivo')]
+class Raza(models.Model):
+    ESTADOS = [('ACTIVO', 'Activo'), ('INACTIVO', 'Inactivo')]
 
     especie = models.ForeignKey(Especie, on_delete=models.PROTECT)
     nombre = models.CharField(max_length=100)
@@ -105,7 +106,7 @@ class Cita(models.Model):
     mascota = models.ForeignKey(
         Mascota,
         on_delete=models.CASCADE,
-        related_name='citas',
+        related_name='citas_legacy',
         verbose_name="Mascota"
     )
 
@@ -115,7 +116,7 @@ class Cita(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='citas_asignadas',
+        related_name='citas_asignadas_legacy',
         limit_choices_to={'rol': 'VETERINARIO'},
         verbose_name="Veterinario asignado"
     )
@@ -233,7 +234,7 @@ class HorarioDisponible(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         limit_choices_to={'rol': 'VETERINARIO'},
-        related_name='horarios'
+        related_name='horarios_legacy'
     )
     dia_semana   = models.IntegerField(choices=DIAS)
     hora_inicio  = models.TimeField()

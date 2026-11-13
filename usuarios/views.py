@@ -546,8 +546,8 @@ def bienvenida(request):
     if datos is None:
         return redirect(destino)
     
-    return render(request, 'usuarios/bienvenida_personal.html' {
+    return render(request, 'usuarios/bienvenida_personal.html', {
         'destino': destino,
-        'nombre': 
+        'nombre': datos.get('nombre', ''),
     })
     
