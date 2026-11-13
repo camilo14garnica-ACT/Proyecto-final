@@ -548,6 +548,6 @@ def bienvenida(request):
     
     return render(request, 'usuarios/bienvenida_personal.html' {
         'destino': destino,
-        'nombre': ,
+        'nombre':
     })
     

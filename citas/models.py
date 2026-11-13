@@ -3,13 +3,21 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
  
-# Cada bloque dura 30 minutos (decisión del proyecto)
-MINUTOS_POR_BLOQUE = 30
+from .disponibilidad import MINUTOS_POR_BLOQUE  # cada bloque dura 30 minutos
  
 # Con cuántas horas de anticipación el cliente puede cancelar o reprogramar
 # (decisión del proyecto: 24 horas). Si cambia la regla, se cambia solo aquí.
 HORAS_MINIMAS_CANCELAR = 24
+ 
+ 
+def ahora_local():
+    """Fecha y hora actual en la zona horaria del proyecto, sin zona (para comparar con las citas)."""
+    ahora = timezone.now()
+    if timezone.is_aware(ahora):
+        ahora = timezone.localtime(ahora).replace(tzinfo=None)
+    return ahora
  
  
 class CategoriaServicio(models.Model):
@@ -221,7 +229,7 @@ class Cita(models.Model):
  
     def puede_cancelar_cliente(self, ahora=None):
         """El cliente puede cancelar hasta 24 horas antes (decisión del proyecto)."""
-        ahora = ahora or datetime.now()
+        ahora = ahora or ahora_local()
         if self.estado not in (self.Estado.PENDIENTE, self.Estado.CONFIRMADA):
             return False
         return self.inicio - ahora >= timedelta(hours=HORAS_MINIMAS_CANCELAR)
@@ -229,4 +237,24 @@ class Cita(models.Model):
     def clean(self):
         if self.mascota_id and self.cliente_id and self.mascota.Cliente_id != self.cliente_id:
             raise ValidationError({"mascota": "Esa mascota no pertenece a este cliente."})
+ 
+ 
+class CambioEstadoCita(models.Model):
+    """Historial: quién cambió el estado de una cita y cuándo (VM-589)."""
+ 
+    cita = models.ForeignKey(Cita, on_delete=models.CASCADE, related_name="cambios_estado")
+    estado_anterior = models.CharField(max_length=12, choices=Cita.Estado.choices)
+    estado_nuevo = models.CharField(max_length=12, choices=Cita.Estado.choices)
+    cambiado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+"
+    )
+    fecha = models.DateTimeField(auto_now_add=True)
+ 
+    class Meta:
+        verbose_name = "cambio de estado de cita"
+        verbose_name_plural = "cambios de estado de citas"
+        ordering = ["-fecha"]
+ 
+    def __str__(self):
+        return f"{self.cita_id}: {self.estado_anterior} -> {self.estado_nuevo}"
  
