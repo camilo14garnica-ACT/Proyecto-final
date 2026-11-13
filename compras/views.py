@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from .models import OrdenCompra, ItemOrdenCompra, Proveedor, RecepcionCompra, ItemRecepcion, Lote
-from mascotas.models import Producto
+from productos.models import Producto
 
 
 def solo_admin_o_vet(request):

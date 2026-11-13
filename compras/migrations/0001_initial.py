@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('mascotas', '0009_alter_horariodisponible_id'),
+        ('productos', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -61,7 +62,7 @@ class Migration(migrations.Migration):
                 ('fecha_ingreso', models.DateField(auto_now_add=True)),
                 ('fecha_vence', models.DateField(blank=True, null=True, verbose_name='Fecha de vencimiento')),
                 ('sync_uuid', models.UUIDField(default=uuid.uuid4, editable=False, unique=True)),
-                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lotes_compra', to='mascotas.producto')),
+                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lotes_compra', to='productos.producto')),
                 ('orden', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='lotes', to='compras.ordencompra')),
             ],
             options={
@@ -76,7 +77,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('cantidad', models.PositiveIntegerField(default=1)),
                 ('precio_unit', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Precio unitario')),
-                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='mascotas.producto')),
+                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='productos.producto')),
                 ('orden', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='compras.ordencompra')),
             ],
         ),
@@ -102,7 +103,7 @@ class Migration(migrations.Migration):
                 ('cantidad', models.PositiveIntegerField()),
                 ('numero_lote', models.CharField(blank=True, max_length=80)),
                 ('fecha_vence', models.DateField(blank=True, null=True)),
-                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='mascotas.producto')),
+                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='productos.producto')),
                 ('recepcion', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='compras.recepcioncompra')),
             ],
         ),

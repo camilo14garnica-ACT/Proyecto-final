@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.conf import settings
-from mascotas.models import Producto
+from productos.models import Producto
 
 
 class Proveedor(models.Model):
