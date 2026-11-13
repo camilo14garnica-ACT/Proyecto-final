@@ -1,23 +1,168 @@
 {% extends 'partials/base-admin.html' %}
+{% load static %}
+
+{% block title %}Nuevo Registro Clínico – {{ mascota.nombre }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .rf-hero {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    border-radius: 16px; padding: 1.4rem 2rem;
+    color: #fff; display: flex; align-items: center; gap: 1.1rem;
+    margin-bottom: 1.75rem;
+  }
+  .rf-hero-icon { font-size: 2.5rem; flex-shrink: 0; }
+  .rf-hero-info h1 { font-size: 1.35rem; font-weight: 700; margin: 0 0 .2rem; }
+  .rf-hero-info p  { margin: 0; opacity: .85; font-size: .88rem; }
+
+  .rf-card {
+    background: #fff; border: 1px solid #e3e8f0;
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  }
+  .rf-card-header {
+    background: #f8faff; border-bottom: 1px solid #e3e8f0;
+    padding: 1rem 1.5rem; display: flex; align-items: center; gap: .6rem;
+  }
+  .rf-card-header h2 { font-size: 1rem; font-weight: 700; margin: 0; color: #1a2340; }
+  .rf-card-body { padding: 1.5rem; }
+
+  .rf-form-group { margin-bottom: 1.25rem; }
+  .rf-label {
+    display: block; font-size: .8rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .4px;
+    color: #666; margin-bottom: .4rem;
+  }
+  .rf-form-group input,
+  .rf-form-group textarea,
+  .rf-form-group select {
+    width: 100%; border: 1.5px solid #d8e2f0; border-radius: 10px;
+    padding: .6rem .9rem; font-size: .93rem; color: #2d3748;
+    background: #fff; transition: border-color .2s, box-shadow .2s;
+    outline: none;
+  }
+  .rf-form-group input:focus,
+  .rf-form-group textarea:focus,
+  .rf-form-group select:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26,115,232,.12);
+  }
+  .rf-form-group textarea { resize: vertical; min-height: 90px; }
+  .rf-error { color: #d32f2f; font-size: .8rem; margin-top: .25rem; }
+
+  .rf-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+  @media (max-width: 600px) { .rf-grid-2 { grid-template-columns: 1fr; } }
+
+  .rf-actions {
+    display: flex; gap: .75rem; justify-content: flex-end;
+    padding: 1rem 1.5rem; border-top: 1px solid #e3e8f0;
+    background: #f8faff;
+  }
+  .btn-rf-save {
+    background: #1a73e8; color: #fff; border: none;
+    border-radius: 10px; padding: .55rem 1.4rem; font-size: .9rem; font-weight: 600;
+    cursor: pointer; display: inline-flex; align-items: center; gap: .4rem;
+    transition: background .2s, transform .15s;
+  }
+  .btn-rf-save:hover { background: #1557b0; transform: translateY(-1px); }
+  .btn-rf-cancel {
+    background: #fff; color: #555; border: 1.5px solid #d0daf0;
+    border-radius: 10px; padding: .5rem 1.2rem; font-size: .9rem; font-weight: 500;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+    transition: all .2s;
+  }
+  .btn-rf-cancel:hover { border-color: #1a73e8; color: #1a73e8; background: #f0f4ff; }
+</style>
+{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-3">Nuevo registro clínico: {{ mascota.nombre }}</h1>
 
-<div class="card shadow-sm">
-  <div class="card-body">
-    <form method="post">
-      {% csrf_token %}
-      {% for field in form %}
-        <div class="mb-3">
-          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-          {{ field }}
-          {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-        </div>
-      {% endfor %}
-      {% if form.non_field_errors %}<div class="text-danger">{{ form.non_field_errors }}</div>{% endif %}
-      <button type="submit" class="btn btn-primary">Guardar registro</button>
-      <a href="{% url 'historial_mascota' mascota.pk %}" class="btn btn-outline-secondary">Cancelar</a>
-    </form>
+<!-- HERO -->
+<div class="rf-hero">
+  <div class="rf-hero-icon">🩺</div>
+  <div class="rf-hero-info">
+    <h1>Nuevo Registro Clínico</h1>
+    <p>
+      <i class="bi bi-heart-fill me-1"></i>{{ mascota.nombre }}
+      &nbsp;·&nbsp;
+      <i class="bi bi-tag-fill me-1"></i>{{ mascota.especie }}{% if mascota.raza %} / {{ mascota.raza.nombre }}{% endif %}
+      &nbsp;·&nbsp;
+      <i class="bi bi-person-fill me-1"></i>{{ mascota.Cliente.get_full_name|default:mascota.Cliente.username }}
+    </p>
   </div>
 </div>
+
+<!-- FORMULARIO -->
+<div class="rf-card">
+  <div class="rf-card-header">
+    <i class="bi bi-clipboard2-pulse-fill" style="color:#1a73e8;font-size:1.1rem;"></i>
+    <h2>Datos del registro</h2>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="rf-card-body">
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger rounded-3 mb-3">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <!-- Fecha + Motivo -->
+      <div class="rf-grid-2">
+        <div class="rf-form-group">
+          <label class="rf-label" for="{{ form.fecha.id_for_label }}">
+            <i class="bi bi-calendar3 me-1"></i>{{ form.fecha.label }}
+          </label>
+          {{ form.fecha }}
+          {% for e in form.fecha.errors %}<div class="rf-error">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="rf-form-group">
+          <label class="rf-label" for="{{ form.motivo.id_for_label }}">
+            <i class="bi bi-chat-square-text me-1"></i>{{ form.motivo.label }}
+          </label>
+          {{ form.motivo }}
+          {% for e in form.motivo.errors %}<div class="rf-error">{{ e }}</div>{% endfor %}
+        </div>
+      </div>
+
+      <!-- Diagnóstico -->
+      <div class="rf-form-group">
+        <label class="rf-label" for="{{ form.diagnostico.id_for_label }}">
+          <i class="bi bi-clipboard2-pulse me-1"></i>{{ form.diagnostico.label }}
+        </label>
+        {{ form.diagnostico }}
+        {% for e in form.diagnostico.errors %}<div class="rf-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <!-- Tratamiento + Observaciones -->
+      <div class="rf-grid-2">
+        <div class="rf-form-group">
+          <label class="rf-label" for="{{ form.tratamiento.id_for_label }}">
+            <i class="bi bi-capsule me-1"></i>{{ form.tratamiento.label }}
+          </label>
+          {{ form.tratamiento }}
+          {% for e in form.tratamiento.errors %}<div class="rf-error">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="rf-form-group">
+          <label class="rf-label" for="{{ form.observaciones.id_for_label }}">
+            <i class="bi bi-journal-text me-1"></i>{{ form.observaciones.label }}
+          </label>
+          {{ form.observaciones }}
+          {% for e in form.observaciones.errors %}<div class="rf-error">{{ e }}</div>{% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rf-actions">
+      <a href="{% url 'historial_mascota' mascota.pk %}" class="btn-rf-cancel">
+        <i class="bi bi-x-circle"></i> Cancelar
+      </a>
+      <button type="submit" class="btn-rf-save">
+        <i class="bi bi-check-circle-fill"></i> Guardar registro
+      </button>
+    </div>
+  </form>
+</div>
+
 {% endblock %}

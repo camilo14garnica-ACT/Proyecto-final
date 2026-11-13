@@ -1,51 +1,256 @@
 {% extends 'partials/base-admin.html' %}
+{% load static %}
+
+{% block title %}Historial Clínico – {{ mascota.nombre }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Encabezado mascota ── */
+  .hc-hero {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+  .hc-hero-icon {
+    font-size: 3rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .hc-hero-info h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 .25rem; }
+  .hc-hero-info p  { margin: 0; opacity: .85; font-size: .9rem; }
+  .hc-hero-actions { margin-left: auto; display: flex; gap: .6rem; flex-shrink: 0; }
+  .btn-hc-primary {
+    background: #fff; color: #1a73e8; font-weight: 600;
+    border: none; border-radius: 8px; padding: .45rem 1.1rem; font-size: .88rem;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+    transition: background .2s, transform .15s;
+  }
+  .btn-hc-primary:hover { background: #e8f0fe; transform: translateY(-1px); }
+  .btn-hc-outline {
+    background: transparent; color: #fff; font-weight: 600;
+    border: 2px solid rgba(255,255,255,.6); border-radius: 8px;
+    padding: .4rem 1rem; font-size: .88rem;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+    transition: all .2s;
+  }
+  .btn-hc-outline:hover { background: rgba(255,255,255,.15); border-color: #fff; }
+
+  /* ── Contador / badge ── */
+  .hc-stats {
+    display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .hc-stat {
+    background: #fff; border: 1px solid #e8edf3; border-radius: 12px;
+    padding: .75rem 1.25rem; display: flex; align-items: center; gap: .75rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  }
+  .hc-stat-icon { font-size: 1.4rem; }
+  .hc-stat-num  { font-size: 1.3rem; font-weight: 700; color: #1a73e8; line-height: 1; }
+  .hc-stat-lbl  { font-size: .78rem; color: #666; }
+
+  /* ── Timeline ── */
+  .hc-timeline { position: relative; padding-left: 2rem; }
+  .hc-timeline::before {
+    content: '';
+    position: absolute; left: .6rem; top: 0; bottom: 0;
+    width: 2px; background: #e3e8f0; border-radius: 2px;
+  }
+  .hc-entry { position: relative; margin-bottom: 1.5rem; }
+  .hc-entry-dot {
+    position: absolute; left: -1.65rem; top: 1rem;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #1a73e8; border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #1a73e8;
+  }
+  .hc-card {
+    background: #fff; border: 1px solid #e3e8f0; border-radius: 14px;
+    overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    transition: box-shadow .2s, transform .15s;
+  }
+  .hc-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.09); transform: translateY(-2px); }
+
+  .hc-card-header {
+    background: #f8faff; border-bottom: 1px solid #e3e8f0;
+    padding: .9rem 1.25rem; display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+  }
+  .hc-date-badge {
+    background: #1a73e8; color: #fff; border-radius: 8px;
+    padding: .25rem .75rem; font-size: .8rem; font-weight: 600;
+    white-space: nowrap;
+  }
+  .hc-motivo { font-weight: 600; color: #1a1a2e; font-size: .95rem; flex: 1; min-width: 0; }
+  .hc-vet-badge {
+    background: #e8f5e9; color: #2e7d32; border-radius: 20px;
+    padding: .2rem .7rem; font-size: .78rem; font-weight: 500;
+    display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap;
+  }
+
+  .hc-card-body { padding: 1.1rem 1.25rem; }
+  .hc-field { margin-bottom: .85rem; }
+  .hc-field:last-child { margin-bottom: 0; }
+  .hc-field-label {
+    font-size: .75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .5px; color: #888; margin-bottom: .2rem;
+  }
+  .hc-field-value { color: #2d3748; font-size: .92rem; line-height: 1.5; }
+
+  .hc-row-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .hc-row-fields { grid-template-columns: 1fr; } }
+
+  /* ── Vacío ── */
+  .hc-empty {
+    text-align: center; padding: 3.5rem 1rem;
+    background: #f8faff; border: 2px dashed #c5d5f5;
+    border-radius: 16px; color: #666;
+  }
+  .hc-empty-icon { font-size: 3rem; margin-bottom: .75rem; opacity: .5; }
+
+  /* ── Paginación ── */
+  .hc-pagination { display: flex; justify-content: center; align-items: center; gap: .75rem; margin-top: 1.5rem; }
+  .btn-hc-pag {
+    background: #fff; border: 1px solid #d0daf0; color: #1a73e8;
+    border-radius: 8px; padding: .4rem .9rem; font-size: .86rem;
+    text-decoration: none; transition: all .2s;
+  }
+  .btn-hc-pag:hover { background: #e8f0fe; border-color: #1a73e8; }
+  .hc-pag-info { font-size: .85rem; color: #666; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-start mb-3">
-  <div>
-    <h1 class="h3 mb-0">Historial clínico: {{ mascota.nombre }}</h1>
-    <span class="text-muted">
-      {{ mascota.especie }}{% if mascota.raza %} · {{ mascota.raza.nombre }}{% endif %}
-      · Dueño: {{ mascota.Cliente.get_full_name|default:mascota.Cliente.username }}
-    </span>
+
+<!-- ── HERO CARD ── -->
+<div class="hc-hero">
+  <div class="hc-hero-icon">
+    {% if mascota.especie.nombre|lower == "perro" %}🐕
+    {% elif mascota.especie.nombre|lower == "gato" %}🐈
+    {% elif mascota.especie.nombre|lower == "ave" %}🦜
+    {% elif mascota.especie.nombre|lower == "conejo" %}🐇
+    {% else %}🐾{% endif %}
   </div>
-  <div class="d-flex gap-2">
-    <a href="{% url 'lista_mascotas' %}" class="btn btn-outline-secondary">Volver</a>
+  <div class="hc-hero-info">
+    <h1>Historial Clínico · {{ mascota.nombre }}</h1>
+    <p>
+      <i class="bi bi-tag-fill me-1"></i>{{ mascota.especie }}
+      {% if mascota.raza %} · {{ mascota.raza.nombre }}{% endif %}
+      &nbsp;·&nbsp;
+      <i class="bi bi-person-fill me-1"></i>{{ mascota.Cliente.get_full_name|default:mascota.Cliente.username }}
+    </p>
+  </div>
+  <div class="hc-hero-actions">
+    <a href="{% url 'lista_mascotas' %}" class="btn-hc-outline">
+      <i class="bi bi-arrow-left"></i> Volver
+    </a>
     {% if es_personal %}
-      <a href="{% url 'agregar_registro' mascota.pk %}" class="btn btn-primary">Agregar registro</a>
+    <a href="{% url 'agregar_registro' mascota.pk %}" class="btn-hc-primary">
+      <i class="bi bi-plus-circle-fill"></i> Nuevo registro
+    </a>
     {% endif %}
   </div>
 </div>
 
+<!-- ── STATS ── -->
+<div class="hc-stats">
+  <div class="hc-stat">
+    <div class="hc-stat-icon">📋</div>
+    <div>
+      <div class="hc-stat-num">{{ pagina.paginator.count }}</div>
+      <div class="hc-stat-lbl">Registros totales</div>
+    </div>
+  </div>
+  {% if pagina %}
+  <div class="hc-stat">
+    <div class="hc-stat-icon">📅</div>
+    <div>
+      <div class="hc-stat-num">{{ pagina.0.fecha|date:"d/m/Y" }}</div>
+      <div class="hc-stat-lbl">Último registro</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ── MENSAJES ── -->
 {% if messages %}
   {% for msg in messages %}
-    <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+    <div class="alert alert-{{ msg.tags }} rounded-3 mb-3">{{ msg }}</div>
   {% endfor %}
 {% endif %}
 
-{% for r in pagina %}
-  <div class="card shadow-sm mb-3">
-    <div class="card-header d-flex justify-content-between">
-      <strong>{{ r.fecha|date:"d/m/Y" }} · {{ r.motivo }}</strong>
-      <small class="text-muted">
-        {% if r.registrado_por %}Atendió: {{ r.registrado_por.get_full_name|default:r.registrado_por.username }}{% endif %}
-      </small>
-    </div>
-    <div class="card-body">
-      <p class="mb-1"><strong>Diagnóstico:</strong> {{ r.diagnostico }}</p>
-      {% if r.tratamiento %}<p class="mb-1"><strong>Tratamiento:</strong> {{ r.tratamiento }}</p>{% endif %}
-      {% if r.observaciones %}<p class="mb-0"><strong>Observaciones:</strong> {{ r.observaciones }}</p>{% endif %}
+<!-- ── TIMELINE ── -->
+{% if pagina %}
+<div class="hc-timeline">
+  {% for r in pagina %}
+  <div class="hc-entry">
+    <div class="hc-entry-dot"></div>
+    <div class="hc-card">
+      <div class="hc-card-header">
+        <span class="hc-date-badge"><i class="bi bi-calendar3 me-1"></i>{{ r.fecha|date:"d/m/Y" }}</span>
+        <span class="hc-motivo">{{ r.motivo }}</span>
+        {% if r.registrado_por %}
+        <span class="hc-vet-badge">
+          <i class="bi bi-person-badge-fill"></i>
+          Dr. {{ r.registrado_por.get_full_name|default:r.registrado_por.username }}
+        </span>
+        {% endif %}
+      </div>
+      <div class="hc-card-body">
+        <div class="hc-row-fields">
+          <div class="hc-field">
+            <div class="hc-field-label"><i class="bi bi-clipboard2-pulse me-1"></i>Diagnóstico</div>
+            <div class="hc-field-value">{{ r.diagnostico }}</div>
+          </div>
+          {% if r.tratamiento %}
+          <div class="hc-field">
+            <div class="hc-field-label"><i class="bi bi-capsule me-1"></i>Tratamiento</div>
+            <div class="hc-field-value">{{ r.tratamiento }}</div>
+          </div>
+          {% endif %}
+        </div>
+        {% if r.observaciones %}
+        <div class="hc-field mt-2">
+          <div class="hc-field-label"><i class="bi bi-chat-left-text me-1"></i>Observaciones</div>
+          <div class="hc-field-value">{{ r.observaciones }}</div>
+        </div>
+        {% endif %}
+      </div>
     </div>
   </div>
-{% empty %}
-  <div class="alert alert-light border text-center">Esta mascota aún no tiene historial clínico.</div>
-{% endfor %}
+  {% endfor %}
+</div>
 
+<!-- ── PAGINACIÓN ── -->
 {% if pagina.has_other_pages %}
-  <nav class="d-flex justify-content-center gap-2">
-    {% if pagina.has_previous %}<a class="btn btn-outline-secondary btn-sm" href="?page={{ pagina.previous_page_number }}">Anterior</a>{% endif %}
-    <span class="align-self-center">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
-    {% if pagina.has_next %}<a class="btn btn-outline-secondary btn-sm" href="?page={{ pagina.next_page_number }}">Siguiente</a>{% endif %}
-  </nav>
+<div class="hc-pagination">
+  {% if pagina.has_previous %}
+  <a class="btn-hc-pag" href="?page={{ pagina.previous_page_number }}">
+    <i class="bi bi-chevron-left"></i> Anterior
+  </a>
+  {% endif %}
+  <span class="hc-pag-info">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+  {% if pagina.has_next %}
+  <a class="btn-hc-pag" href="?page={{ pagina.next_page_number }}">
+    Siguiente <i class="bi bi-chevron-right"></i>
+  </a>
+  {% endif %}
+</div>
 {% endif %}
+
+{% else %}
+<div class="hc-empty">
+  <div class="hc-empty-icon">🩺</div>
+  <h5 class="fw-semibold mb-1">Sin registros clínicos</h5>
+  <p class="mb-3 text-muted">Esta mascota aún no tiene historial médico registrado.</p>
+  {% if es_personal %}
+  <a href="{% url 'agregar_registro' mascota.pk %}" class="btn-hc-primary" style="display:inline-flex;">
+    <i class="bi bi-plus-circle-fill"></i> Agregar primer registro
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+
 {% endblock %}

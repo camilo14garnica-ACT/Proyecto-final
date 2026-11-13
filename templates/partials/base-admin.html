@@ -95,6 +95,19 @@
             class="panel-seccion-titulo text-muted small text-uppercase px-3 pt-3 pb-1"
             style="font-size: 0.72rem; letter-spacing: 0.5px"
           >
+            Clínico
+          </div>
+          <a
+            href="{% url 'lista_historial' %}"
+            class="{% if actual == 'lista_historial' or actual == 'historial_mascota' or actual == 'agregar_registro' %}activo{% endif %}"
+          >
+            <i class="bi bi-clipboard2-pulse"></i> Historial Clínico
+          </a>
+
+          <div
+            class="panel-seccion-titulo text-muted small text-uppercase px-3 pt-3 pb-1"
+            style="font-size: 0.72rem; letter-spacing: 0.5px"
+          >
             Calidad y Servicio
           </div>
           <a
@@ -139,6 +152,12 @@
             class="{% if actual == 'lista_mascotas' or actual == 'registrar_mascota' or actual == 'editar_mascota' or actual == 'eliminar_mascota' %}activo{% endif %}"
           >
             <i class="bi bi-balloon-heart"></i> Mascotas
+          </a>
+          <a
+            href="{% url 'lista_historial' %}"
+            class="{% if actual == 'lista_historial' or actual == 'historial_mascota' or actual == 'agregar_registro' %}activo{% endif %}"
+          >
+            <i class="bi bi-clipboard2-pulse"></i> Historial Clínico
           </a>
           {% endif %}
         </nav>

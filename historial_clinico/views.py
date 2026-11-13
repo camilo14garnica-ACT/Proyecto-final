@@ -19,6 +19,32 @@ def _mascota_permitida(request, mascota_id):
 
 
 @login_required
+def lista_historial(request):
+    """Vista de entrada al historial clínico: lista de mascotas con buscador."""
+    if not es_personal(request.user):
+        raise PermissionDenied
+
+    busqueda = request.GET.get('q', '').strip()
+    mascotas = Mascota.objects.select_related('especie', 'raza', 'Cliente').filter(estado='ACTIVO')
+
+    if busqueda:
+        mascotas = mascotas.filter(nombre__icontains=busqueda) | \
+                   Mascota.objects.select_related('especie', 'raza', 'Cliente').filter(
+                       Cliente__first_name__icontains=busqueda, estado='ACTIVO') | \
+                   Mascota.objects.select_related('especie', 'raza', 'Cliente').filter(
+                       Cliente__last_name__icontains=busqueda, estado='ACTIVO')
+        mascotas = mascotas.distinct()
+
+    mascotas = mascotas.order_by('nombre')
+    pagina = Paginator(mascotas, 15).get_page(request.GET.get('page'))
+
+    return render(request, 'historial_clinico/lista_historial.html', {
+        'pagina': pagina,
+        'busqueda': busqueda,
+    })
+
+
+@login_required
 def historial_mascota(request, mascota_id):
     mascota = _mascota_permitida(request, mascota_id)
     registros = (
