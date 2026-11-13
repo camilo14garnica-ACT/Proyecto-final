@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-
-    
-# Create your views here.
-=======
 from datetime import date, datetime, timedelta 
 
 from django.contrib import messages 
@@ -53,4 +48,4 @@ def calcular_hora_fin(fecha, hora_inicio, servicio):
 
 
 
->>>>>>> b15a0f39deb62426a38e2830bf9d9378cc78d7b9
+
