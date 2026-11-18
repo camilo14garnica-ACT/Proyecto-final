@@ -116,6 +116,13 @@
             <i class="bi bi-truck"></i> Proveedores
           </a>
 
+          <a
+            href="{% url 'crear_producto' %}"
+            class="{% if actual == 'crear_producto' %}activo{% endif %}"
+          >
+            <i class="bi bi-bag-plus"></i> Nuevo producto
+          </a>
+
           <div
             class="panel-seccion-titulo text-muted small text-uppercase px-3 pt-3 pb-1"
             style="font-size: 0.72rem; letter-spacing: 0.5px"

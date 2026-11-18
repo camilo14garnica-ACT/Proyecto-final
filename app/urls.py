@@ -15,7 +15,9 @@ urlpatterns = [
     path('historial/', include('historial_clinico.urls')),
     path('calidad/', include('calidad.urls')),
     path('compras/', include('compras.urls')),
+    path('productos/', include('productos.urls')),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
