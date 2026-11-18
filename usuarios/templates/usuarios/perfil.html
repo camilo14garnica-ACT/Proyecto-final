@@ -33,6 +33,13 @@
       <a href="#citas"><i class="bi bi-calendar-check"></i> Mis Citas</a>
       <a href="#mascotas"><i class="bi bi-heart-fill"></i> Mis Mascotas</a>
       <a href="#historial"><i class="bi bi-clock-history"></i> Historial</a>
+      <a href="{% url 'mis_pqrs' %}"><i class="bi bi-chat-square-text-fill"></i> Mis PQRS</a>
+      <a href="{% url 'mis_notificaciones' %}">
+        <i class="bi bi-bell-fill"></i> Notificaciones
+        {% if notificaciones_no_leidas_count > 0 %}
+          <span class="badge bg-danger rounded-pill ms-2" style="font-size:0.65rem;">{{ notificaciones_no_leidas_count }}</span>
+        {% endif %}
+      </a>
       <a href="#seguridad"><i class="bi bi-shield-lock-fill"></i> Seguridad</a>
     </nav>
 
@@ -55,9 +62,22 @@
         <h1 class="perfil-titulo">Hola, {{ user.first_name }} 👋</h1>
         <p class="perfil-subtitulo">Gestiona tu perfil, mascotas y citas desde aquí.</p>
       </div>
-      <a href="#citas" class="btn-agendar-cita">
-        <i class="bi bi-calendar-plus-fill me-2"></i>Agendar Cita
-      </a>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <a href="{% url 'mis_notificaciones' %}" class="btn btn-outline-secondary position-relative d-inline-flex align-items-center px-3 py-2 rounded-3 shadow-sm" title="Notificaciones">
+          <i class="bi bi-bell-fill"></i>
+          {% if notificaciones_no_leidas_count > 0 %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+              {{ notificaciones_no_leidas_count }}
+            </span>
+          {% endif %}
+        </a>
+        <a href="{% url 'mis_pqrs' %}" class="btn btn-outline-primary fw-semibold d-inline-flex align-items-center px-3 py-2 rounded-3 shadow-sm">
+          <i class="bi bi-chat-square-dots-fill me-2"></i>Mis PQRS
+        </a>
+        <a href="#citas" class="btn-agendar-cita">
+          <i class="bi bi-calendar-plus-fill me-2"></i>Agendar Cita
+        </a>
+      </div>
     </div>
 
     <!-- Tarjetas resumen rápido -->
@@ -202,6 +222,7 @@
                 <th>Veterinario</th>
                 <th>Fecha</th>
                 <th>Estado</th>
+                <th>Calificación</th>
               </tr>
             </thead>
             <tbody>
@@ -219,6 +240,17 @@
                   <span class="estado-badge estado-{{ cita.estado|lower }}">
                     {{ cita.get_estado_display }}
                   </span>
+                </td>
+                <td>
+                  {% if cita.ya_calificada %}
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success px-2 py-1">
+                      <i class="bi bi-star-fill text-warning me-1"></i>Calificado
+                    </span>
+                  {% else %}
+                    <a href="{% url 'crear_encuesta' %}?cita_id={{ cita.id }}" class="btn btn-sm btn-outline-warning text-dark fw-semibold rounded-pill px-2 py-1 shadow-sm" style="font-size: 0.78rem;">
+                      <i class="bi bi-star me-1 text-warning"></i>Calificar atención
+                    </a>
+                  {% endif %}
                 </td>
               </tr>
               {% endfor %}

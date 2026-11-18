@@ -1,0 +1,126 @@
+{% extends 'partials/base-user.html' %}
+{% load static %}
+
+{% block title %}Centro de Notificaciones | Mascott{% endblock %}
+
+{% block content %}
+<div class="container py-4 my-2">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'inicio' %}" class="text-decoration-none">Inicio</a></li>
+            {% if user.rol == 'ADMIN' %}
+                <li class="breadcrumb-item"><a href="{% url 'panel_admin' %}" class="text-decoration-none">Panel Admin</a></li>
+            {% else %}
+                <li class="breadcrumb-item"><a href="{% url 'mi_perfil' %}" class="text-decoration-none">Mi Perfil</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">Notificaciones</li>
+        </ol>
+    </nav>
+
+    <!-- Header con acciones -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h2 class="fw-bold mb-1 text-primary">
+                <i class="bi bi-bell-fill me-2"></i>Centro de Notificaciones
+            </h2>
+            <p class="text-muted mb-0">Revisa avisos de PQRS, novedades de tus citas y actualizaciones de calidad.</p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if notificaciones_list %}
+                <form method="post" action="{% url 'marcar_todas_notificaciones_leidas' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                        <i class="bi bi-check2-all me-1"></i>Marcar todas como leídas
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filtros rápidos -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-3 d-flex flex-wrap gap-2 align-items-center">
+            <span class="text-muted small fw-semibold me-2">Filtrar:</span>
+            <a href="{% url 'mis_notificaciones' %}" class="btn btn-sm {% if not filtro_estado %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill px-3">
+                Todas ({{ total_count }})
+            </a>
+            <a href="{% url 'mis_notificaciones' %}?estado=no_leidas" class="btn btn-sm {% if filtro_estado == 'no_leidas' %}btn-warning text-dark{% else %}btn-outline-warning text-dark{% endif %} rounded-pill px-3">
+                No leídas ({{ no_leidas_count }})
+            </a>
+            <a href="{% url 'mis_notificaciones' %}?estado=leidas" class="btn btn-sm {% if filtro_estado == 'leidas' %}btn-secondary{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">
+                Leídas
+            </a>
+        </div>
+    </div>
+
+    <!-- Lista de notificaciones -->
+    {% if notificaciones_list %}
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+            <ul class="list-group list-group-flush">
+                {% for n in notificaciones_list %}
+                    <li class="list-group-item p-3 {% if not n.leida %}bg-light border-start border-4 border-primary{% endif %} d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+                        <div class="d-flex align-items-start gap-3">
+                            <!-- Icono según tipo -->
+                            <div class="mt-1">
+                                {% if n.tipo == 'PQRS' %}
+                                    <span class="badge bg-primary p-2 rounded-circle"><i class="bi bi-chat-square-dots-fill fs-6"></i></span>
+                                {% elif n.tipo == 'CALIDAD' %}
+                                    <span class="badge bg-danger p-2 rounded-circle"><i class="bi bi-shield-exclamation fs-6"></i></span>
+                                {% elif n.tipo == 'ENCUESTA' %}
+                                    <span class="badge bg-warning text-dark p-2 rounded-circle"><i class="bi bi-star-fill fs-6"></i></span>
+                                {% else %}
+                                    <span class="badge bg-info text-dark p-2 rounded-circle"><i class="bi bi-info-circle-fill fs-6"></i></span>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <h6 class="mb-0 fw-bold {% if not n.leida %}text-primary{% endif %}">{{ n.titulo }}</h6>
+                                    {% if not n.leida %}
+                                        <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.7rem;">Nueva</span>
+                                    {% endif %}
+                                    <span class="badge bg-light text-secondary border rounded-pill" style="font-size: 0.7rem;">{{ n.get_tipo_display }}</span>
+                                </div>
+                                <p class="text-secondary small mt-1 mb-2" style="white-space: pre-line;">{{ n.mensaje }}</p>
+                                <span class="text-muted" style="font-size: 0.75rem;">
+                                    <i class="bi bi-clock me-1"></i>{{ n.fecha|date:"d/m/Y h:i a" }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="d-flex align-items-center gap-2 ms-auto mt-2 mt-md-0">
+                            {% if n.enlace %}
+                                <a href="{% url 'marcar_notificacion_leida' n.pk %}?next={{ n.enlace }}" class="btn btn-sm btn-primary rounded-pill px-3">
+                                    <i class="bi bi-arrow-right-circle me-1"></i>Ver detalle
+                                </a>
+                            {% endif %}
+                            {% if not n.leida %}
+                                <form method="post" action="{% url 'marcar_notificacion_leida' n.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3" title="Marcar como leída">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm rounded-3 text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-bell-slash text-muted" style="font-size: 3.5rem;"></i>
+                <h5 class="fw-bold mt-3">No tienes notificaciones en esta bandeja</h5>
+                <p class="text-muted">Aquí te informaremos sobre tus PQRS, servicios y avisos de calidad.</p>
+                <a href="{% url 'inicio' %}" class="btn btn-outline-primary rounded-pill px-4 mt-2">
+                    <i class="bi bi-house me-1"></i>Volver al inicio
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

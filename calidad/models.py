@@ -187,3 +187,55 @@ class NoConformidad(models.Model):
         else:
             origen = 'Sin origen'
         return f'NC #{self.pk} — {origen}'
+
+
+class Notificacion(models.Model):
+    """Notificaciones del sistema para usuarios y personal administrativo."""
+
+    class Tipo(models.TextChoices):
+        INFO     = 'INFO',     'Información'
+        PQRS     = 'PQRS',     'PQRS'
+        CALIDAD  = 'CALIDAD',  'Calidad y No Conformidades'
+        ENCUESTA = 'ENCUESTA', 'Encuesta de Satisfacción'
+
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notificaciones',
+        verbose_name='Usuario destinatario',
+    )
+    titulo = models.CharField(
+        max_length=200,
+        verbose_name='Título',
+    )
+    mensaje = models.TextField(
+        verbose_name='Mensaje',
+    )
+    tipo = models.CharField(
+        max_length=15,
+        choices=Tipo.choices,
+        default=Tipo.INFO,
+        verbose_name='Tipo de notificación',
+    )
+    leida = models.BooleanField(
+        default=False,
+        verbose_name='¿Leída?',
+    )
+    enlace = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='Enlace de acción',
+        help_text='Ruta a la que dirige al hacer clic.',
+    )
+    fecha = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Fecha de notificación',
+    )
+
+    class Meta:
+        verbose_name = 'Notificación'
+        verbose_name_plural = 'Notificaciones'
+        ordering = ['-fecha']
+
+    def __str__(self):
+        return f'{self.titulo} — {self.usuario} ({"Leída" if self.leida else "No leída"})'

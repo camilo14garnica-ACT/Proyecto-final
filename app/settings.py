@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'usuarios',
     'mascotas',
     'calidad',
@@ -97,6 +98,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'mascotas.context_processors.plantilla_base',
+                'calidad.context_processors.notificaciones_context',
             ],
         },
     },
@@ -139,8 +141,6 @@ else:
         }
     }
 
-#   DATABASE_ROUTERS = ['app.routers.EnrutadorDobleBase']
-
 
 # ============================================================
 # VALIDACIÓN DE CONTRASEÑAS
@@ -156,7 +156,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ============================================================
 # INTERNACIONALIZACIÓN
 # ============================================================
-LANGUAGE_CODE = 'en-co'
+LANGUAGE_CODE = 'es-co'
 TIME_ZONE = 'America/Bogota'
 USE_I18N = True
 USE_TZ = True
@@ -192,7 +192,23 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'no-reply@mascott.com'
+
+
+# ============================================================
+# DJANGO REST FRAMEWORK (API REST)
+# ============================================================
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
 
 
 # ============================================================

@@ -19,7 +19,21 @@ from .models import Usuario, CodigoRecuperacion
 
 # Página de inicio pública
 def inicio(request):
-    return render(request, 'usuarios/inicio.html')
+    from calidad.models import EncuestaSatisfaccion
+    from django.db.models import Avg
+
+    resenas = EncuestaSatisfaccion.objects.filter(
+        puntuacion__gte=4
+    ).select_related('cliente', 'cita').order_by('-fecha')[:6]
+
+    total_resenas = EncuestaSatisfaccion.objects.count()
+    promedio_satisfaccion = EncuestaSatisfaccion.objects.aggregate(Avg('puntuacion'))['puntuacion__avg'] or 4.5
+
+    return render(request, 'usuarios/inicio.html', {
+        'resenas': resenas,
+        'total_resenas': total_resenas,
+        'promedio_satisfaccion': round(promedio_satisfaccion, 1),
+    })
 
 
 # Registro de clientes
@@ -120,13 +134,25 @@ def mi_perfil(request):
     historial_citas = Cita.objects.filter(
         mascota__Cliente=request.user,
         estado='COMPLETADA',
-    ).order_by('-fecha_hora')[:5]
+    ).select_related('mascota', 'servicio', 'veterinario').order_by('-fecha_hora')[:10]
+
+    from calidad.models import EncuestaSatisfaccion
+    citas_calificadas_ids = set(
+        EncuestaSatisfaccion.objects.filter(
+            cliente=request.user,
+            cita__isnull=False
+        ).values_list('cita_id', flat=True)
+    )
+
+    for c in historial_citas:
+        c.ya_calificada = c.id in citas_calificadas_ids
 
     return render(request, 'usuarios/perfil.html', {
         'form': form,
         'mascotas': mascotas,
         'proximas_citas': proximas_citas,
         'historial_citas': historial_citas,
+        'citas_calificadas_ids': citas_calificadas_ids,
     })
 
 #PERFIL DE ADMIN Y ADMINISTAOR

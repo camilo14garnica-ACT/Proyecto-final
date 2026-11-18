@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.contrib import admin
 from django.utils import timezone
-from .models import EncuestaSatisfaccion, PQRS, LoteProducto, NoConformidad
+from .models import EncuestaSatisfaccion, PQRS, LoteProducto, NoConformidad, Notificacion
 
 
 class EstadoVencimientoFilter(admin.SimpleListFilter):
@@ -117,3 +117,21 @@ class NoConformidadAdmin(admin.ModelAdmin):
         if obj.encuesta:
             return f'Encuesta #{obj.encuesta.pk}'
         return '—'
+
+
+@admin.register(Notificacion)
+class NotificacionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'titulo', 'usuario', 'tipo', 'leida', 'fecha')
+    list_filter = ('tipo', 'leida', 'fecha')
+    search_fields = (
+        'titulo',
+        'mensaje',
+        'usuario__first_name',
+        'usuario__last_name',
+        'usuario__username',
+        'usuario__Number_Document',
+    )
+    autocomplete_fields = ('usuario',)
+    readonly_fields = ('fecha',)
+    date_hierarchy = 'fecha'
+    list_per_page = 25

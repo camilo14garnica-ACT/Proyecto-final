@@ -14,9 +14,14 @@
             <h1 class="h3 mb-1"><i class="bi bi-shield-exclamation text-danger me-2"></i> No Conformidades y Acciones Correctivas</h1>
             <p class="text-muted mb-0">Gestión de fallos, auditoría interna y planes de mejora continua.</p>
         </div>
-        <a href="{% url 'admin_no_conformidad_crear' %}" class="btn btn-danger">
-            <i class="bi bi-plus-circle me-1"></i> Nueva No Conformidad
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'exportar_no_conformidades' %}" class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel
+            </a>
+            <a href="{% url 'admin_no_conformidad_crear' %}" class="btn btn-danger">
+                <i class="bi bi-plus-circle me-1"></i> Nueva No Conformidad
+            </a>
+        </div>
     </div>
 
     <!-- TARJETAS -->
@@ -141,4 +146,3 @@
     });
 </script>
 {% endblock extra_js %}
-
