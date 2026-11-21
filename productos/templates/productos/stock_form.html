@@ -1,0 +1,28 @@
+{% extends 'partials/base-admin.html' %}
+
+{% block title %}Ajustar stock - Panel Interno{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="h3 mb-2">Ajustar stock</h1>
+  <p class="text-muted mb-4">
+    {{ producto.nombre }} — stock actual: <strong>{{ producto.stock }}</strong>
+    {% if producto.agotado %}<span class="badge bg-danger">Agotado</span>{% endif %}
+  </p>
+
+  <form method="post" novalidate style="max-width: 480px">
+    {% csrf_token %}
+    {% for campo in form %}
+    <div class="mb-3">
+      <label for="{{ campo.id_for_label }}" class="form-label fw-semibold">{{ campo.label }}</label>
+      {{ campo }}
+      {% for error in campo.errors %}
+      <div class="text-danger small mt-1">{{ error }}</div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar</button>
+    <a href="{% url 'lista_productos' %}" class="btn btn-outline-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock content %}
