@@ -116,11 +116,23 @@
             <i class="bi bi-truck"></i> Proveedores
           </a>
 
-          <a
-            href="{% url 'crear_producto' %}"
-            class="{% if actual == 'crear_producto' %}activo{% endif %}"
+                    <a
+            href="{% url 'lista_productos' %}"
+            class="{% if actual == 'lista_productos' or actual == 'crear_producto' or actual == 'editar_producto' or actual == 'ajustar_stock' %}activo{% endif %}"
           >
-            <i class="bi bi-bag-plus"></i> Nuevo producto
+            <i class="bi bi-bag"></i> Productos
+          </a>
+          <a
+            href="{% url 'lista_categorias' %}"
+            class="{% if actual == 'lista_categorias' or actual == 'crear_categoria' or actual == 'editar_categoria' %}activo{% endif %}"
+          >
+            <i class="bi bi-tags"></i> Categorías
+          </a>
+          <a
+            href="{% url 'catalogo' %}"
+            class="{% if actual == 'catalogo' %}activo{% endif %}"
+          >
+            <i class="bi bi-grid-3x3-gap"></i> Catálogo
           </a>
 
           <div
