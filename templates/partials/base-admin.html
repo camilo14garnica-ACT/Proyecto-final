@@ -165,11 +165,11 @@
           >
             Promociones
           </div>
-          <a
-            href="{% url 'crear_promocion' %}"
-            class="{% if actual == 'crear_promocion' %}activo{% endif %}"
+                    <a
+            href="{% url 'lista_promociones' %}"
+            class="{% if actual == 'lista_promociones' or actual == 'crear_promocion' %}activo{% endif %}"
           >
-            <i class="bi bi-megaphone"></i> Nueva promoción
+            <i class="bi bi-megaphone"></i> Promociones
           </a>    
           {% elif user.rol == 'VETERINARIO' %}
           <a
