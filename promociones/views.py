@@ -99,3 +99,8 @@ def eliminar_promocion(request, pk):
     promocion.delete()
     messages.success(request, f'Promoción "{nombre}" eliminada.')
     return redirect("lista_promociones")
+
+# VM-711 — Carrusel de promociones
+@login_required
+def carrusel(request):
+    return render(request, "promociones/carrusel.html")
