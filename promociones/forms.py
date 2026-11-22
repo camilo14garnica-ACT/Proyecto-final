@@ -48,3 +48,14 @@ class PromocionForm(forms.ModelForm):
                 "No puedes activar una promoción que ya venció. Cambia la fecha de fin o márcala como Inactiva.",
             )
         return datos
+
+    # VM-709 — Si una persona cambia el estado, deja de ser "por vencimiento"
+    def save(self, commit=True):
+        promocion = super().save(commit=False)
+        estaba_activa = self.initial.get("estado") == "ACTIVA"
+        if promocion.estado == "ACTIVA" or estaba_activa:
+            promocion.inactiva_por_vencimiento = False
+        if commit:
+            promocion.save()
+            self.save_m2m()
+        return promocion

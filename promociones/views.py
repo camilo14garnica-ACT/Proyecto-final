@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from .forms import PromocionForm
 from .models import Promocion
 
-# Opciones de orden permitidas (lista cerrada, así nadie ordena por campos raros)
 ORDENES = {
     "recientes": "-fecha_registro",
     "nombre": "nombre",
@@ -20,12 +20,16 @@ def solo_admin(request):
     return request.user.rol == "ADMIN"
 
 
-# VM-704 — Formulario para crear una promoción
+def sin_permiso(request):
+    messages.error(request, "No tienes permiso.")
+    return redirect("mi_perfil")
+
+
+# VM-704 — Crear promoción
 @login_required
 def crear_promocion(request):
     if not solo_admin(request):
-        messages.error(request, "No tienes permiso.")
-        return redirect("mi_perfil")
+        return sin_permiso(request)
 
     if request.method == "POST":
         form = PromocionForm(request.POST)
@@ -37,18 +41,14 @@ def crear_promocion(request):
     else:
         form = PromocionForm()
 
-    return render(request, "promociones/promocion_form.html", {
-        "form": form,
-        "titulo": "Nueva promoción",
-    })
+    return render(request, "promociones/promocion_form.html", {"form": form, "titulo": "Nueva promoción"})
 
 
-# VM-715 — Listar promociones (VM-718: con orden)
+# VM-715 / VM-718 — Listar con orden
 @login_required
 def lista_promociones(request):
     if not solo_admin(request):
-        messages.error(request, "No tienes permiso.")
-        return redirect("mi_perfil")
+        return sin_permiso(request)
 
     orden = request.GET.get("orden", "recientes")
     if orden not in ORDENES:
@@ -65,3 +65,37 @@ def lista_promociones(request):
         "orden": orden,
         "estado_sel": estado,
     })
+
+
+# VM-707 — Editar promoción
+@login_required
+def editar_promocion(request, pk):
+    if not solo_admin(request):
+        return sin_permiso(request)
+
+    promocion = get_object_or_404(Promocion, pk=pk)
+    if request.method == "POST":
+        form = PromocionForm(request.POST, instance=promocion)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Promoción "{promocion.nombre}" actualizada correctamente.')
+            return redirect("lista_promociones")
+        messages.error(request, "Revisa los campos marcados en rojo.")
+    else:
+        form = PromocionForm(instance=promocion)
+
+    return render(request, "promociones/promocion_form.html", {"form": form, "titulo": "Editar promoción"})
+
+
+# VM-707 — Eliminar promoción
+@login_required
+@require_POST
+def eliminar_promocion(request, pk):
+    if not solo_admin(request):
+        return sin_permiso(request)
+
+    promocion = get_object_or_404(Promocion, pk=pk)
+    nombre = promocion.nombre
+    promocion.delete()
+    messages.success(request, f'Promoción "{nombre}" eliminada.')
+    return redirect("lista_promociones")
