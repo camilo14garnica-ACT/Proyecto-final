@@ -15,6 +15,7 @@ urlpatterns = [
     path('historial/', include('historial_clinico.urls')),
     path('calidad/', include('calidad.urls')),
     path('compras/', include('compras.urls')),
+    path('promociones/', include('promociones.urls')),
 ]
 
 if settings.DEBUG:
