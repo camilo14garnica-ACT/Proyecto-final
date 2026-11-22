@@ -1,0 +1,75 @@
+{% extends 'partials/base-admin.html' %}
+
+{% block title %}Promociones - Panel Interno{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Promociones</h1>
+    <a href="{% url 'crear_promocion' %}" class="btn btn-success">
+      <i class="bi bi-plus-lg"></i> Nueva promoción
+    </a>
+  </div>
+
+  <form method="get" class="row g-2 mb-4">
+    <div class="col-md-4">
+      <select name="orden" class="form-select">
+        <option value="recientes" {% if orden == 'recientes' %}selected{% endif %}>Más recientes primero</option>
+        <option value="nombre" {% if orden == 'nombre' %}selected{% endif %}>Nombre (A-Z)</option>
+        <option value="descuento" {% if orden == 'descuento' %}selected{% endif %}>Mayor descuento</option>
+        <option value="inicio" {% if orden == 'inicio' %}selected{% endif %}>Inicio más reciente</option>
+        <option value="fin" {% if orden == 'fin' %}selected{% endif %}>Próximas a terminar</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <select name="estado" class="form-select">
+        <option value="">Todos los estados</option>
+        <option value="ACTIVA" {% if estado_sel == 'ACTIVA' %}selected{% endif %}>Activas</option>
+        <option value="INACTIVA" {% if estado_sel == 'INACTIVA' %}selected{% endif %}>Inactivas</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-grid">
+      <button type="submit" class="btn btn-outline-primary">
+        <i class="bi bi-funnel"></i> Aplicar
+      </button>
+    </div>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descuento</th>
+          <th>Inicio</th>
+          <th>Fin</th>
+          <th>Productos</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in promociones %}
+        <tr>
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.descuento|floatformat:"-2" }}%</td>
+          <td>{{ p.fecha_inicio|date:"d/m/Y" }}</td>
+          <td>{{ p.fecha_fin|date:"d/m/Y" }}</td>
+          <td>{{ p.total_productos }}</td>
+          <td>
+            {% if p.estado == 'ACTIVA' %}
+            <span class="badge bg-success">Activa</span>
+            {% else %}
+            <span class="badge bg-secondary">Inactiva</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">No hay promociones para mostrar.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
