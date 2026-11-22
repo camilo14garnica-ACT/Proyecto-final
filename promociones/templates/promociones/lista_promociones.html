@@ -45,6 +45,7 @@
           <th>Fin</th>
           <th>Productos</th>
           <th>Estado</th>
+          <th class="text-end">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -56,16 +57,31 @@
           <td>{{ p.fecha_fin|date:"d/m/Y" }}</td>
           <td>{{ p.total_productos }}</td>
           <td>
-            {% if p.estado == 'ACTIVA' %}
-            <span class="badge bg-success">Activa</span>
+            {% if p.inactiva_por_vencimiento %}
+            <span class="badge bg-warning text-dark">Inactiva por vencimiento</span>
+            {% elif p.estado == 'INACTIVA' %}
+            <span class="badge bg-secondary">Desactivada</span>
+            {% elif p.vencida %}
+            <span class="badge bg-warning text-dark">Vencida</span>
             {% else %}
-            <span class="badge bg-secondary">Inactiva</span>
+            <span class="badge bg-success">Activa</span>
             {% endif %}
+          </td>
+          <td class="text-end">
+            <a href="{% url 'editar_promocion' p.pk %}" class="btn btn-sm btn-outline-primary" title="Editar">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <form method="post" action="{% url 'eliminar_promocion' p.pk %}" class="d-inline" onsubmit="return confirm('¿Eliminar esta promoción?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="text-center text-muted py-4">No hay promociones para mostrar.</td>
+          <td colspan="7" class="text-center text-muted py-4">No hay promociones para mostrar.</td>
         </tr>
         {% endfor %}
       </tbody>
