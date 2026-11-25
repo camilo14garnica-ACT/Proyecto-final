@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reporte de Ventas</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; background: #f4f6f8; color: #222; }
+    h1 { margin-bottom: 4px; }
+    .tarjetas { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+    .tarjeta { background: #fff; padding: 16px 24px; border-radius: 8px; box-shadow: 0 1px 4px #0002; min-width: 180px; }
+    .tarjeta b { font-size: 24px; display: block; }
+    form.filtros, .bloque { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 4px #0002; }
+    label { margin-right: 12px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
+    th { background: #e9eef3; }
+    button, .btn { background: #2b7a78; color: #fff; border: 0; padding: 8px 14px; border-radius: 6px; cursor: pointer; text-decoration: none; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <h1>Gestión de Reporte de Ventas</h1>
+  <p>Analiza la rentabilidad de la veterinaria.</p>
+
+  <form class="filtros" method="get">
+    <label>Desde <input type="date" name="inicio" value="{{ filtros.inicio|date:'Y-m-d' }}"></label>
+    <label>Hasta <input type="date" name="fin" value="{{ filtros.fin|date:'Y-m-d' }}"></label>
+    <label>Categoría
+      <select name="categoria">
+        <option value="">Todas</option>
+        {% for c in categorias %}
+          <option value="{{ c.id }}" {% if filtros.categoria == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nombre }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Pago
+      <select name="metodo">
+        <option value="">Todos</option>
+        {% for valor, nombre in metodos %}
+          <option value="{{ valor }}" {% if filtros.metodo == valor %}selected{% endif %}>{{ nombre }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit">Filtrar</button>
+    <a class="btn" href="{% url 'reportes:exportar' %}?{{ request.GET.urlencode }}">Exportar CSV</a>
+  </form>
+
+  <div class="tarjetas">
+    <div class="tarjeta">Total vendido <b>${{ total|floatformat:0 }}</b></div>
+    <div class="tarjeta">N.º de ventas <b>{{ cantidad }}</b></div>
+    <div class="tarjeta">Venta promedio <b>${{ promedio|floatformat:0 }}</b></div>
+  </div>
+
+  <div class="grid">
+    <div class="bloque">
+      <h3>Ventas por mes</h3>
+      <table>
+        <tr><th>Mes</th><th>Ventas</th><th>Total</th></tr>
+        {% for m in por_mes %}
+          <tr><td>{{ m.mes|date:"M Y" }}</td><td>{{ m.n }}</td><td>${{ m.total|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3">Sin datos</td></tr>{% endfor %}
+      </table>
+    </div>
+
+    <div class="bloque">
+      <h3>Productos más vendidos</h3>
+      <table>
+        <tr><th>Producto</th><th>Unidades</th><th>Ingresos</th></tr>
+        {% for p in top_productos %}
+          <tr><td>{{ p.producto__nombre }}</td><td>{{ p.unidades }}</td><td>${{ p.ingresos|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3">Sin datos</td></tr>{% endfor %}
+      </table>
+    </div>
+
+    <div class="bloque">
+      <h3>Ventas por método de pago</h3>
+      <table>
+        <tr><th>Método</th><th>Ventas</th><th>Total</th></tr>
+        {% for m in por_metodo %}
+          <tr><td>{{ m.metodo_pago }}</td><td>{{ m.n }}</td><td>${{ m.total|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3">Sin datos</td></tr>{% endfor %}
+      </table>
+    </div>
+
+    <div class="bloque">
+      <h3>Reportes guardados</h3>
+      <form method="post" action="{% url 'reportes:guardar' %}?{{ request.GET.urlencode }}">
+        {% csrf_token %}
+        <input type="text" name="nombre" placeholder="Nombre del reporte" required>
+        <button type="submit">Guardar filtros actuales</button>
+      </form>
+      <ul>
+        {% for r in guardados %}
+          <li>
+            <a href="?inicio={{ r.fecha_inicio|date:'Y-m-d' }}&fin={{ r.fecha_fin|date:'Y-m-d' }}&categoria={{ r.categoria_id|default_if_none:'' }}">{{ r.nombre }}</a>
+          </li>
+        {% empty %}<li>Aún no hay reportes guardados</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
