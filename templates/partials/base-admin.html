@@ -178,6 +178,18 @@
           >
             <i class="bi bi-star"></i> Satisfacción
           </a>
+                    <div
+            class="panel-seccion-titulo text-muted small text-uppercase px-3 pt-3 pb-1"
+            style="font-size: 0.72rem; letter-spacing: 0.5px"
+          >
+            Promociones
+          </div>
+                    <a
+            href="{% url 'lista_promociones' %}"
+            class="{% if actual == 'lista_promociones' or actual == 'crear_promocion' %}activo{% endif %}"
+          >
+            <i class="bi bi-megaphone"></i> Promociones
+          </a>    
           {% elif user.rol == 'VETERINARIO' %}
           <a
             href="{% url 'panel_veterinario' %}"
