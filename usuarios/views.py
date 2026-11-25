@@ -141,6 +141,7 @@ def panel_veterinario(request):
 @login_required
 def mi_perfil(request):
     from mascotas.models import Mascota
+    from citas.models import Cita
 
     if request.user.rol != 'CLIENTE':
         return redirect('editar_perfil_admin')
@@ -157,17 +158,17 @@ def mi_perfil(request):
     # Mascotas del usuario
     mascotas = Mascota.objects.filter(Cliente=request.user, estado='ACTIVO')
 
-    # Próximas citas (programadas o confirmadas)
+    # Próximas citas (pendientes o confirmadas)
     proximas_citas = Cita.objects.filter(
-        mascota__Cliente=request.user,
-        estado__in=['PROGRAMADA', 'CONFIRMADA'],
-    ).order_by('fecha_hora')[:5]
+        cliente=request.user,
+        estado__in=[Cita.Estado.PENDIENTE, Cita.Estado.CONFIRMADA],
+    ).select_related('mascota', 'servicio', 'veterinario').order_by('fecha', 'hora_inicio')[:5]
 
-    # Últimas citas completadas
+    # Últimas citas completadas (atendidas)
     historial_citas = Cita.objects.filter(
-        mascota__Cliente=request.user,
-        estado='COMPLETADA',
-    ).select_related('mascota', 'servicio', 'veterinario').order_by('-fecha_hora')[:10]
+        cliente=request.user,
+        estado=Cita.Estado.ATENDIDA,
+    ).select_related('mascota', 'servicio', 'veterinario').order_by('-fecha', '-hora_inicio')[:10]
 
     from calidad.models import EncuestaSatisfaccion
     citas_calificadas_ids = set(

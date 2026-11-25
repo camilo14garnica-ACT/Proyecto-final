@@ -157,7 +157,7 @@
                     <span class="text-muted">Por asignar</span>
                   {% endif %}
                 </td>
-                <td>{{ cita.fecha_hora|date:"d/m/Y H:i" }}</td>
+                <td>{{ cita.fecha|date:"d/m/Y" }} {{ cita.hora_inicio|time:"h:i A" }}</td>
                 <td>
                   <span class="estado-badge estado-{{ cita.estado|lower }}">
                     {{ cita.get_estado_display }}
@@ -236,6 +236,7 @@
               <th>Veterinario</th>
               <th>Fecha</th>
               <th>Estado</th>
+              <th>Calificación</th>
             </tr>
           </thead>
           <tbody>
@@ -247,11 +248,22 @@
                 {% if cita.veterinario %}Dr. {{ cita.veterinario.first_name }} {{ cita.veterinario.last_name }}
                 {% else %}-{% endif %}
               </td>
-              <td>{{ cita.fecha_hora|date:"d/m/Y" }}</td>
+              <td>{{ cita.fecha|date:"d/m/Y" }}</td>
               <td>
                 <span class="estado-badge estado-{{ cita.estado|lower }}">
                   {{ cita.get_estado_display }}
                 </span>
+              </td>
+              <td>
+                {% if cita.ya_calificada %}
+                  <span class="badge bg-success bg-opacity-25 text-success border border-success px-2 py-1">
+                    <i class="bi bi-star-fill text-warning me-1"></i>Calificado
+                  </span>
+                {% else %}
+                  <a href="{% url 'crear_encuesta' %}?cita_id={{ cita.id }}" class="btn btn-sm btn-outline-warning text-dark fw-semibold rounded-pill px-2 py-1 shadow-sm" style="font-size: 0.78rem;">
+                    <i class="bi bi-star me-1 text-warning"></i>Calificar servicio
+                  </a>
+                {% endif %}
               </td>
             </tr>
             {% endfor %}
