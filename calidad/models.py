@@ -14,7 +14,7 @@ class EncuestaSatisfaccion(models.Model):
         verbose_name='Cliente',
     )
     cita = models.ForeignKey(
-        'mascotas.Cita',
+        'citas.Cita',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -102,7 +102,7 @@ class LoteProducto(models.Model):
         EN_REVISION = 'EN_REVISION', 'En revisión'
 
     producto = models.ForeignKey(
-        'mascotas.Producto',
+        'productos.Producto',
         on_delete=models.CASCADE,
         related_name='lotes',
         verbose_name='Producto',

@@ -16,7 +16,7 @@ body {
    SIDEBAR
 ============================================================ */
 .perfil-sidebar {
-  width: 200px;
+  width: 160px;
   min-height: 100vh;
   background: linear-gradient(180deg, #0d2d5e 0%, #1a4a8a 100%);
   display: flex;
@@ -52,7 +52,7 @@ body {
 .user-email {
   font-size: 0.68rem; color: rgba(255,255,255,0.55);
   display: block; overflow: hidden;
-  text-overflow: ellipsis; white-space: nowrap; max-width: 120px;
+  text-overflow: ellipsis; white-space: nowrap; max-width: 100px;
 }
 
 .sidebar-nav { flex: 1; padding: 10px 0; }
@@ -96,11 +96,12 @@ body {
    CONTENIDO PRINCIPAL
 ============================================================ */
 .perfil-main {
-  margin-left: 200px;
+  margin-left: 160px;
   flex: 1;
   min-height: 100vh;
   background: #e8f0f7;
-  padding: 28px 28px 48px;
+  padding: 28px 32px 48px;
+  width: calc(100% - 160px);
 }
 
 /* Bienvenida */
@@ -123,12 +124,16 @@ body {
 /* Tarjetas resumen */
 .resumen-card {
   background: #fff; border-radius: 12px;
-  padding: 18px 16px; text-align: center;
+  padding: 18px 10px; text-align: center;
   box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  overflow: hidden;
 }
 .resumen-icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
-.resumen-num { font-size: 1.4rem; font-weight: 800; color: #111827; }
-.resumen-label { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+.resumen-num {
+  font-size: 1.1rem; font-weight: 800; color: #111827;
+  word-break: break-word; line-height: 1.2;
+}
+.resumen-label { font-size: 0.72rem; color: #6b7280; margin-top: 2px; }
 
 /* Secciones */
 .perfil-seccion {
@@ -275,9 +280,53 @@ body {
 .btn-seguridad--danger { background: #dc2626; }
 .btn-seguridad--danger:hover { background: #b91c1c; color: #fff; }
 
+/* ---- HAMBURGUESA (solo móvil) ---- */
+.hamburguesa {
+  display: none;
+  position: fixed;
+  top: 12px; left: 12px;
+  z-index: 200;
+  background: #0d2d5e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 40px; height: 40px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Overlay oscuro */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+}
+.sidebar-overlay.activo { display: block; }
+
 /* ---- RESPONSIVE ---- */
 @media (max-width: 768px) {
-  .perfil-sidebar { width: 100%; min-height: auto; position: relative; }
-  .perfil-main { margin-left: 0; padding: 16px; }
-  .perfil-bienvenida { flex-direction: column; align-items: flex-start; }
+  .hamburguesa {
+    display: flex;
+  }
+
+  .perfil-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    width: 220px;
+  }
+
+  .perfil-sidebar.abierto {
+    transform: translateX(0);
+  }
+
+  .perfil-main {
+    margin-left: 0;
+    width: 100%;
+    padding: 64px 16px 32px;
+  }
 }

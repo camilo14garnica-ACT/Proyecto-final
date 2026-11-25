@@ -67,7 +67,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'usuarios',
     'mascotas',
+    'historial_clinico',
+    'citas',
     'calidad',
+    'compras',
+    'productos',
+    'promociones',
+    'reportes',
 ]
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
@@ -78,6 +84,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

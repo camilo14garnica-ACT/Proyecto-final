@@ -1,6 +1,6 @@
 from django import forms
 from .models import EncuestaSatisfaccion, PQRS, LoteProducto, NoConformidad
-from mascotas.models import Cita
+from citas.models import Cita
 
 
 class PQRSForm(forms.ModelForm):

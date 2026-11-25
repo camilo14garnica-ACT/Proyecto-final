@@ -2,7 +2,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory, SimpleTestCase
+from django.test import Client, RequestFactory, SimpleTestCase
 from django.urls import reverse
 
 from .views import iniciar_sesion
@@ -27,10 +27,29 @@ class InicioSesionTests(SimpleTestCase):
         login.assert_called_once_with(request, usuario)
         self.assertRedirects(response, reverse('panel_admin'), fetch_redirect_response=False)
 
-    def test_admin_ya_autenticado_se_redirige_a_su_panel(self):
+    def test_usuario_autenticado_ve_su_pantalla_personalizada(self):
         request = self.factory.get(reverse('login'))
         request.user = SimpleNamespace(is_authenticated=True, rol='ADMIN')
 
-        response = iniciar_sesion(request)
+        with patch('usuarios.views.render') as render:
+            response = iniciar_sesion(request)
 
-        self.assertRedirects(response, reverse('panel_admin'), fetch_redirect_response=False)
+        render.assert_called_once_with(
+            request,
+            'usuarios/iniciar_sesion.html',
+            {'form': None},
+        )
+        self.assertEqual(response, render.return_value)
+
+
+class LogoutSecurityTests(SimpleTestCase):
+    def test_logout_rechaza_get(self):
+        response = Client().get(reverse('cerrar_sesion'))
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_logout_requiere_csrf(self):
+        client = Client(enforce_csrf_checks=True)
+        response = client.post(reverse('cerrar_sesion'))
+
+        self.assertEqual(response.status_code, 403)

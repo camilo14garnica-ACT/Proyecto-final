@@ -1,0 +1,41 @@
+<div class="mb-4">
+  {% if promociones %}
+  <div id="carruselPromociones" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+    {% if promociones|length > 1 %}
+    <div class="carousel-indicators">
+      {% for p in promociones %}
+      <button type="button" data-bs-target="#carruselPromociones" data-bs-slide-to="{{ forloop.counter0 }}"
+              {% if forloop.first %}class="active" aria-current="true"{% endif %}
+              aria-label="Promoción {{ forloop.counter }}"></button>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="carousel-inner rounded shadow-sm">
+      {% for p in promociones %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="bg-success text-white text-center py-5 px-4">
+          <h3 class="fw-bold">{{ p.nombre }}</h3>
+          <p class="display-5 fw-bold mb-2">{{ p.descuento|floatformat:"-2" }}% de descuento</p>
+          {% if p.descripcion %}<p>{{ p.descripcion|truncatechars:120 }}</p>{% endif %}
+          <p class="small mb-0">Válida hasta el {{ p.fecha_fin|date:"d/m/Y" }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if promociones|length > 1 %}
+    <button class="carousel-control-prev" type="button" data-bs-target="#carruselPromociones" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carruselPromociones" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Siguiente</span>
+    </button>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="alert alert-info text-center mb-0">No hay promociones activas por ahora.</div>
+  {% endif %}
+</div>

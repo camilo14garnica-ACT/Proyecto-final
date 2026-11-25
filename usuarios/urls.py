@@ -8,8 +8,8 @@ urlpatterns = [
     path('crear/', views.crear_usuario, name='crear_usuario'),
     path('iniciar-sesion/', views.iniciar_sesion, name='iniciar_sesion'),
     path('login/', views.iniciar_sesion, name='login'),
-    path('cerrar-sesion/', views.cerrar_sesion, name='cerrar_sesion'),
-    path('logout/', views.cerrar_sesion, name='logout'),
+    path('cerrar-sesion/', auth_views.LogoutView.as_view(next_page='inicio'), name='cerrar_sesion'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='inicio'), name='logout'),
     path('perfil/', views.mi_perfil, name='mi_perfil'),
     path('perfil/eliminar-cuenta/', views.solicitar_eliminacion_cuenta, name='solicitar_eliminacion_cuenta'),
 

@@ -1,0 +1,141 @@
+{% extends 'partials/base-admin.html' %}
+{% block title %}Órdenes de Compra – Mascott{% endblock %}
+
+{% block extra_css %}
+<style>
+  .estado-badge { display:inline-block; border-radius:20px; padding:.2rem .7rem; font-size:.76rem; font-weight:600; }
+  .estado-borrador  { background:#f3f4f6; color:#374151; }
+  .estado-enviada   { background:#dbeafe; color:#1d4ed8; }
+  .estado-recibida  { background:#fef9c3; color:#92400e; }
+  .estado-completada{ background:#dcfce7; color:#166534; }
+  .estado-cancelada { background:#fee2e2; color:#991b1b; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h1 class="h3 mb-0"><i class="bi bi-cart-fill me-2 text-primary"></i>Órdenes de Compra</h1>
+    <p class="text-muted mb-0 small">Gestiona las compras a proveedores.</p>
+  </div>
+  <a href="{% url 'crear_orden' %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle me-1"></i>Nueva orden
+  </a>
+</div>
+
+{% if messages %}{% for msg in messages %}
+  <div class="alert alert-success alert-dismissible fade show">{{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+{% endfor %}{% endif %}
+
+<!-- Filtros -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-sm-3">
+        <label class="form-label small fw-bold">Estado</label>
+        <select name="estado" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for val, label in estados %}
+          <option value="{{ val }}" {% if filtros.estado == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-sm-3">
+        <label class="form-label small fw-bold">Proveedor</label>
+        <select name="proveedor" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for p in proveedores %}
+          <option value="{{ p.pk }}" {% if filtros.proveedor == p.pk|stringformat:"s" %}selected{% endif %}>{{ p.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-sm-2">
+        <label class="form-label small fw-bold">Desde</label>
+        <input type="date" name="fecha_desde" value="{{ filtros.fecha_desde }}" class="form-control form-control-sm"/>
+      </div>
+      <div class="col-6 col-sm-2">
+        <label class="form-label small fw-bold">Hasta</label>
+        <input type="date" name="fecha_hasta" value="{{ filtros.fecha_hasta }}" class="form-control form-control-sm"/>
+      </div>
+      <div class="col-12 col-sm-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary btn-sm flex-fill">
+          <i class="bi bi-funnel"></i> Filtrar
+        </button>
+        <a href="{% url 'lista_ordenes' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-x"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="card shadow-sm">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-list-ul me-1"></i>Órdenes registradas</span>
+    <span class="badge bg-secondary">{{ ordenes|length }}</span>
+  </div>
+  <div class="card-body p-0">
+    {% if ordenes %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="tablaOrdenes">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Proveedor</th>
+            <th>Fecha</th>
+            <th>Entrega esperada</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for orden in ordenes %}
+          <tr>
+            <td class="fw-bold text-primary">OC-{{ orden.pk }}</td>
+            <td>{{ orden.proveedor.nombre }}</td>
+            <td>{{ orden.fecha_orden|date:"d/m/Y" }}</td>
+            <td>{% if orden.fecha_esperada %}{{ orden.fecha_esperada|date:"d/m/Y" }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+            <td><span class="estado-badge estado-{{ orden.estado|lower }}">{{ orden.get_estado_display }}</span></td>
+            <td class="fw-semibold">${{ orden.total|floatformat:0 }}</td>
+            <td class="text-center text-nowrap">
+              <a href="{% url 'detalle_orden' orden.pk %}" class="btn btn-sm btn-outline-primary me-1" title="Ver detalle">
+                <i class="bi bi-eye"></i>
+              </a>
+              {% if orden.estado != 'CANCELADA' and orden.estado != 'COMPLETADA' %}
+              <a href="{% url 'recibir_orden' orden.pk %}" class="btn btn-sm btn-outline-success me-1" title="Recepcionar">
+                <i class="bi bi-box-arrow-in-down"></i>
+              </a>
+              <a href="{% url 'cancelar_orden' orden.pk %}" class="btn btn-sm btn-outline-danger" title="Cancelar">
+                <i class="bi bi-x-circle"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="bi bi-cart-x fs-1 text-muted"></i>
+      <p class="mt-2 text-muted">No hay órdenes de compra.
+        {% if filtros.estado or filtros.proveedor or filtros.fecha_desde %}Ajusta los filtros.{% endif %}
+      </p>
+      <a href="{% url 'crear_orden' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i>Crear primera orden
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  if (document.getElementById('tablaOrdenes')) {
+    new DataTable('#tablaOrdenes', { language: { url: '//cdn.datatables.net/plug-ins/2.0.0/i18n/es-ES.json' }, pageLength: 15 });
+  }
+</script>
+{% endblock %}

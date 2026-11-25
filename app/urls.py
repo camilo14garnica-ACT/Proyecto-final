@@ -12,9 +12,16 @@ urlpatterns = [
     path('', usuarios_views.inicio, name='inicio'),
     path('usuarios/', include('usuarios.urls')),
     path('mascotas/', include('mascotas.urls')),
+    path('citas/', include('citas.urls')),
+    path('historial/', include('historial_clinico.urls')),
     path('calidad/', include('calidad.urls')),
     path('api/calidad/', include('calidad.api_urls')),
+    path('compras/', include('compras.urls')),
+    path('productos/', include('productos.urls')),
+    path('promociones/', include('promociones.urls')),
+    path('reportes/', include('reportes.urls')),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])

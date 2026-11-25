@@ -1,0 +1,53 @@
+{% extends 'partials/base-admin.html' %}
+
+{% block title %}Catálogo - Panel Interno{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="h3 mb-4">Catálogo de productos</h1>
+
+  <form method="get" class="row g-2 mb-4">
+    <div class="col-md-5">
+      <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Buscar producto" />
+    </div>
+    <div class="col-md-4">
+      <select name="categoria" class="form-select">
+        <option value="">Todas las categorías</option>
+        {% for c in categorias %}
+        <option value="{{ c.pk }}" {% if categoria_sel == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3 d-grid">
+      <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> Buscar</button>
+    </div>
+  </form>
+
+  <div class="row">
+    {% for p in productos %}
+    <div class="col-sm-6 col-lg-3 mb-4">
+      <div class="card h-100 shadow-sm">
+        {% if p.imagen %}
+        <img src="{{ p.imagen.url }}" class="card-img-top" alt="{{ p.nombre }}" style="height: 180px; object-fit: cover" />
+        {% else %}
+        <div class="d-flex align-items-center justify-content-center bg-light" style="height: 180px">
+          <i class="bi bi-image text-muted fs-1"></i>
+        </div>
+        {% endif %}
+        <div class="card-body">
+          <span class="badge bg-info text-dark mb-2">{{ p.categoria.nombre }}</span>
+          <h5 class="card-title">{{ p.nombre }}</h5>
+          <p class="card-text small text-muted">{{ p.descripcion|truncatechars:80 }}</p>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-between">
+            <strong>${{ p.precio|floatformat:"0g" }}</strong>
+          <small class="text-muted">{{ p.stock }} disponibles</small>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-muted py-5">No hay productos disponibles.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

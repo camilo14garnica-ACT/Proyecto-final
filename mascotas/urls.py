@@ -23,4 +23,5 @@ urlpatterns = [
     path('razas/crear/', views.CrearRazaView.as_view(), name='registrar_raza'),
     path('razas/editar/<int:pk>/', views.EditarRazaView.as_view(), name='editar_raza'),
     path('razas/eliminar/<int:pk>/', views.EliminarRazaView.as_view(), name='eliminar_raza'),
+
 ]

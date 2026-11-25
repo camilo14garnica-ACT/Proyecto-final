@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Especie, Raza, Mascota, Servicio, Cita, Producto, Carrito, ItemCarrito
+from .models import Especie, Raza, Mascota, HorarioDisponible
 
 
 @admin.register(Especie)
@@ -23,34 +23,7 @@ class MascotaAdmin(admin.ModelAdmin):
     list_filter = ('especie', 'estado')
 
 
-@admin.register(Servicio)
-class ServicioAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'duracion_minutos', 'precio', 'estado')
-    search_fields = ('nombre',)
-    list_filter = ('estado',)
-
-
-@admin.register(Cita)
-class CitaAdmin(admin.ModelAdmin):
-    list_display = ('mascota', 'servicio', 'veterinario', 'fecha_hora', 'estado')
-    list_filter = ('estado', 'servicio', 'fecha_hora')
-    search_fields = ('mascota__nombre', 'veterinario__first_name', 'veterinario__last_name')
-    date_hierarchy = 'fecha_hora'
-    ordering = ('-fecha_hora',)
-
-
-@admin.register(Producto)
-class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'categoria', 'precio', 'stock', 'estado')
-    list_filter = ('categoria', 'estado')
-    search_fields = ('nombre',)
-
-
-class ItemCarritoInline(admin.TabularInline):
-    model = ItemCarrito
-    extra = 0
-
-@admin.register(Carrito)
-class CarritoAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'cantidad_items', 'total', 'actualizado')
-    inlines = [ItemCarritoInline]
+@admin.register(HorarioDisponible)
+class HorarioDisponibleAdmin(admin.ModelAdmin):
+    list_display = ('veterinario', 'dia_semana', 'hora_inicio', 'hora_fin', 'activo')
+    list_filter = ('dia_semana', 'activo', 'veterinario')

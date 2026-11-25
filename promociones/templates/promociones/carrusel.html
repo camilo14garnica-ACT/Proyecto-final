@@ -1,0 +1,11 @@
+{% extends 'partials/base-admin.html' %}
+{% load promociones_tags %}
+
+{% block title %}Carrusel de promociones - Panel Interno{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="h3 mb-4">Carrusel de promociones</h1>
+  {% carrusel_promociones %}
+</div>
+{% endblock %}
